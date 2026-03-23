@@ -1,0 +1,41 @@
+/* ===============================
+   MAGICREEL — APPLICATION SHELL
+   FINAL STRUCTURAL LOCK
+================================ */
+
+.mr-app-shell {
+  display: grid;
+  grid-template-columns: 280px 1fr 480px;
+  height: 100vh;
+  width: 100%;
+  background: #0b1220; /* 🔒 Prevent white bleed */
+}
+
+/* Sidebar */
+.mr-app-sidebar {
+  border-right: 1px solid rgba(255,255,255,0.08);
+  overflow-y: auto;
+  height: 100%;
+}
+
+/* Canvas */
+.mr-app-canvas {
+  overflow-y: auto;              /* allow internal scroll if needed */
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 22px 28px 16px 28px;  /* tighter bottom spacing */
+  box-sizing: border-box;
+}
+
+/* Preview Column */
+.mr-app-preview {
+  border-left: 1px solid rgba(255,255,255,0.08);
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
+  padding: 28px;
+  box-sizing: border-box;
+  background: #0b1220; /* 🔒 Match app background */
+}

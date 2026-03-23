@@ -1,0 +1,212 @@
+.hero-preview-panel {
+  width: 100%;
+  height: 100%;
+  background: #050816;
+  border-radius: 18px;
+  padding: 24px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Main stage */
+.hero-stage {
+  width: 100%;
+  height: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Toggle */
+.hero-toggle {
+  display: flex;
+  background: #0e1325;
+  border-radius: 999px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.toggle-btn {
+  padding: 6px 18px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  color: #9aa3b2;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggle-btn.active {
+  background: white;
+  color: black;
+}
+
+/* Hero Card */
+.hero-card {
+  position: relative;
+  width: 100%;
+  background: #0c1022;
+  border-radius: 16px;
+  padding: 14px 18px 18px 18px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* Hero Image */
+.hero-preview-image {
+  max-width: 100%;
+  max-height: 520px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+/* Ready Text */
+.hero-ready-text {
+  margin-top: 18px;
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #22c55e;
+
+  opacity: 0;
+  transform: translateY(6px);
+  animation: fadeSlideUp 0.4s ease forwards;
+}
+
+@keyframes fadeSlideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ================= AI ACTIONS (TOP RIGHT OVERLAY) ================= */
+
+.ai-actions-container {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 20;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.ai-action-btn {
+  padding: 8px 14px;
+  border-radius: 999px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #fff;
+
+  border: none;
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.ai-action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.4);
+}
+
+/* Dropdown aligned to button */
+.ai-dropdown {
+  margin-top: 6px;
+
+  background: #11162b;
+  border-radius: 10px;
+  padding: 6px;
+
+  min-width: 180px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ai-dropdown button {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 10px 12px;
+  text-align: left;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 8px;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-dropdown button:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ai-dropdown button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.ai-dropdown button:not(:last-child) {
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Loading overlay */
+.hero-loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  z-index: 10;
+}
+
+.hero-spinner {
+  width: 34px;
+  height: 34px;
+  border: 3px solid #e5e5e5;
+  border-top: 3px solid #111;
+  border-radius: 50%;
+  animation: hero-spin 0.9s linear infinite;
+}
+
+.hero-loading-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+@keyframes hero-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Empty / Error */
+.hero-preview-empty {
+  color: #7f8aa3;
+}
+
+.hero-preview-error {
+  color: #ff5a5a;
+  margin-bottom: 10px;
+}

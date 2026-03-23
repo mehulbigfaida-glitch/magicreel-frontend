@@ -1,0 +1,147 @@
+.predictions-page{
+  padding:40px;
+}
+
+.predictions-title{
+  font-size:28px;
+  margin-bottom:30px;
+}
+
+.predictions-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,260px);
+  gap:24px;
+}
+
+.prediction-card{
+  background:#121212;
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 0 0 1px rgba(255,255,255,0.05);
+}
+
+.prediction-image img{
+  width:100%;
+  display:block;
+}
+
+.prediction-meta{
+  padding:10px;
+  font-size:12px;
+  color:#fff;
+  opacity:0.9;
+}
+
+.prediction-placeholder{
+  height:140px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#aaa;
+  font-size:13px;
+  background:#1a1a1a;
+  border-radius:8px;
+}
+
+.predictions-empty{
+  margin-top:40px;
+  font-size:16px;
+  color:#999;
+}
+
+.prediction-actions{
+  display:flex;
+  justify-content:space-between;
+  padding:12px;
+}
+
+.prediction-actions button,
+.prediction-actions a{
+  background:#1f1f1f;
+  border:none;
+  color:white;
+  font-size:12px;
+  padding:6px 10px;
+  border-radius:6px;
+  cursor:pointer;
+  text-decoration:none;
+}
+
+.prediction-actions button:hover,
+.prediction-actions a:hover{
+  background:#2a2a2a;
+}
+
+.predictions-loading{
+  padding:40px;
+  font-size:18px;
+}
+
+.prediction-card{
+  border-radius:12px;
+  overflow:hidden;
+  background:#111;
+  transition:transform 0.2s ease;
+}
+
+.prediction-card:hover{
+  transform:translateY(-4px);
+}
+
+.prediction-image{
+  position:relative;
+  aspect-ratio:2/3;
+  overflow:hidden;
+}
+
+.prediction-image img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  transition:transform 0.3s ease;
+}
+
+.prediction-card:hover img{
+  transform:scale(1.05);
+}
+
+.prediction-overlay{
+  position:absolute;
+  inset:0;
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  align-items:center;
+  background:rgba(0,0,0,0.55);
+  opacity:0;
+  transition:opacity 0.2s ease;
+}
+
+.prediction-card:hover .prediction-overlay{
+  opacity:1;
+}
+
+.prediction-overlay button,
+.prediction-overlay a{
+  background:white;
+  color:black;
+  border:none;
+  padding:8px 12px;
+  border-radius:6px;
+  font-size:12px;
+  cursor:pointer;
+  text-decoration:none;
+}
+
+.prediction-meta{
+  padding:10px;
+  font-size:12px;
+  color:#aaa;
+  display:flex;
+  gap:6px;
+  justify-content:center;
+}
+
+.prediction-meta .status{
+  color:#4ade80;
+}

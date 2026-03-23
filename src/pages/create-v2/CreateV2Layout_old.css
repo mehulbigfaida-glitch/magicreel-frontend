@@ -1,0 +1,53 @@
+.create-v2-canvas {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.create-v2-breadcrumb {
+  opacity: 0.85;
+}
+
+.create-v2-main {
+  display: grid;
+  grid-template-columns: 1.4fr 0.6fr;
+  gap: 28px;
+  min-height: 100%;
+}
+
+/* LEFT COLUMN */
+.create-v2-left {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.create-v2-upload {
+  min-height: 340px;
+}
+
+.create-v2-back {
+  opacity: 0.65;
+}
+
+/* RIGHT COLUMN */
+.create-v2-right {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.create-v2-avatars {
+  min-height: 200px;
+}
+
+.create-v2-cta {
+  margin-top: auto;
+  display: flex;
+  justify-content: center;
+}
+
+/* CTA button sizing */
+.create-v2-cta button {
+  width: 260px;
+}

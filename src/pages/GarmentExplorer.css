@@ -1,0 +1,38 @@
+.mr-tree {
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+.mr-tree-title {
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #ffffff;
+}
+
+.mr-tree-node {
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #c9c9d8;
+}
+
+.mr-tree-node:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+.mr-tree-node.open {
+  color: #ffffff;
+}
+
+.mr-tree-node.leaf {
+  color: #b8b8c5;
+}
+
+.mr-tree-node.active {
+  background: linear-gradient(
+    135deg,
+    rgba(123,97,255,0.45),
+    rgba(123,97,255,0.25)
+  );
+  color: #ffffff;
+}

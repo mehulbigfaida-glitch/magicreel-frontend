@@ -1,0 +1,122 @@
+/* ================================
+   MAGICREEL UPLOAD FRAME — LOCKED
+   ================================ */
+
+.mr-upload-frame {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Header */
+.mr-upload-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #cfd3da;
+}
+
+.mr-upload-header .optional {
+  color: #8a8f98;
+  font-size: 12px;
+}
+
+/* FRAME — FORCE GEOMETRY */
+.mr-upload-box {
+  position: relative !important;
+  width: 100% !important;
+  height: 260px !important;
+
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  border-radius: 14px;
+  background: radial-gradient(
+    120% 120% at 50% 0%,
+    #0f172a 0%,
+    #020617 70%
+  );
+
+  /* 🔒 STRONGEST CENTERING POSSIBLE */
+  display: grid !important;
+  place-items: center !important;
+
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+/* IMAGE WRAPPER */
+.mr-image-wrap {
+  width: 100% !important;
+  height: 100% !important;
+  padding: 14px !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  box-sizing: border-box !important;
+}
+
+/* IMAGE — HARD OVERRIDE */
+.mr-image-wrap img {
+  max-width: 100% !important;
+  max-height: 100% !important;
+
+  width: auto !important;
+  height: auto !important;
+
+  object-fit: contain !important;
+  display: block !important;
+
+  border-radius: 10px;
+}
+
+/* PLACEHOLDER */
+.mr-upload-box .placeholder {
+  text-align: center;
+  font-size: 14px;
+  color: #8a8f98;
+}
+
+/* REPLACE BUTTON */
+.mr-replace-btn {
+  position: absolute !important;
+  top: 12px;
+  right: 12px;
+
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 999px;
+
+  cursor: pointer;
+  z-index: 10;
+}
+
+/* SUCCESS TICK */
+.mr-upload-tick {
+  position: absolute;
+  bottom: 12px;
+  right: 14px;
+
+  background: #22c55e;
+  color: #020617;
+  font-size: 14px;
+
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+
+  display: grid;
+  place-items: center;
+
+  z-index: 9;
+}
+
+/* LOADER */
+.mr-upload-loader {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 20;
+}

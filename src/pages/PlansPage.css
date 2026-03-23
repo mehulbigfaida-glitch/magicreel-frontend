@@ -1,0 +1,133 @@
+.plans-page{
+  padding:60px 40px;
+  min-height:100vh;
+  background:#0b0f19;
+  color:white;
+}
+
+.plans-header{
+  text-align:center;
+  margin-bottom:50px;
+}
+
+.plans-header h1{
+  font-size:36px;
+  margin-bottom:10px;
+}
+
+.plans-header p{
+  opacity:.7;
+}
+
+.plans-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:24px;
+  max-width:1200px;
+  margin:auto;
+}
+
+.plan-card{
+  background:#111827;
+  border-radius:14px;
+  padding:30px;
+  text-align:center;
+  position:relative;
+  border:1px solid rgba(255,255,255,0.08);
+  transition:.2s;
+}
+
+.plan-card:hover{
+  transform:translateY(-6px);
+}
+
+.plan-name{
+  font-size:22px;
+  margin-bottom:10px;
+}
+
+.plan-price{
+  font-size:28px;
+  font-weight:600;
+  margin-bottom:10px;
+}
+
+.plan-credits{
+  opacity:.7;
+  margin-bottom:6px;
+}
+
+.plan-credit-price{
+  font-size:13px;
+  opacity:.6;
+  margin-bottom:20px;
+}
+
+.plan-packs{
+  list-style:none;
+  padding:0;
+  margin-bottom:30px;
+}
+
+.plan-packs li{
+  margin-bottom:8px;
+}
+
+.upgrade-btn{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:8px;
+  background:#6366f1;
+  color:white;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.upgrade-btn:hover{
+  background:#4f46e5;
+}
+
+.popular{
+  border:2px solid #6366f1;
+}
+
+.popular-badge{
+  position:absolute;
+  top:-12px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#6366f1;
+  padding:4px 12px;
+  font-size:12px;
+  border-radius:6px;
+}
+
+.enterprise-section{
+  margin-top:80px;
+  text-align:center;
+}
+
+.enterprise-section h2{
+  font-size:28px;
+  margin-bottom:10px;
+}
+
+.enterprise-section p{
+  opacity:.7;
+  margin-bottom:20px;
+}
+
+.enterprise-btn{
+  padding:12px 26px;
+  border-radius:8px;
+  border:none;
+  background:#6366f1;
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.enterprise-btn:hover{
+  background:#4f46e5;
+}

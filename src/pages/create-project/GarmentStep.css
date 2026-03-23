@@ -1,0 +1,33 @@
+.mr-garment-page {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 64px);
+  padding: 40px 32px;
+  background: transparent;
+  color: #E5E7EB;
+}
+
+/* 🔹 Breadcrumb (Category > Subcategory) */
+.mr-garment-breadcrumb {
+  font-size: 13px;
+  font-weight: 500;
+  color: #9CA3AF;
+  margin-bottom: 8px;
+  letter-spacing: 0.2px;
+}
+
+/* Helper hint */
+.mr-garment-hint {
+  font-size: 13px;
+  color: #9CA3AF;
+  margin-bottom: 24px;
+}
+
+/* Upload area — FIXED */
+.mr-garment-upload-fixed {
+  /* ❌ flex: 1;  REMOVED */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-top: 24px;
+}

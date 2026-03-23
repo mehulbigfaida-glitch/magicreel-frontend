@@ -1,0 +1,167 @@
+/* ================================
+   Brand Styling – Dark / Premium
+================================ */
+
+.mr-style {
+  min-height: calc(100vh - 64px);
+  padding: 48px 80px;
+  color: #E5E7EB;
+}
+
+.mr-style h1 {
+  font-size: 32px;
+  margin-bottom: 6px;
+}
+
+.mr-style-sub {
+  color: #9CA3AF;
+  margin-bottom: 32px;
+}
+
+/* ---------- Sections ---------- */
+
+.mr-style section {
+  margin-bottom: 40px;
+}
+
+.mr-style h3 {
+  font-size: 18px;
+  margin-bottom: 16px;
+}
+
+/* ---------- Grids ---------- */
+
+.mr-style-grid {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.mr-style-grid button {
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.04);
+  cursor: pointer;
+  font-size: 14px;
+  color: #E5E7EB;
+}
+
+.mr-style-grid button:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: #8B5CF6;
+}
+
+/* ---------- Upload ---------- */
+
+.mr-style input[type="file"] {
+  margin-top: 10px;
+  color: #9CA3AF;
+}
+
+/* ---------- Logo Controls ---------- */
+
+.mr-style-row {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+.mr-style-row select,
+.mr-style-row input[type="range"] {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #E5E7EB;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+
+.mr-style-row button {
+  background: rgba(255,255,255,0.08);
+  border: none;
+  color: #E5E7EB;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* ---------- Preview ---------- */
+
+.mr-style-preview {
+  margin-top: 32px;
+}
+
+.mr-style-canvas {
+  position: relative;
+  width: 100%;
+  height: 360px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.04);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.mr-style-bg {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9CA3AF;
+  font-size: 14px;
+}
+
+/* ---------- Logo Overlay ---------- */
+
+.mr-logo-overlay {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Safe margin = 5% */
+
+.mr-logo-overlay.top-left {
+  top: 5%;
+  left: 5%;
+}
+
+.mr-logo-overlay.top-right {
+  top: 5%;
+  right: 5%;
+}
+
+.mr-logo-overlay.bottom-left {
+  bottom: 5%;
+  left: 5%;
+}
+
+.mr-logo-overlay.bottom-right {
+  bottom: 5%;
+  right: 5%;
+}
+
+/* Size presets */
+
+.mr-logo-overlay.small {
+  max-width: 12%;
+}
+
+.mr-logo-overlay.medium {
+  max-width: 18%;
+}
+
+.mr-logo-overlay.large {
+  max-width: 24%;
+}
+
+/* ---------- Buttons ---------- */
+
+button.primary {
+  background: linear-gradient(135deg, #8B5CF6 0%, #3B82F6 100%);
+  color: #fff;
+  border: none;
+  padding: 12px 26px;
+  border-radius: 12px;
+  cursor: pointer;
+}

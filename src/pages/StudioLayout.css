@@ -1,0 +1,81 @@
+/* =========================
+   STUDIO ROOT
+   ========================= */
+
+.mr-studio-root {
+  display: flex;
+  height: calc(100vh - 64px); /* header height accounted */
+  overflow: hidden;
+}
+
+/* =========================
+   LEFT SIDEBAR
+   ========================= */
+
+.mr-studio-left {
+  width: 260px;
+  height: 100%;
+  overflow-y: auto;
+  border-right: 1px solid rgba(255,255,255,0.08);
+}
+
+/* =========================
+   MAIN AREA
+   ========================= */
+
+.mr-studio-main {
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* =========================
+   VARIANT SELECTOR
+   ========================= */
+
+.mr-studio-selector {
+  flex-shrink: 0;
+  padding: 12px 16px;
+}
+
+/* =========================
+   CANVAS AREA
+   ========================= */
+
+.mr-studio-canvas {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr 0.8fr;
+  gap: 16px;
+  
+}
+
+/* =========================
+   CANVAS PANELS
+   ========================= */
+
+.mr-canvas {
+  background: rgba(255,255,255,0.03);
+  border-radius: 16px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mr-canvas.front,
+.mr-canvas.back {
+  min-height: 520px;
+}
+
+/* =========================
+   PREVIEW COLUMN
+   ========================= */
+
+.mr-preview-column {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}

@@ -1,0 +1,53 @@
+.mr-create-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+
+/* ---------------- GLOBAL HEADER ---------------- */
+
+.mr-create-header {
+  padding: 20px 80px; /* 🔧 reduced for tighter layout */
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: #fff;
+}
+
+.mr-create-header h1 {
+  font-size: 32px;
+  margin: 0 0 6px 0;
+}
+
+.mr-create-header p {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+}
+
+/* ---------------- CONTINUE BUTTON ---------------- */
+
+.mr-continue-btn {
+  padding: 10px 22px;
+  border-radius: 8px;
+  border: none;
+  background: #000;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.mr-continue-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---------------- MAIN CONTENT ---------------- */
+
+.mr-create-main {
+  flex: 1;
+  padding: 24px 80px; /* 🔧 reduced top padding */
+  overflow-y: auto;   /* scrolling ONLY here */
+}

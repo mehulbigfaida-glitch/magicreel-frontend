@@ -1,0 +1,58 @@
+.mr-export {
+  min-height: calc(100vh - 64px);
+  padding: 48px 80px;
+  color: #E5E7EB;
+}
+
+.mr-export h1 {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+.mr-export-sub {
+  color: #9CA3AF;
+  margin-bottom: 32px;
+}
+
+/* Preview */
+.mr-export-preview {
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 18px;
+  padding: 24px;
+  margin-bottom: 32px;
+  background: rgba(255,255,255,0.04);
+}
+
+.mr-export-placeholder {
+  height: 320px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9CA3AF;
+}
+
+/* Actions */
+.mr-export-actions {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.mr-export-actions .primary {
+  padding: 14px 28px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #8B5CF6 0%, #3B82F6 100%);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* Meta */
+.mr-export-meta {
+  font-size: 13px;
+  color: #9CA3AF;
+}

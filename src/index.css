@@ -1,0 +1,147 @@
+/* Lookbook page scroll authority */
+.lookbook-page {
+  overflow: hidden !important;
+}
+
+.lookbook-strip {
+  overflow: auto !important;
+}
+
+/* =========================
+   GLOBAL VIEWPORT
+========================= */
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* =========================
+   DESIGN TOKENS (LOCKED)
+========================= */
+:root {
+  /* Backgrounds */
+  --bg-app: #0B0B12;
+  --bg-surface: rgba(255, 255, 255, 0.04);
+  --bg-surface-border: rgba(255, 255, 255, 0.08);
+
+  /* Text */
+  --text-primary: #E5E7EB;
+  --text-secondary: #9CA3AF;
+
+  /* Accent */
+  --accent-gradient: linear-gradient(135deg, #8B5CF6 0%, #3B82F6 100%);
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+}
+
+/* =========================
+   RESET
+========================= */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg-app);
+  color: var(--text-primary);
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Remove random margins */
+h1, h2, h3, p {
+  margin-top: 0;
+}
+
+/* =========================
+   BASE ELEMENTS
+========================= */
+p {
+  color: var(--text-secondary);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* =========================
+   CARDS / SURFACES
+========================= */
+.mr-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--bg-surface-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+button.primary {
+  background: var(--accent-gradient);
+  color: #fff;
+  border: none;
+  padding: 12px 26px;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+}
+
+button.primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =========================
+   UPLOAD FRAME (GLOBAL)
+========================= */
+.upload-frame {
+  border: 2px dashed rgba(255,255,255,0.25);
+  border-radius: var(--radius-md);
+  background: rgba(255,255,255,0.02);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-frame-preview img {
+  width: 92%;
+  height: 92%;
+  object-fit: contain;
+}
+
+/* =========================
+   NO SCROLL PAGES
+========================= */
+.mr-garment-page,
+.mr-avatar-page {
+  overflow: hidden;
+}
+
+/* =========================
+   PROGRESS ANIMATION
+========================= */
+@keyframes pulse {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(0%); }
+  100% { transform: translateX(100%); }
+}
+
+/* ================================
+   LOOKBOOK GLOBAL SCROLL OVERRIDE
+================================ */
+
+body:has(.lookbook-page) {
+  overflow-y: auto !important;
+}
+
+body:has(.lookbook-page) #root {
+  overflow: visible !important;
+}

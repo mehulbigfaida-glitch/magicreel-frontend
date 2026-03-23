@@ -1,0 +1,47 @@
+/* ===============================
+   GLOBAL STEP HEADER (APP SHELL)
+   =============================== */
+
+.mr-step-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  padding: 32px 80px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Title */
+.mr-step-header h1 {
+  font-size: 34px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+/* Subtitle */
+.mr-step-header .mr-subtext {
+  font-size: 15px;
+  color: #6b7280;
+}
+
+/* Continue button (GLOBAL POSITION) */
+.mr-step-header .mr-continue-btn {
+  padding: 12px 26px;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.mr-step-header .mr-continue-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

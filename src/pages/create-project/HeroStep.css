@@ -1,0 +1,77 @@
+/* ======================================================
+   HERO STEP – DARK / BRAND-ALIGNED
+====================================================== */
+
+.mr-hero {
+  min-height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 24px;
+  background: radial-gradient(
+    900px at 50% 20%,
+    rgba(139, 92, 246, 0.18),
+    transparent 60%
+  );
+  color: #E5E7EB;
+}
+
+.mr-hero h1 {
+  font-size: 36px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.mr-hero p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #9CA3AF;
+  max-width: 560px;
+  margin-bottom: 40px;
+}
+
+/* Actions */
+.mr-hero-actions {
+  display: flex;
+  gap: 16px;
+}
+
+.mr-hero-actions button {
+  min-width: 200px;
+  height: 52px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  padding: 0 28px;
+  transition: transform 0.15s ease, opacity 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+/* Reject */
+.mr-hero-actions button:not(.primary) {
+  background: rgba(255, 255, 255, 0.08);
+  color: #E5E7EB;
+}
+
+.mr-hero-actions button:not(.primary):hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* Accept */
+.mr-hero-actions .primary {
+  background: linear-gradient(
+    135deg,
+    #8B5CF6 0%,
+    #3B82F6 100%
+  );
+  color: #fff;
+}
+
+.mr-hero-actions .primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 36px rgba(139, 92, 246, 0.45);
+}

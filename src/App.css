@@ -1,0 +1,973 @@
+/* =========================
+   UPLOAD FRAME — FINAL, CLICK-SAFE
+========================= */
+
+.upload-frame-label {
+  font-size: 11px;
+  margin-bottom: 6px;
+  color: var(--mr-text-soft);
+}
+
+.upload-frame-box {
+  position: relative;
+
+  /* 🔒 FIXED, PREDICTABLE FRAME */
+  width: 100%;
+  height: 420px;
+
+  border-radius: 16px;
+  border: 1px dashed rgba(148, 163, 184, 0.6);
+
+  background: radial-gradient(
+    circle at top left,
+    #111827 0,
+    #020617 50%,
+    #000 100%
+  );
+
+  /* 🔒 STRONG CENTERING */
+  display: grid;
+  place-items: center;
+
+  padding: 12px;
+  cursor: pointer;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+
+/* 🔒 THE ONLY CLICK TARGET */
+.upload-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;          /* invisible but clickable */
+  cursor: pointer;
+  z-index: 10;         /* ALWAYS on top */
+}
+
+/* Visual content must NOT intercept clicks */
+.upload-placeholder,
+.upload-preview-wrapper,
+.upload-preview-image,
+.reupload-chip {
+  pointer-events: none;
+}
+
+/* Placeholder text */
+.upload-placeholder {
+  text-align: center;
+  font-size: 12px;
+  color: var(--mr-text-soft);
+}
+
+.upload-placeholder strong {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--mr-text);
+}
+
+/* Image preview wrapper */
+.upload-preview-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* Image itself */
+.upload-preview-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  background: #020617;
+  border-radius: 12px;
+  margin: auto;
+  display: block;
+}
+
+/* Re-upload chip (visual only) */
+.reupload-chip {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-size: 10px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  color: var(--mr-text-soft);
+}
+/* =====================================================
+   GARMENT PREVIEW — HARD RULE: FULL VISIBILITY
+   ===================================================== */
+
+/* Upload frame acts as a viewport — neutralized */
+.upload-frame-box {
+  /* no-op rule to satisfy linter */
+  pointer-events: inherit;
+}
+
+
+/* Image MUST fit fully inside frame */
+.upload-preview-image {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;     /* 🔒 NEVER crop */
+  display: block;
+  margin: auto;
+  background: transparent;
+}
+
+/* Ensure garment image is centered and contained */
+.upload-frame-box img {
+  max-width: 100%;
+  max-height: 100%;
+
+  width: auto;
+  height: auto;
+
+  object-fit: contain;
+  display: block;
+}
+
+/* File input covers frame but stays invisible */
+.upload-frame-box input[type="file"] {
+  position: absolute;
+  inset: 0;
+
+  opacity: 0;
+  cursor: pointer;
+  z-index: 5;
+}
+
+/* =========================================================
+   MAGICREEL SIDEBAR — PREMIUM STUDIO POLISH
+   (NO LAYOUT CHANGES)
+========================================================= */
+
+/* Sidebar base */
+.mr-sidebar {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(
+    180deg,
+    rgba(15, 23, 42, 0.92),
+    rgba(8, 12, 22, 0.98)
+  );
+  border-right: 1px solid rgba(255,255,255,0.08);
+  box-shadow: inset -1px 0 0 rgba(255,255,255,0.03);
+  padding-bottom: 12px;
+}
+
+/* Brand block */
+.mr-sidebar > div:first-child {
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+}
+
+/* Step sections */
+.mr-sidebar-section {
+  margin: 10px 8px;
+  padding: 10px 10px 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.03);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+}
+
+/* Step badge */
+.mr-step-badge {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 6px;
+}
+
+/* Section title */
+.mr-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+/* Garment rows */
+.mr-garment-row {
+  padding: 8px 10px;
+  margin: 2px 0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.75);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.mr-garment-row:hover {
+  background: rgba(255,255,255,0.06);
+  color: #ffffff;
+}
+
+/* Active garment */
+.mr-garment-row.active {
+  background: linear-gradient(
+    90deg,
+    rgba(139, 92, 246, 0.35),
+    rgba(139, 92, 246, 0.15)
+  );
+  color: #ffffff;
+  box-shadow:
+    inset 3px 0 0 #8b5cf6,
+    0 0 0 1px rgba(139,92,246,0.45);
+}
+
+/* Sublist */
+.mr-sublist {
+  margin-left: 6px;
+  margin-top: 6px;
+}
+
+/* Subitems */
+.mr-subitem {
+  padding: 6px 10px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.65);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mr-subitem:hover {
+  background: rgba(255,255,255,0.06);
+  color: #ffffff;
+}
+
+/* Active subitem */
+.mr-subitem.active {
+  background: rgba(139,92,246,0.18);
+  color: #ffffff;
+  box-shadow: inset 2px 0 0 #8b5cf6;
+}
+
+/* Avatar cards in sidebar */
+.mr-avatar-card {
+  padding: 8px 10px;
+  margin: 4px 0;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.7);
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.mr-avatar-card:hover {
+  background: rgba(255,255,255,0.06);
+  color: #ffffff;
+}
+
+.mr-avatar-card.active {
+  background: rgba(139,92,246,0.22);
+  color: #ffffff;
+  box-shadow:
+    inset 2px 0 0 #8b5cf6,
+    0 0 0 1px rgba(139,92,246,0.4);
+}
+
+/* Utilities section */
+.mr-sidebar hr {
+  border: none;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  margin: 12px 0;
+}
+
+.mr-sidebar .mr-subitem:last-child {
+  margin-bottom: 0;
+}
+
+/* =========================================================
+   MAGICREEL — APPLICATION SHELL (FINAL)
+========================================================= */
+
+/* App shell defines the viewport */
+.mr-app-shell {
+  height: 100vh;
+  width: 100vw;
+  display: grid;
+  grid-template-columns: 280px 1fr 420px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* Sidebar scrolls */
+.mr-app-sidebar {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-right: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Canvas NEVER scrolls */
+.mr-app-canvas {
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Preview NEVER scrolls */
+.mr-app-preview {
+  height: 100%;
+  overflow: hidden;
+  border-left: 1px solid rgba(255,255,255,0.08);
+}
+
+/* =========================================================
+   MAGICREEL — HERO PREVIEW VISIBILITY FIX (POLISH)
+========================================================= */
+
+/* Preview column background */
+.mr-app-preview {
+  background: linear-gradient(
+    180deg,
+    rgba(15, 23, 42, 0.92),
+    rgba(8, 12, 22, 0.98)
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Make the preview frame stand out */
+.mr-app-preview .preview-frame,
+.mr-app-preview .hero-preview-frame,
+.mr-app-preview > div {
+  background: radial-gradient(
+    circle at top,
+    rgba(2, 6, 23, 0.9),
+    rgba(0, 0, 0, 0.95)
+  );
+  border: 1px dashed rgba(148, 163, 184, 0.35);
+  border-radius: 18px;
+  box-shadow:
+    0 0 0 1px rgba(139, 92, 246, 0.25),
+    0 0 60px rgba(139, 92, 246, 0.15);
+}
+
+/* =========================================================
+   MAGICREEL — CENTER CANVAS SURFACE FIX
+========================================================= */
+
+/* Canvas background */
+.mr-app-canvas {
+  background: linear-gradient(
+    180deg,
+    rgba(12, 17, 32, 0.95),
+    rgba(6, 8, 18, 0.98)
+  );
+}
+
+/* Ensure canvas content spacing stays readable */
+.mr-app-canvas > * {
+  max-width: 100%;
+}
+
+/* =========================================================
+   MAGICREEL — CANVAS TEXT VISIBILITY FIX
+========================================================= */
+
+/* Default canvas text */
+.mr-app-canvas {
+  color: rgba(248, 250, 252, 0.95); /* near-white */
+}
+
+/* Secondary / helper text inside canvas */
+.mr-app-canvas .upload-placeholder,
+.mr-app-canvas .upload-placeholder div,
+.mr-app-canvas .upload-placeholder strong {
+  color: rgba(226, 232, 240, 0.85);
+}
+
+/* Breadcrumb text */
+.mr-app-canvas .breadcrumb,
+.mr-app-canvas h1,
+.mr-app-canvas h2,
+.mr-app-canvas h3 {
+  color: #f8fafc;
+}
+
+/* =========================================================
+   MAGICREEL — SIDEBAR EXPAND ARROWS
+========================================================= */
+
+.mr-expand {
+  float: right;
+  opacity: 0.7;
+  font-size: 14px;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.mr-garment-row.active .mr-expand {
+  opacity: 1;
+}
+
+/* =========================================================
+   MAGICREEL — CLASSY SIDEBAR (REFERENCE MATCH)
+   ========================================================= */
+
+.mr-sidebar-ref {
+  width: 280px;
+  height: 100vh;
+  background: linear-gradient(
+    180deg,
+    rgba(18, 22, 32, 0.95) 0%,
+    rgba(10, 12, 20, 0.98) 100%
+  );
+  color: #e5e7eb;
+  padding: 20px 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* BRAND */
+.mr-sidebar-ref-brand {
+  margin-bottom: 24px;
+}
+
+.mr-sidebar-ref-title {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.mr-sidebar-ref-sub {
+  font-size: 12px;
+  color: rgba(229, 231, 235, 0.6);
+  margin-top: 2px;
+}
+
+/* SECTION */
+.mr-sidebar-ref-section {
+  margin-bottom: 22px;
+}
+
+.mr-sidebar-ref-step {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: rgba(229, 231, 235, 0.45);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.mr-sidebar-ref-heading {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mr-sidebar-ref-heading.clickable {
+  cursor: pointer;
+}
+
+/* ROWS */
+.mr-sidebar-ref-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  color: rgba(229, 231, 235, 0.85);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.mr-sidebar-ref-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.mr-sidebar-ref-row.active {
+  background: linear-gradient(
+    90deg,
+    rgba(139, 92, 246, 0.25),
+    rgba(139, 92, 246, 0.05)
+  );
+  box-shadow: inset 3px 0 0 #8b5cf6;
+  color: #ffffff;
+}
+
+.mr-sidebar-ref-row.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* CHEVRON */
+.mr-chevron {
+  font-size: 14px;
+  opacity: 0.6;
+}
+
+/* SUBLIST */
+.mr-sidebar-ref-sublist {
+  margin-left: 10px;
+  margin-top: 4px;
+}
+
+.mr-sidebar-ref-subrow {
+  padding: 6px 10px;
+  font-size: 12px;
+  color: rgba(229, 231, 235, 0.7);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.mr-sidebar-ref-subrow:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: #ffffff;
+}
+
+.mr-sidebar-ref-subrow.active {
+  background: rgba(139, 92, 246, 0.18);
+  color: #ffffff;
+}
+
+/* FOOTER */
+.mr-sidebar-ref-footer {
+  margin-top: auto;
+  padding-top: 14px;
+  font-size: 12px;
+  color: rgba(229, 231, 235, 0.5);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.breadcrumb-avatar-link {
+  background: none;
+  border: none;
+  color: #38bdf8;
+  cursor: pointer;
+  padding: 0;
+  font-weight: 500;
+}
+.breadcrumb-avatar-link:hover {
+  text-decoration: underline;
+}
+
+.upload-placeholder {
+  text-align: center;
+  color: #cbd5f5;
+}
+
+.upload-icon {
+  font-size: 22px;
+  margin-bottom: 6px;
+}
+
+.upload-subtext {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.upload-reco {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+/* ================= CINEMATIC PAGE ================= */
+
+.cinematic-container {
+  padding: 60px 80px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.cinematic-header h1 {
+  font-size: 36px;
+  font-weight: 600;
+}
+
+.cinematic-header p {
+  color: #777;
+  margin-top: 8px;
+}
+
+.cinematic-grid {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 30px;
+}
+
+.cinematic-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #e5e5e5;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.cinematic-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.cinematic-card.active {
+  border: 2px solid black;
+}
+
+.cinematic-preview {
+  height: 240px;
+}
+
+.cinematic-content {
+  padding: 20px;
+}
+
+.cinematic-content h3 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.cinematic-content p {
+  font-size: 14px;
+  color: #666;
+  margin-top: 6px;
+}
+
+.cinematic-footer {
+  margin-top: 50px;
+  text-align: center;
+}
+
+.cinematic-footer button {
+  padding: 14px 28px;
+  font-size: 16px;
+  background: black;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+/* =========================
+   APP WRAPPER (PRODUCTION LOCK)
+========================= */
+
+.mr-app-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+}
+
+/* =========================
+   GLOBAL HEADER (PRODUCTION)
+========================= */
+
+.mr-global-header {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;   /* 👈 important */
+  padding: 0 32px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: #0b1220;
+  flex-shrink: 0;
+}
+
+.mr-brand {
+  font-weight: 600;
+  font-size: 18px;
+  color: #ffffff;
+}
+
+.mr-logo-link {
+  text-decoration: none;
+  color: #ffffff;
+}
+
+.mr-header-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.mr-credits {
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 999px;
+
+  background: rgba(123, 97, 255, 0.18);
+  border: 1px solid rgba(123, 97, 255, 0.45);
+  color: #ffffff;
+
+  backdrop-filter: blur(4px);
+}
+
+.mr-user-circle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7b61ff, #9f8cff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.mr-user-circle:hover {
+  transform: scale(1.08);
+}
+
+.mr-brand {
+  font-weight: 600;
+  font-size: 18px;
+  color: #ffffff;
+}
+
+.mr-app-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* =========================
+   GLOBAL HEADER STYLING
+========================= */
+
+.mr-global-header{
+  height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 32px;
+  background:#0b0f1a;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+
+.mr-header-left{
+  display:flex;
+  align-items:center;
+  gap:32px;
+}
+
+.mr-logo-link{
+  font-weight:600;
+  font-size:18px;
+  color:white;
+  text-decoration:none;
+}
+
+.mr-main-nav{
+  display:flex;
+  gap:22px;
+  align-items:center;
+}
+
+.mr-main-nav a{
+  color:#9ca3af;
+  text-decoration:none;
+  font-size:14px;
+}
+
+.mr-main-nav a:hover{
+  color:white;
+}
+
+.mr-main-nav a.active{
+  color:white;
+}
+
+.mr-help-menu{
+  position:relative;
+  cursor:pointer;
+  color:#9ca3af;
+  font-size:14px;
+}
+
+.mr-help-dropdown{
+  position:absolute;
+  top:28px;
+  left:0;
+  background:#111827;
+  border-radius:8px;
+  display:none;
+  flex-direction:column;
+  min-width:150px;
+  padding:6px 0;
+}
+
+.mr-help-menu:hover .mr-help-dropdown{
+  display:flex;
+}
+
+.mr-help-dropdown a{
+  padding:10px 14px;
+  color:white;
+  text-decoration:none;
+}
+
+.mr-help-dropdown a:hover{
+  background:#1f2937;
+}
+
+.mr-header-right{
+  display:flex;
+  align-items:center;
+  gap:18px;
+}
+
+.mr-credits{
+  background:#1f2937;
+  padding:6px 12px;
+  border-radius:999px;
+  font-size:13px;
+  color:#e5e7eb;
+}
+
+.mr-profile-menu{
+  position:relative;
+}
+
+.mr-user-circle{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  background:#7c3aed;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.mr-profile-dropdown{
+  position:absolute;
+  top:42px;
+  right:0;
+  background:#111827;
+  border-radius:8px;
+  display:none;
+  flex-direction:column;
+  min-width:140px;
+}
+
+.mr-profile-menu:hover .mr-profile-dropdown{
+  display:flex;
+}
+
+.mr-profile-dropdown a,
+.mr-profile-dropdown button{
+  padding:10px 14px;
+  text-align:left;
+  background:none;
+  border:none;
+  color:white;
+  cursor:pointer;
+}
+
+.mr-profile-dropdown a:hover,
+.mr-profile-dropdown button:hover{
+  background:#1f2937;
+}
+
+/* CREATE MENU */
+
+.mr-create-menu{
+  position:relative;
+  cursor:pointer;
+  color:#9ca3af;
+  font-size:14px;
+}
+
+/* dropdown container */
+
+.mr-create-dropdown{
+  position:absolute;
+  top:100%;
+  left:0;
+  margin-top:6px;
+
+  width:320px;
+
+  background:#111827;
+  border-radius:10px;
+
+  display:flex;
+  flex-direction:column;
+
+  padding:10px 0;
+
+  box-shadow:0 12px 32px rgba(0,0,0,0.45);
+
+  opacity:0;
+  transform:translateY(8px);
+
+  pointer-events:none;
+
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
+}
+
+/* OPEN STATE */
+
+.mr-create-menu:hover .mr-create-dropdown,
+.mr-create-dropdown:hover{
+  opacity:1;
+  transform:translateY(0);
+  pointer-events:auto;
+}
+
+/* ITEM */
+
+.mr-create-item{
+  display:block;
+  padding:12px 18px;
+  text-decoration:none;
+  color:white;
+}
+
+/* HOVER */
+
+.mr-create-item:hover{
+  background:#1f2937;
+}
+
+/* TITLE */
+
+.mr-create-item-title{
+  font-weight:600;
+  font-size:14px;
+}
+
+/* DESCRIPTION */
+
+.mr-create-item-desc{
+  font-size:12px;
+  opacity:0.7;
+  margin-top:3px;
+}
+
+/* LOCKED ITEMS */
+
+.mr-create-item.locked{
+  opacity:0.6;
+  cursor:pointer;
+}

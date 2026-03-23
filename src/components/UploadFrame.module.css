@@ -1,0 +1,78 @@
+.wrapper {
+  width: 100%;
+}
+
+.frame {
+  position: relative;
+  width: 100%;
+  max-height: calc(100vh - 260px); /* 🔒 CRITICAL FIX */
+  border: 2px dashed #d1d5db;
+  border-radius: 14px;
+  background: #fafafa;
+  cursor: pointer;
+  overflow: auto; /* 🔒 allow vertical scroll */
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+/* EMPTY STATE */
+.empty {
+  text-align: center;
+  color: #374151;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 40px 20px;
+}
+
+.cta {
+  color: #2563eb;
+  font-weight: 500;
+}
+
+.optional {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+/* IMAGE */
+.image {
+  width: 100%;
+  height: auto;          /* 🔒 DO NOT FORCE HEIGHT */
+  object-fit: contain;   /* safety */
+  display: block;
+}
+
+/* OVERLAY */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.frame:hover .overlay {
+  opacity: 1;
+}
+
+/* SUCCESS BADGE */
+.badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #22c55e;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 6px;
+  border-radius: 6px;
+}

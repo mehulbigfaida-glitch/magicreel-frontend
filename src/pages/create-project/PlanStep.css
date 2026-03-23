@@ -1,0 +1,81 @@
+.mr-plan {
+  padding: 48px 80px;
+}
+
+.mr-plan h1 {
+  font-size: 34px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.mr-plan-sub {
+  color: #666;
+  margin-bottom: 40px;
+}
+
+.mr-plan-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.mr-plan-card {
+  border: 1px solid #eaeaea;
+  border-radius: 20px;
+  padding: 28px;
+  background: #fff;
+  position: relative;
+}
+
+.mr-plan-card.highlight {
+  border-color: #000;
+}
+
+.mr-plan-badge {
+  position: absolute;
+  top: -12px;
+  right: 20px;
+  background: #000;
+  color: #fff;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.mr-plan-price {
+  font-size: 28px;
+  font-weight: 600;
+  margin: 12px 0 20px;
+}
+
+.mr-plan-card ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 24px;
+}
+
+.mr-plan-card li {
+  margin-bottom: 8px;
+  color: #444;
+}
+
+.mr-plan-card button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+}
+
+.mr-plan-enterprise {
+  margin-top: 48px;
+  padding: 24px;
+  background: #fafafa;
+  border-radius: 16px;
+}
+
+.mr-plan-enterprise a {
+  font-weight: 500;
+}

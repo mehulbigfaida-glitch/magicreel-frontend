@@ -1,0 +1,79 @@
+.mr-tree {
+  margin-top: 18px;
+  font-size: 14px;
+}
+
+.mr-tree-title {
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #ffffff;
+}
+
+.mr-tree-node {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #c9c9d8;
+}
+
+.mr-tree-node:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+.mr-tree-node.open {
+  color: #ffffff;
+}
+
+.mr-tree-node.leaf {
+  color: #b8b8c5;
+}
+
+.mr-tree-node.active {
+  background: linear-gradient(
+    135deg,
+    rgba(123,97,255,0.45),
+    rgba(123,97,255,0.25)
+  );
+  color: #ffffff;
+}
+
+.mr-tree-arrow {
+  width: 12px;
+  text-align: center;
+  opacity: 0.7;
+}
+
+/* ACTIONS */
+.mr-sidebar-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.08);
+  margin: 16px 0;
+}
+
+.mr-sidebar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mr-action {
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.mr-action.locked {
+  opacity: 0.35;
+}
+
+.mr-action.active {
+  background: linear-gradient(
+    135deg,
+    rgba(123,97,255,0.35),
+    rgba(123,97,255,0.15)
+  );
+  color: #ffffff;
+}

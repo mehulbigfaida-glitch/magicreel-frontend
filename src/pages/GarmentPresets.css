@@ -1,0 +1,30 @@
+/* src/pages/GarmentPresets.css */
+.mr-preset-row {
+  margin-bottom: 18px;
+}
+
+.mr-preset-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.mr-preset-items {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.mr-preset-pill {
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  font-size: 13px;
+  cursor: pointer;
+  color: #ffffff;
+}
+
+.mr-preset-pill:hover {
+  background: rgba(255,255,255,0.12);
+}
