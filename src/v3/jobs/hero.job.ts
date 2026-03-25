@@ -1,50 +1,34 @@
-export type GenerateHeroPayload = {
-  categoryKey: string;
-  avatarGender: string;
-  avatarFaceImageUrl: string;
-  garmentFrontImageUrl: string;
-  avatarBackImageUrl?: string;
-  garmentBackImageUrl?: string;
-  styling?: string | null;
-};
+import { generateHero, pollHero } from "../api/hero.api";
 
-import { API_BASE } from "../../config/api";
+export async function runHeroJob(payload: any, token: string) {
+  // Step 1: trigger generation
+  const { runId } = await generateHero(payload, token);
 
-export async function generateHero(
-  payload: GenerateHeroPayload,
-  token: string
-) {
-  const res = await fetch(`${API_BASE}/api/p2m/hero/generate-v2`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(payload),
-  });
-
-  const data = await res.json();
-
-  if (!res.ok) {
-    throw new Error(data.error || "Hero generation failed");
+  if (!runId) {
+    throw new Error("No runId received");
   }
 
-  return data;
-}
+  // Step 2: poll until done
+  let result = null;
 
-export async function pollHero(runId: string, token: string) {
-  const res = await fetch(
-    `${API_BASE}/api/p2m/hero/poll/${runId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+  for (let i = 0; i < 30; i++) {
+    const data = await pollHero(runId, token);
+
+    if (data.status === "completed") {
+      result = data;
+      break;
     }
-  );
 
-  if (!res.ok) {
-    throw new Error("Polling failed");
+    if (data.status === "failed") {
+      throw new Error("Hero generation failed");
+    }
+
+    await new Promise((r) => setTimeout(r, 2000));
   }
 
-  return res.json();
+  if (!result) {
+    throw new Error("Timeout waiting for hero result");
+  }
+
+  return result;
 }
