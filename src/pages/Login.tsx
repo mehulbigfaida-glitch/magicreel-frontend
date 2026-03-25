@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { API_BASE } from "../config/api";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -21,7 +22,7 @@ const Login: React.FC = () => {
 
     try {
       const res = await fetch(
-        "http://localhost:5003/api/auth/login",
+        `${API_BASE}/api/auth/login`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

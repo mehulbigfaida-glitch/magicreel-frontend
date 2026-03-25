@@ -1,135 +1,50 @@
-import type { Job } from "./job.types";
-import { generateHero } from "../api/hero.api";
-
-type RunHeroJobInput = {
-  payload: any;
-  token: string;
+export type GenerateHeroPayload = {
+  categoryKey: string;
+  avatarGender: string;
+  avatarFaceImageUrl: string;
+  garmentFrontImageUrl: string;
+  avatarBackImageUrl?: string;
+  garmentBackImageUrl?: string;
+  styling?: string | null;
 };
 
-const delay = (ms: number) =>
-  new Promise((res) => setTimeout(res, ms));
+import { API_BASE } from "../../config/api";
 
-export async function runHeroJob(
-  input: RunHeroJobInput
-): Promise<Job<{ frontImage?: string; backImage?: string }>> {
-  const { payload, token } = input;
+export async function generateHero(
+  payload: GenerateHeroPayload,
+  token: string
+) {
+  const res = await fetch(`${API_BASE}/api/p2m/hero/generate-v2`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
 
-  const job: Job<{
-    frontImage?: string;
-    backImage?: string;
-  }> = {
-    id: "",
-    type: "hero",
-    status: "queued",
-    createdAt: Date.now(),
-  };
+  const data = await res.json();
 
-  try {
-    /* ================= GENERATE ================= */
-    const data = await generateHero(payload, token);
-
-    const frontRunId = data.frontRunId;
-    const backRunId = data.backRunId;
-
-    job.id = frontRunId || backRunId;
-    job.status = "processing";
-
-    let frontImage: string | undefined;
-    let backImage: string | undefined;
-
-    /* ================= SMART POLLING ================= */
-
-    // 🔥 Phase 1 — WAIT (no useless calls)
-    await delay(20000); // 20 sec buffer
-
-    let attempts = 0;
-    const MAX_ATTEMPTS = 25;
-
-    while (attempts < MAX_ATTEMPTS) {
-      attempts++;
-
-      let frontDone = false;
-      let backDone = false;
-
-      try {
-        /* ---------- FRONT ---------- */
-        if (frontRunId && !frontImage) {
-          const res = await fetch(
-            `http://localhost:5003/api/p2m/hero/poll/${frontRunId}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-
-          if (res.ok) {
-            const data = await res.json();
-
-            if (data.status === "completed") {
-              frontImage = data.imageUrl;
-              frontDone = true;
-            }
-          }
-        } else if (frontImage) {
-          frontDone = true;
-        }
-
-        /* ---------- BACK ---------- */
-        if (backRunId && !backImage) {
-          const res = await fetch(
-            `http://localhost:5003/api/p2m/hero/poll/${backRunId}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-
-          if (res.ok) {
-            const data = await res.json();
-
-            if (data.status === "completed") {
-              backImage = data.imageUrl;
-              backDone = true;
-            }
-          }
-        } else if (!backRunId || backImage) {
-          backDone = true;
-        }
-
-        /* ---------- COMPLETE ---------- */
-        if (frontDone && backDone) {
-          job.status = "completed";
-          job.output = {
-            frontImage,
-            backImage,
-          };
-
-          return job;
-        }
-      } catch (err: any) {
-        if (err.message?.includes("429")) {
-          console.warn("Rate limited — backing off...");
-          await delay(8000);
-        } else {
-          throw err;
-        }
-      }
-
-      /* 🔥 Adaptive delay */
-      if (attempts < 5) {
-        await delay(6000); // early phase (slow)
-      } else {
-        await delay(4000); // normal phase
-      }
-    }
-
-    throw new Error("Polling timeout");
-  } catch (err: any) {
-    job.status = "failed";
-    job.error = err.message;
-
-    return job;
+  if (!res.ok) {
+    throw new Error(data.error || "Hero generation failed");
   }
+
+  return data;
+}
+
+export async function pollHero(runId: string, token: string) {
+  const res = await fetch(
+    `${API_BASE}/api/p2m/hero/poll/${runId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("Polling failed");
+  }
+
+  return res.json();
 }

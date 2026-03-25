@@ -8,13 +8,13 @@ export type GenerateHeroPayload = {
   styling?: string | null;
 };
 
-const BASE_URL = "http://localhost:5003/api";
+import { API_BASE } from "../../config/api";
 
 export async function generateHero(
   payload: GenerateHeroPayload,
   token: string
 ) {
-  const res = await fetch(`${BASE_URL}/p2m/hero/generate-v2`, {
+  const res = await fetch(`${API_BASE}/api/p2m/hero/generate-v2`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -34,7 +34,7 @@ export async function generateHero(
 
 export async function pollHero(runId: string, token: string) {
   const res = await fetch(
-    `${BASE_URL}/p2m/hero/poll/${runId}`,
+    `${API_BASE}/api/p2m/hero/poll/${runId}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,

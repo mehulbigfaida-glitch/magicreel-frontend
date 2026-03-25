@@ -1,7 +1,7 @@
 // frontend/src/services/p2mService.ts
 // 🔒 Transport-only P2M service (no state logic)
 
-const API_BASE = "http://localhost:5003";
+import { API_BASE } from "../config/api";
 
 export interface P2MStartRequest {
   productImageUrl: string;

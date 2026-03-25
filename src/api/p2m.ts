@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:5003";
+import { API_BASE } from "../config/api";
 
 export interface StartP2MResponse {
   success: boolean;

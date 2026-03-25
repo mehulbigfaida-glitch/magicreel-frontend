@@ -18,6 +18,7 @@ import type { AvatarType } from "../StudioSidebar";
 
 import { CATEGORY_PILLS } from "../../magicreel/config/categoryPills";
 import { useAvatarStore } from "../../store/avatarStore";
+import { API_BASE } from "../../config/api";
 
 type Selection = {
   category: GarmentCategory | null;
@@ -199,7 +200,7 @@ export default function CreateV2Page() {
       const token = localStorage.getItem("token");
 
       const res = await fetch(
-        "http://localhost:5003/api/p2m/hero/generate-v2",
+        `${API_BASE}/api/p2m/hero/generate-v2`,
         {
           method: "POST",
           headers: {
@@ -274,7 +275,7 @@ useEffect(() => {
       if (frontRunId && !frontHeroImageUrl) {
 
         const res = await fetch(
-          `http://localhost:5003/api/p2m/hero/poll/${frontRunId}`,
+          `${API_BASE}/api/p2m/hero/poll/${frontRunId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -307,7 +308,7 @@ useEffect(() => {
       if (backRunId && !backHeroImageUrl) {
 
         const res = await fetch(
-          `http://localhost:5003/api/p2m/hero/poll/${backRunId}`,
+          `${API_BASE}/api/p2m/hero/poll/${backRunId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 

@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useGenerate } from "../context/GenerateContext";
+import { API_BASE } from "../config/api";
 
 export default function StudioGenerateButton() {
   const {
@@ -21,7 +22,7 @@ export default function StudioGenerateButton() {
         if (!canGenerate) return;
 
         const res = await fetch(
-          "http://localhost:5003/api/lookbook/lookbook/generate",
+          `${API_BASE}/api/lookbook/lookbook/generate`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

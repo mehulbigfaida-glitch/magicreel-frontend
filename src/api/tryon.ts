@@ -1,6 +1,6 @@
 import { AVATAR_PRESET_CONFIG } from "../components/avatar/avatarPresetConfig";
 
-const API_BASE = "http://localhost:5003";
+import { API_BASE } from "../config/api";
 
 export interface StartTryOnResponse {
   success: boolean;

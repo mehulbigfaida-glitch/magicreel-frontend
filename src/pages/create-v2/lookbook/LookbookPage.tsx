@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./lookbook.css";
+import SharePanel from "../../../components/SharePanel";
+import { API_BASE } from "../../../config/api";
 
 type Pose = {
   poseId: string;
@@ -190,7 +192,8 @@ useEffect(() => {
 
   /* Export ZIP */
 
-  const handleExport = async () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+const handleExport = async () => {
 
     if (!poses.length) return;
 
@@ -198,7 +201,7 @@ useEffect(() => {
 
       const token = localStorage.getItem("token");
 
-      const res = await fetch("http://localhost:5003/api/lookbook/export", {
+      const res = await fetch(`${API_BASE}/api/lookbook/export`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -280,15 +283,15 @@ useEffect(() => {
 
         <div className="header-actions">
 
-          <button className="export-btn" onClick={handleExport}>
-            Export
-          </button>
+  <div style={{ width: "240px" }}>
+    <SharePanel videoUrl={selectedImage || ""} />
+  </div>
 
-          <button className="theme-btn" disabled>
-            Cinematic Lookbook (Coming Soon)
-          </button>
+  <button className="theme-btn" disabled>
+    Cinematic Lookbook (Coming Soon)
+  </button>
 
-        </div>
+</div>
 
       </div>
 
