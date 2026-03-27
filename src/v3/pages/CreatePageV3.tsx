@@ -60,29 +60,31 @@ export default function CreatePageV3() {
   };
 
   const handleGenerate = async () => {
-    if (!image || !selectedAvatar) return;
+  if (!image || !selectedAvatar) return;
 
+  try {
     setLoading(true);
 
-    const token = localStorage.getItem("token");
-
     const job = await runHeroJob({
-      token: token || "",
-      payload: {
-        categoryKey: category,
-        avatarGender: "female",
-        avatarFaceImageUrl: selectedAvatar.image,
-        garmentFrontImageUrl: image,
-        styling: selectedPill || null,
-      },
+      categoryKey: category,
+      avatarGender: "female",
+      avatarFaceImageUrl: selectedAvatar.image,
+      garmentFrontImageUrl: image,
+      styling: selectedPill || null,
     });
 
-    if (job.status === "completed") {
-      setResult(job.output || null);
+    // ✅ NEW RESPONSE SHAPE
+    if (job?.front?.imageUrl) {
+      setResult({
+        frontImage: job.front.imageUrl,
+      });
     }
-
+  } catch (err) {
+    console.error("Hero generation failed:", err);
+  } finally {
     setLoading(false);
-  };
+  }
+};
 
   const getPills = () => {
     if (category === "WOMEN_TOP")

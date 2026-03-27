@@ -1,7 +1,8 @@
 // magicreel-tryon-frontend/src/api/p2m/hero.ts
-// 🔒 FRONTEND HERO GENERATION API (CANONICAL)
+// 🔒 FRONTEND HERO GENERATION API (FIXED - USES API_BASE)
 
 import axios from "axios";
+import { API_BASE } from "../../config/api";
 
 export type GenerateHeroV2Payload = {
   categoryKey: string;
@@ -17,9 +18,17 @@ export type GenerateHeroV2Payload = {
 export async function generateHeroV2(
   payload: GenerateHeroV2Payload
 ): Promise<{ runId: string }> {
+  const token = localStorage.getItem("token");
+
   const res = await axios.post(
-    "/api/p2m/hero/generate-v2",
-    payload
+    `${API_BASE}/api/p2m/hero/generate-v2`, // ✅ FIXED
+    payload,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
   );
 
   return res.data;

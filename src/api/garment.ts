@@ -1,32 +1,21 @@
-import axios from "axios";
+import type { GarmentCategory } from "../magicreel/config/garments";
 
-/**
- * MUST match StudioSidebar GarmentSubType exactly
- */
-export type GarmentCategory =
-  | "shirt"
-  | "tshirt"
-  | "top"
-  | "one_piece"
-  | "ethnic_set"
-  | "saree"
-  | "lehenga"
-  | "kurta"
-  | "kurta_set"
-  | "sherwani"
-  | "bandhgala"
-  | "bottoms";
-
-export async function uploadGarment(params: {
+export async function uploadGarment(data: {
   frontImageUrl: string;
   backImageUrl?: string;
   category: GarmentCategory;
 }) {
-  const res = await axios.post("/api/garment/upload", {
-    frontImageUrl: params.frontImageUrl,
-    backImageUrl: params.backImageUrl,
-    category: params.category,
+  const res = await fetch("/api/garment/upload", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
   });
 
-  return res.data;
+  if (!res.ok) {
+    throw new Error("Failed to upload garment");
+  }
+
+  return res.json();
 }

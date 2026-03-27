@@ -91,9 +91,9 @@ export default function CreatePage() {
       const uploadedUrl = await uploadToCloudinary(file);
 
       const garment = await uploadGarment({
-        frontImageUrl: uploadedUrl,
-        category: selection.subType!,
-      });
+  frontImageUrl: uploadedUrl,
+  category: selection.category!,
+});
 
       setFrontImage(garment.frontImageUrl);
     } catch (err) {
