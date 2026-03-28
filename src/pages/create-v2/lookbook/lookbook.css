@@ -42,14 +42,12 @@ body {
 .export-btn {
   background: black;
   color: white;
-  border: none;
-  padding: 10px 22px;
   border-radius: 999px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 14px;
+  padding: 10px 20px;
 
-  transition: all 0.2s ease;
+  font-weight: 600;
+
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
 }
 
 .export-btn:hover {
@@ -80,14 +78,18 @@ body {
 ================================ */
 
 .hero-column {
-  width: 42%;
+  width: 45%;
   background: #f8f9fb;
 
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
 
   padding: 32px;
+
   border-right: 1px solid rgba(0,0,0,0.05);
+
+  overflow: visible;
 }
 
 /* HERO FRAME (UPGRADED) */
@@ -96,8 +98,8 @@ body {
   position: relative;
 
   width: 100%;
-  height: calc(100vh - 160px);
-  max-height: 760px;
+  height: 70vh;
+  max-height: 720px;
 
   aspect-ratio: 2 / 3;
 
@@ -119,10 +121,10 @@ body {
   width: 100%;
   height: 100%;
 
-  object-fit: contain;
-  object-position: center 18%;
+  object-fit: cover;
+  object-position: center;
 
-  padding: 18px;
+  padding: 0;
 
   transition: transform 0.3s ease;
 }
@@ -221,7 +223,7 @@ body {
 .thumbnail-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  gap: 24px;
 }
 
 /* ================================
@@ -348,4 +350,103 @@ body {
 @keyframes skeleton-loading {
   0% { background-position: 100% 0; }
   100% { background-position: 0 0; }
+}
+
+.hero-actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.reel-btn {
+  background: linear-gradient(135deg, #000000, #1a1a1a);
+  color: white;
+  border: none;
+
+  padding: 14px 28px;
+  border-radius: 999px;
+
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.2px;
+
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+
+  transition: all 0.25s ease;
+}
+
+.reel-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+}
+
+.reel-btn:active {
+  transform: scale(0.98);
+}
+
+.hero-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.share-wrapper {
+  position: relative;
+}
+
+.share-dropdown {
+  position: fixed;   /* 🔥 KEY CHANGE */
+  top: 80px;
+  right: 32px;
+
+  background: white;
+  border-radius: 12px;
+
+  box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+
+  padding: 8px 0;
+  min-width: 180px;
+
+  z-index: 999999;  /* max priority */
+}
+
+.share-item {
+  padding: 10px 16px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.share-item:hover {
+  background: #f5f5f5;
+}
+
+.share-item.disabled {
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+.share-item.disabled:hover {
+  background: transparent;
+}
+
+.share-wrapper {
+  position: relative;
+  z-index: 10000;
+}
+
+.lookbook-main {
+  position: relative;
+  z-index: 1;
+}
+
+.thumb-card.selected {
+  border: 2px solid #2563eb;
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(37,99,235,0.25);
 }
