@@ -7,7 +7,6 @@ import { API_BASE } from "../../../config/api";
 type Pose = {
   poseId: string;
   imageUrl?: string;
-  crop?: "chest" | "waist" | "fabric";
   loading?: boolean;
 };
 
@@ -51,8 +50,6 @@ export default function LookbookPage() {
     if (hasGenerated.current) return;
     hasGenerated.current = true;
 
-    /* ---------------- PLACEHOLDERS ---------------- */
-
     const placeholders: Pose[] = [];
 
     placeholders.push({
@@ -77,8 +74,6 @@ export default function LookbookPage() {
     setPoses(placeholders);
     setSelectedImage(heroImageUrl);
 
-    /* ---------------- GENERATE LOOKBOOK ---------------- */
-
     const generateLookbook = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -89,20 +84,17 @@ export default function LookbookPage() {
           return;
         }
 
-        const res = await fetch(
-          `${API_BASE}/api/p2m/lookbook/generate-v2`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              heroImageUrl,
-              backHeroImageUrl,
-            }),
-          }
-        );
+        const res = await fetch(`${API_BASE}/api/p2m/lookbook/generate-v2`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            heroImageUrl,
+            backHeroImageUrl,
+          }),
+        });
 
         if (!res.ok) {
           setError("Lookbook generation failed");
@@ -165,49 +157,6 @@ export default function LookbookPage() {
     reader.readAsDataURL(file);
   };
 
-  /* Export ZIP */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleExport = async () => {
-    if (!poses.length) return;
-
-    try {
-      const token = localStorage.getItem("token");
-
-      const res = await fetch(
-        `${API_BASE}/api/p2m/lookbook/export`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            images: poses
-              .filter((p) => p.imageUrl)
-              .map((p) => p.imageUrl),
-          }),
-        }
-      );
-
-      if (!res.ok) {
-        alert("Export failed");
-        return;
-      }
-
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "magicreel-lookbook.zip";
-      link.click();
-
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error("Export error:", err);
-    }
-  };
-
   /* Generate Reel */
   const handleGenerateReel = async () => {
     try {
@@ -239,7 +188,9 @@ export default function LookbookPage() {
     <div className="lookbook-page">
       {/* HEADER */}
       <div className="lookbook-header">
-        <div style={{ flex: 1 }} />
+        <div style={{ fontWeight: 600, fontSize: 16 }}>
+          MagicReel Lookbook
+        </div>
 
         <div className="header-actions">
           <div style={{ width: "240px" }}>
@@ -247,17 +198,23 @@ export default function LookbookPage() {
           </div>
 
           <button className="theme-btn" disabled>
-            Cinematic Lookbook (Coming Soon)
+            Cinematic Mode
           </button>
         </div>
       </div>
 
       {/* MAIN */}
       <div className="lookbook-main">
-        {/* HERO COLUMN */}
+        {/* HERO */}
         <div className="hero-column">
+          <div style={{ marginBottom: 12, fontWeight: 600 }}>
+            Main Preview
+          </div>
+
           <div className="hero-frame">
-            {selectedImage && <img src={selectedImage} alt="Preview" />}
+            {selectedImage ? (
+              <img src={selectedImage} alt="Preview" />
+            ) : null}
 
             <div className="reel-overlay" onClick={handleGenerateReel}>
               ▶ Generate Reel
@@ -265,13 +222,20 @@ export default function LookbookPage() {
           </div>
         </div>
 
-        {/* THUMBNAILS */}
+        {/* RIGHT PANEL */}
         <div className="thumbnail-panel">
-          <h3 style={{ marginBottom: 14 }}>AI Lookbook Shots</h3>
+          <div style={{ marginBottom: 18 }}>
+            <div style={{ fontSize: 20, fontWeight: 600 }}>
+              Lookbook Shots
+            </div>
+            <div style={{ fontSize: 13, color: "#666" }}>
+              Generated poses + manual detail frames
+            </div>
+          </div>
 
           {loading && (
-            <div style={{ marginBottom: 12 }}>
-              Generating AI Lookbook Shots...
+            <div style={{ marginBottom: 16, fontSize: 13 }}>
+              Generating AI lookbook…
             </div>
           )}
 
@@ -291,7 +255,7 @@ export default function LookbookPage() {
                 {pose.loading ? (
                   <div className="loading-skeleton" />
                 ) : (
-                  <img src={pose.imageUrl} alt={pose.poseId} />
+                  <img src={pose.imageUrl || ""} alt={pose.poseId} />
                 )}
 
                 <div className="pose-label">
@@ -307,11 +271,11 @@ export default function LookbookPage() {
                 className="thumb-card upload-card"
                 onClick={() => fileInputRef.current?.click()}
               >
-                Upload Detail Frame
-                <br />
-                Fabric • Logo • Stitching
-                <br />
-                Optional
+                <div className="upload-title">Add Detail Shot</div>
+                <div className="upload-subtitle">
+                  Fabric • Logo • Stitching
+                </div>
+                <div className="upload-note">Optional</div>
 
                 <input
                   ref={fileInputRef}

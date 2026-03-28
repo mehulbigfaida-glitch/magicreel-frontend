@@ -2,8 +2,8 @@ body {
   margin: 0;
   overflow-x: hidden;
   overflow-y: auto;
-  font-family: Arial, sans-serif;
-  background: #f6f6f7;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #f3f4f6;
 }
 
 /* ================================
@@ -17,43 +17,52 @@ body {
 }
 
 /* ================================
-   HEADER
+   HEADER (PREMIUM)
 ================================ */
 
 .lookbook-header {
-  height: 64px;
-  background: white;
+  height: 72px;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(10px);
+
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 32px;
-  border-bottom: 1px solid rgba(0,0,0,0.08);
+
+  padding: 0 40px;
+
+  border-bottom: 1px solid rgba(0,0,0,0.06);
 }
 
 .header-actions {
   display: flex;
-  gap: 12px;
+  gap: 14px;
 }
 
 .export-btn {
   background: black;
   color: white;
   border: none;
-  padding: 8px 18px;
-  border-radius: 8px;
+  padding: 10px 22px;
+  border-radius: 999px;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 14px;
+
+  transition: all 0.2s ease;
 }
 
 .export-btn:hover {
-  background: #222;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
 }
 
 .theme-btn {
-  background: #e6e7eb;
+  background: #e9eaee;
   border: none;
-  padding: 8px 18px;
-  border-radius: 8px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  font-weight: 500;
 }
 
 /* ================================
@@ -67,33 +76,39 @@ body {
 }
 
 /* ================================
-   LEFT COLUMN (HERO PREVIEW)
+   HERO COLUMN (LEFT)
 ================================ */
 
 .hero-column {
-  width: 40%;
-  background: white;
+  width: 42%;
+  background: #f8f9fb;
+
   display: flex;
   flex-direction: column;
-  padding: 24px;
-  border-right: 1px solid rgba(0,0,0,0.08);
+
+  padding: 32px;
+  border-right: 1px solid rgba(0,0,0,0.05);
 }
 
-/* Hero preview frame */
+/* HERO FRAME (UPGRADED) */
 
 .hero-frame {
   position: relative;
+
   width: 100%;
-  height: calc(100vh - 140px);
-  max-height: 720px;
+  height: calc(100vh - 160px);
+  max-height: 760px;
+
   aspect-ratio: 2 / 3;
 
   background: #ffffff;
 
-  border-radius: 18px;
+  border-radius: 22px;
   overflow: hidden;
 
-  box-shadow: 0 18px 40px rgba(0,0,0,0.18);
+  box-shadow:
+    0 30px 80px rgba(0,0,0,0.25),
+    0 8px 24px rgba(0,0,0,0.08);
 
   display: flex;
   align-items: center;
@@ -105,18 +120,18 @@ body {
   height: 100%;
 
   object-fit: contain;
-  object-position: center 20%;
+  object-position: center 18%;
 
-  padding: 16px;
+  padding: 18px;
 
-  transition: transform 0.25s ease;
+  transition: transform 0.3s ease;
 }
 
 .hero-frame:hover img {
-  transform: scale(1.02);
+  transform: scale(1.03);
 }
 
-/* cinematic gradient overlay */
+/* CINEMATIC OVERLAY */
 
 .hero-frame::after {
   content: "";
@@ -125,87 +140,93 @@ body {
 
   background: linear-gradient(
     to top,
-    rgba(0,0,0,0.35),
-    rgba(0,0,0,0.0) 55%
+    rgba(0,0,0,0.45),
+    rgba(0,0,0,0.0) 60%
   );
-
-  pointer-events: none;
 }
 
-/* Brand logo */
+/* LOGO */
 
 .hero-logo {
   position: absolute;
-  top: 14px;
-  right: 14px;
+  top: 16px;
+  right: 16px;
 
-  width: 60px;
-  height: 60px;
+  width: 64px;
+  height: 64px;
 
   background: white;
   padding: 6px;
 
-  border-radius: 10px;
+  border-radius: 12px;
 
   object-fit: contain;
 
-  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
 }
 
-/* Reel button */
+/* REEL BUTTON */
 
 .reel-overlay {
   position: absolute;
 
-  bottom: 18px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
 
-  background: rgba(0,0,0,0.65);
+  background: rgba(0,0,0,0.75);
   color: white;
 
-  padding: 10px 18px;
-  border-radius: 28px;
+  padding: 12px 22px;
+  border-radius: 999px;
 
   font-weight: 600;
   font-size: 14px;
 
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(8px);
+
+  transition: all 0.2s ease;
+}
+
+.reel-overlay:hover {
+  background: black;
 }
 
 /* ================================
-   RIGHT COLUMN (THUMBNAILS)
+   RIGHT PANEL
 ================================ */
 
 .thumbnail-panel {
-  width: 60%;
-  padding: 24px;
+  width: 58%;
+  padding: 32px;
 
   overflow-y: auto;
-  height: calc(100vh - 64px);
+  height: calc(100vh - 72px);
 
-  padding-bottom: 80px;
+  padding-bottom: 100px;
 }
 
-/* Section title */
+/* TITLE */
 
 .lookbook-section-title {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
-  margin-bottom: 18px;
+  margin-bottom: 22px;
 }
 
 /* ================================
-   THUMBNAIL GRID
+   GRID (SPACING FIXED)
 ================================ */
 
 .thumbnail-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  gap: 20px;
 }
 
-/* Thumbnail cards */
+/* ================================
+   THUMB CARDS (PREMIUM)
+================================ */
 
 .thumb-card {
   position: relative;
@@ -214,21 +235,21 @@ body {
   aspect-ratio: 3 / 4;
 
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: 16px;
 
-  background: #f5f5f5;
+  background: #ffffff;
 
   cursor: pointer;
 
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: all 0.2s ease;
+
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
 }
 
 .thumb-card:hover {
-  transform: scale(1.02);
-  box-shadow: 0 10px 22px rgba(0,0,0,0.12);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.18);
 }
-
-/* Thumbnail images */
 
 .thumb-card img {
   width: 100%;
@@ -237,14 +258,19 @@ body {
   object-fit: contain;
   object-position: center top;
 
-  transition: transform 0.25s ease;
+  transition: transform 0.3s ease;
 }
 
-/* Selected frame */
+.thumb-card:hover img {
+  transform: scale(1.05);
+}
+
+/* SELECTED */
 
 .thumb-card.selected {
   outline: 3px solid #4f7cff;
-  transform: scale(1.02);
+  transform: scale(1.03);
+  box-shadow: 0 18px 40px rgba(79,124,255,0.35);
 }
 
 /* ================================
@@ -269,48 +295,16 @@ body {
   font-weight: 500;
 
   color: #667085;
+
+  border-radius: 16px;
+
+  transition: all 0.2s ease;
 }
 
 .upload-card:hover {
   border-color: #4f7cff;
   background: #f5f7ff;
   color: #4f7cff;
-}
-
-.upload-title {
-  font-weight: 600;
-}
-
-.upload-subtitle {
-  font-size: 12px;
-  opacity: 0.75;
-}
-
-.upload-note {
-  font-size: 11px;
-  opacity: 0.6;
-}
-
-/* ================================
-   SKELETON LOADING
-================================ */
-
-.skeleton-card {
-  background: linear-gradient(
-    90deg,
-    #f0f0f0 25%,
-    #e0e0e0 37%,
-    #f0f0f0 63%
-  );
-
-  background-size: 400% 100%;
-
-  animation: skeleton-loading 1.4s ease infinite;
-}
-
-@keyframes skeleton-loading {
-  0% { background-position: 100% 0; }
-  100% { background-position: 0 0; }
 }
 
 /* ================================
@@ -320,64 +314,38 @@ body {
 .pose-label {
   position: absolute;
 
-  bottom: 6px;
-  left: 6px;
+  bottom: 8px;
+  left: 8px;
 
-  background: rgba(0,0,0,0.65);
+  background: rgba(0,0,0,0.7);
   color: white;
 
   font-size: 11px;
 
-  padding: 3px 6px;
-  border-radius: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
 
   text-transform: uppercase;
 }
 
 /* ================================
-   DETAIL CROPS
+   SKELETON
 ================================ */
 
-.crop-chest {
-  object-fit: cover !important;
-  object-position: center 18% !important;
-  transform: scale(1.35);
-}
-
-.crop-waist {
-  object-fit: cover !important;
-  object-position: center 48% !important;
-  transform: scale(1.35);
-}
-
-.crop-fabric {
-  object-fit: cover !important;
-  object-position: center 82% !important;
-  transform: scale(1.45);
-}
-
-.upload-hint {
-  font-size: 11px;
-  color: #888;
-  margin-top: 4px;
-}
-
-/* ================================
-   LOADING PLACEHOLDER FRAME
-================================ */
-
+.skeleton-card,
 .loading-skeleton {
-  width: 100%;
-  height: 100%;
-  border-radius: 12px;
-
   background: linear-gradient(
     90deg,
     #f0f0f0 25%,
-    #e0e0e0 37%,
+    #e4e4e4 37%,
     #f0f0f0 63%
   );
 
   background-size: 400% 100%;
   animation: skeleton-loading 1.4s ease infinite;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 100% 0; }
+  100% { background-position: 0 0; }
 }
