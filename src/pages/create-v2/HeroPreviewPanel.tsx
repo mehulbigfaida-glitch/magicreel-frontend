@@ -1,6 +1,7 @@
 import "./HeroPreviewPanel.css";
 import { useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
+import { API_BASE } from "../../../config/api"; // ✅ ADDED
 
 type Props = {
   heroImageUrl: string | null;
@@ -100,20 +101,49 @@ export default function HeroPreviewPanel({
   };
 
   /* -----------------------------
-     GENERATE REEL
+     GENERATE REEL (✅ FIXED)
   ----------------------------- */
-  const handleGenerateReel = () => {
+  const handleGenerateReel = async () => {
     if (!heroImageUrl || reelStarting) return;
 
-    setMenuOpen(false);
-    setReelStarting(true);
+    try {
+      setMenuOpen(false);
+      setReelStarting(true);
 
-    const url = `/reel-viewer?hero=${encodeURIComponent(heroImageUrl)}`;
-    window.open(url, "_blank");
+      const token = localStorage.getItem("token");
 
-    setTimeout(() => {
+      if (!token) {
+        alert("Please login again");
+        setReelStarting(false);
+        return;
+      }
+
+      const res = await fetch(`${API_BASE}/api/p2m/reel/generate-v1`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          jobId: "hero",
+          heroPreviewUrl: heroImageUrl,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data?.reelVideoUrl) {
+        window.open(data.reelVideoUrl, "_blank");
+      } else {
+        alert(data?.error || "Reel generation failed");
+      }
+
+    } catch (err) {
+      console.error("Hero reel error:", err);
+      alert("Reel generation failed");
+    } finally {
       setReelStarting(false);
-    }, 3000);
+    }
   };
 
   /* -----------------------------
@@ -209,25 +239,25 @@ export default function HeroPreviewPanel({
                 <div className="ai-dropdown">
 
                   <button onClick={handleGenerateLookbook}>
-  Generate Lookbook
-</button>
+                    Generate Lookbook
+                  </button>
 
-<button
-  onClick={handleGenerateReel}
-  disabled={reelStarting}
->
-  {reelStarting
-    ? "Opening Reel Studio..."
-    : "Generate Reel"}
-</button>
+                  <button
+                    onClick={handleGenerateReel}
+                    disabled={reelStarting}
+                  >
+                    {reelStarting
+                      ? "Generating Reel..."
+                      : "Generate Reel"}
+                  </button>
 
-<button disabled>
-  Create Ad Creatives (Soon)
-</button>
+                  <button disabled>
+                    Create Ad Creatives (Soon)
+                  </button>
 
-<button onClick={handleDownloadHero}>
-  Download Image
-</button>
+                  <button onClick={handleDownloadHero}>
+                    Download Image
+                  </button>
 
                 </div>
               )}
