@@ -137,55 +137,99 @@ export default function LookbookPage() {
   };
 
   /* Export ZIP */
-  const handleExport = async () => {
-    if (!poses.length) return;
+const resizeImage = (base64: string): Promise<string> => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.src = base64;
 
-    try {
-      const token = localStorage.getItem("token");
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
 
-      const res = await fetch(`${API_BASE}/api/p2m/lookbook/export`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          images: poses
-            .filter(p => p.imageUrl)
-            .map(p => p.imageUrl),
-        }),
-      });
+      const targetWidth = 1080;
+      const targetHeight = 1920;
 
-      if (!res.ok) {
-        const text = await res.text();
-        console.error("Export failed:", text);
-        alert("Export failed");
-        return;
-      }
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
 
-      const blob = await res.blob();
+      const ctx = canvas.getContext("2d");
 
-      if (!blob || blob.size === 0) {
-        alert("Empty file received");
-        return;
-      }
+      const ratio = Math.max(
+        targetWidth / img.width,
+        targetHeight / img.height
+      );
 
-      const url = window.URL.createObjectURL(blob);
+      const newWidth = img.width * ratio;
+      const newHeight = img.height * ratio;
 
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "magicreel-lookbook.zip";
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      const x = (targetWidth - newWidth) / 2;
+      const y = (targetHeight - newHeight) / 2;
 
-      window.URL.revokeObjectURL(url);
+      ctx?.drawImage(img, x, y, newWidth, newHeight);
 
-    } catch (err) {
-      console.error("Export error:", err);
-      alert("Download failed");
+      resolve(canvas.toDataURL("image/jpeg", 0.9));
+    };
+  });
+};
+
+const handleExport = async () => {
+  if (!poses.length) return;
+
+  try {
+    const token = localStorage.getItem("token");
+
+    // ✅ Normalize ONLY uploaded images
+    const processedImages = await Promise.all(
+      poses
+        .filter(p => p.imageUrl)
+        .map(async (p) => {
+          if (p.poseId === "DETAIL" && p.imageUrl?.startsWith("data:")) {
+            return await resizeImage(p.imageUrl);
+          }
+          return p.imageUrl;
+        })
+    );
+
+    const res = await fetch(`${API_BASE}/api/p2m/lookbook/export`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        images: processedImages,
+      }),
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      console.error("Export failed:", text);
+      alert("Export failed");
+      return;
     }
-  };
+
+    const blob = await res.blob();
+
+    if (!blob || blob.size === 0) {
+      alert("Empty file received");
+      return;
+    }
+
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "magicreel-lookbook.zip";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    window.URL.revokeObjectURL(url);
+
+  } catch (err) {
+    console.error("Export error:", err);
+    alert("Download failed");
+  }
+};
 
   /* ✅ REEL GENERATION (ADDED ONLY THIS) */
   const handleGenerateReel = async () => {
