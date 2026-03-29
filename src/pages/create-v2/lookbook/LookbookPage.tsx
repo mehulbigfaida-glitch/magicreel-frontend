@@ -10,27 +10,10 @@ type Pose = {
   loading?: boolean;
 };
 
-const DEV_MODE = false; // 🔥 set false in production
+const DEV_MODE = false;
 
 export default function LookbookPage() {
   const location = useLocation();
-  [{
-	"resource": "/d:/magicreel-root/magicreel-tryon-frontend/src/pages/create-v2/lookbook/LookbookPage.tsx",
-	"owner": "typescript",
-	"code": "6133",
-	"severity": 4,
-	"message": "'navigate' is declared but its value is never read.",
-	"source": "ts",
-	"startLineNumber": 17,
-	"startColumn": 9,
-	"endLineNumber": 17,
-	"endColumn": 17,
-	"modelVersionId": 59,
-	"tags": [
-		1
-	],
-	"origin": "extHost1"
-}]
 
   const heroImageUrl = location.state?.heroImageUrl as string | undefined;
   const backHeroImageUrl = location.state?.backHeroImageUrl as string | undefined;
@@ -43,7 +26,7 @@ export default function LookbookPage() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const hasGenerated = useRef(false);
 
-    /* Lock body scroll */
+  /* Lock scroll */
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -53,102 +36,86 @@ export default function LookbookPage() {
 
   /* Generate Lookbook */
   useEffect(() => {
-  if (hasGenerated.current) return;
-  hasGenerated.current = true;
+    if (hasGenerated.current) return;
+    hasGenerated.current = true;
 
-  /* ================= DEV MODE ================= */
-  if (DEV_MODE) {
-    const mockImage =
-      "https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?w=800";
+    if (DEV_MODE) return;
 
-    const finalImage = heroImageUrl || mockImage;
+    const generateLookbook = async () => {
+      try {
+        setLoading(true);
 
-    const mockPoses: Pose[] = [
-      { poseId: "HERO", imageUrl: finalImage },
-      { poseId: "P1", imageUrl: finalImage },
-      { poseId: "P2", imageUrl: finalImage },
-      { poseId: "P3", imageUrl: finalImage },
-      { poseId: "P4", imageUrl: finalImage },
-    ];
+        const token = localStorage.getItem("token");
 
-    const ordered = ["HERO", "P1", "P2", "P3", "P4"];
+        if (!token) {
+          setError("Please login again");
+          setLoading(false);
+          return;
+        }
 
-const sortedPoses = ordered
-  .map(id => mockPoses.find(p => p.poseId === id))
-  .filter(Boolean);
+        if (!heroImageUrl) {
+          setError("Missing hero image");
+          setLoading(false);
+          return;
+        }
 
-setPoses(sortedPoses as Pose[]);
-    const heroPose = mockPoses.find(p => p.poseId === "HERO");
-setSelectedImage(heroPose?.imageUrl || finalImage);
-    setLoading(false);
+        const res = await fetch(`${API_BASE}/api/p2m/lookbook/generate-v2`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            heroImageUrl,
+            backHeroImageUrl,
+          }),
+        });
 
-    return;
-  }
+        if (!res.ok) {
+          setError("Lookbook generation failed");
+          setLoading(false);
+          return;
+        }
 
-  /* ================= API ================= */
-const generateLookbook = async () => {
-  try {
-    setLoading(true);
+        const data = await res.json();
+        let poseData: Pose[] = data?.poses || [];
 
-    const token = localStorage.getItem("token");
+        if (!poseData.length) {
+          setError("No poses generated");
+          setLoading(false);
+          return;
+        }
 
-    if (!token) {
-      setError("Authentication required. Please login again.");
-      setLoading(false);
-      return;
-    }
+        // 🔥 ORDER FIX (HERO → BACK → others)
+        const order = ["HERO", "BACK", "P1", "P2", "P3", "P4"];
 
-    if (!heroImageUrl) {
-      setError("Missing hero image.");
-      setLoading(false);
-      return;
-    }
+        const sorted = order
+  .map(id => poseData.find(p => p.poseId === id))
+  .filter((p): p is Pose => Boolean(p));
 
-    const res = await fetch(`${API_BASE}/api/p2m/lookbook/generate-v2`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        heroImageUrl,
-        backHeroImageUrl,
-      }),
-    });
+        const remaining = poseData.filter(
+          p => !order.includes(p.poseId)
+        );
 
-    if (!res.ok) {
-      setError("Lookbook generation failed");
-      setLoading(false);
-      return;
-    }
+        poseData = [...sorted, ...remaining];
 
-    const data = await res.json();
-    const poseData: Pose[] = data?.poses || [];
+        const heroPose = poseData.find(p => p.poseId === "HERO");
 
-    if (!poseData.length) {
-      setError("No poses generated");
-      setLoading(false);
-      return;
-    }
+        setPoses(poseData);
+        setSelectedImage(heroPose?.imageUrl || poseData[0].imageUrl || null);
 
-    // 🔥 Ensure HERO is selected first
-    const heroPose = poseData.find(p => p.poseId === "HERO");
+        setLoading(false);
+      } catch (err) {
+        console.error("Lookbook error:", err);
+        setError("Lookbook generation failed");
+        setLoading(false);
+      }
+    };
 
-    setPoses(poseData);
-    setSelectedImage(heroPose?.imageUrl || poseData[0].imageUrl || null);
+    generateLookbook();
+  }, [heroImageUrl, backHeroImageUrl]);
 
-    setLoading(false);
-  } catch (err) {
-    console.error("Lookbook error:", err);
-    setError("Lookbook generation failed");
-    setLoading(false);
-  }
-};
-
-  generateLookbook();
-}, [heroImageUrl, backHeroImageUrl]);
-
-  /* Upload detail frame */
+  /* Upload detail */
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -158,177 +125,165 @@ const generateLookbook = async () => {
     reader.onload = () => {
       const image = reader.result as string;
 
-      const newPose: Pose = {
-        poseId: "DETAIL",
-        imageUrl: image,
-      };
+      setPoses(prev => [
+        ...prev,
+        { poseId: "DETAIL", imageUrl: image },
+      ]);
 
-      setPoses((prev) => [...prev, newPose]);
       setSelectedImage(image);
     };
 
     reader.readAsDataURL(file);
   };
 
-  /* Create Reel */
-  const handleGenerateReel = async () => {
+  /* Export ZIP */
+  const handleExport = async () => {
+    if (!poses.length) return;
+
     try {
-      const res = await fetch(`${API_BASE}/api/p2m/reel/generate-v1`, {
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(`${API_BASE}/api/lookbook/export`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           images: poses
-            .filter((p) => p.imageUrl)
-            .map((p) => p.imageUrl),
+            .filter(p => p.imageUrl)
+            .map(p => p.imageUrl),
         }),
       });
 
-      const data = await res.json();
-
-      if (data?.reelVideoUrl) {
-        window.open(data.reelVideoUrl, "_blank");
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("Export failed:", text);
+        alert("Export failed");
+        return;
       }
+
+      const blob = await res.blob();
+
+      if (!blob || blob.size === 0) {
+        alert("Empty file received");
+        return;
+      }
+
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "magicreel-lookbook.zip";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      window.URL.revokeObjectURL(url);
+
     } catch (err) {
-      console.error("Reel generation failed:", err);
+      console.error("Export error:", err);
+      alert("Download failed");
     }
   };
 
-  const detailCount = poses.filter((p) => p.poseId === "DETAIL").length;
+  const detailCount = poses.filter(p => p.poseId === "DETAIL").length;
 
-const handleExport = async () => {
-  if (!poses.length) return;
-
-  try {
-    const token = localStorage.getItem("token");
-
-    const res = await fetch(`${API_BASE}/api/p2m/lookbook/export`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        images: poses
-          .filter((p) => p.imageUrl)
-          .map((p) => p.imageUrl),
-      }),
-    });
-
-    if (!res.ok) {
-      alert("Export failed");
-      return;
-    }
-
-    const blob = await res.blob();
-    const url = window.URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "magicreel-lookbook.zip";
-    link.click();
-
-    window.URL.revokeObjectURL(url);
-  } catch (err) {
-    console.error("Export error:", err);
-  }
-};
-
- return (
-  <div className="lookbook-page">
-    {/* HEADER */}
-    <div className="lookbook-header">
-      <div className="header-left">
-        MagicReel Lookbook
-      </div>
-
-      <div className="header-right">
-        <button className="export-btn" onClick={handleExport}>
-          Download Lookbook
-        </button>
-      </div>
-    </div>
-
-    {/* MAIN */}
-    <div className="lookbook-main">
-      {/* HERO */}
-      <div className="hero-column">
-        <div style={{ marginBottom: 12, fontWeight: 600 }}>
-          Main Preview
+  return (
+    <div className="lookbook-page">
+      {/* HEADER */}
+      <div className="lookbook-header">
+        <div className="header-left">
+          MagicReel Lookbook
         </div>
 
-        <div className="hero-frame">
-          {selectedImage && (
-            <img src={selectedImage} alt="Preview" />
-          )}
-        </div>
-
-        {/* 🔥 FIXED REEL BUTTON */}
-        <div className="hero-actions">
-          <button className="reel-btn" onClick={handleGenerateReel}>
-            ▶ Create Reel
+        <div className="header-right">
+          <button className="export-btn" onClick={handleExport}>
+            Download Lookbook
           </button>
         </div>
       </div>
 
-      {/* RIGHT PANEL */}
-      <div className="thumbnail-panel">
-        <div style={{ marginBottom: 18 }}>
-          <div style={{ fontSize: 20, fontWeight: 600 }}>
-            Lookbook Shots
+      <div className="lookbook-main">
+        {/* HERO */}
+        <div className="hero-column">
+          <div style={{ marginBottom: 12, fontWeight: 600 }}>
+            Main Preview
           </div>
-          <div style={{ fontSize: 13, color: "#666" }}>
-            Generated poses + detail frames
+
+          <div className="hero-frame">
+            {loading ? (
+              <div className="loading-state">
+                <div className="loader"></div>
+                <div className="loading-title">
+                  Creating your lookbook
+                </div>
+                <div className="loading-steps">
+                  <div>• Generating poses</div>
+                  <div>• Styling compositions</div>
+                  <div>• Finalizing images</div>
+                </div>
+                <div className="loading-subtext">
+                  This may take up to 2–3 minutes
+                </div>
+              </div>
+            ) : (
+              selectedImage && <img src={selectedImage} alt="Preview" />
+            )}
           </div>
         </div>
 
-        {loading && <div>Generating...</div>}
-        {error && <div>{error}</div>}
+        {/* GRID */}
+        <div className="thumbnail-panel">
+          <div style={{ marginBottom: 18 }}>
+            <div style={{ fontSize: 20, fontWeight: 600 }}>
+              Lookbook Shots
+            </div>
+            <div style={{ fontSize: 13, color: "#666" }}>
+              Generated poses + detail frames
+            </div>
+          </div>
 
-        <div className="thumbnail-grid">
-          {poses.map((pose) => (
-            <div
-              key={pose.poseId + (pose.imageUrl || "")}
-              className={`thumb-card ${
-                selectedImage === pose.imageUrl ? "selected" : ""
-              }`}
-              onClick={() => {
-  if (!pose.imageUrl) return;
-  setSelectedImage(pose.imageUrl);
-}}
-            >
-              {pose.loading ? (
-                <div className="loading-skeleton" />
-              ) : (
+          {error && <div>{error}</div>}
+
+          <div className="thumbnail-grid">
+            {poses.map((pose) => (
+              <div
+                key={pose.poseId + (pose.imageUrl || "")}
+                className={`thumb-card ${
+                  selectedImage === pose.imageUrl ? "selected" : ""
+                }`}
+                onClick={() => {
+                  if (!pose.imageUrl) return;
+                  setSelectedImage(pose.imageUrl);
+                }}
+              >
                 <img src={pose.imageUrl || ""} alt={pose.poseId} />
-              )}
+                <div className="pose-label">{pose.poseId}</div>
+              </div>
+            ))}
 
-              <div className="pose-label">{pose.poseId}</div>
-            </div>
-          ))}
+            {detailCount < 3 && (
+              <div
+                className="thumb-card upload-card"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <div className="upload-title">Add Close-Up Shot</div>
+                <div className="upload-subtext">
+                  Fabric, logo or stitching
+                </div>
 
-          {detailCount < 3 && (
-            <div
-              className="thumb-card upload-card"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <div className="upload-title">Add Close-Up Shot</div>
-<div className="upload-subtext">
-  Show fabric, logo or stitching
-</div>
-
-              <input
-                ref={fileInputRef}
-                type="file"
-                style={{ display: "none" }}
-                onChange={handleImageUpload}
-              />
-            </div>
-          )}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  style={{ display: "none" }}
+                  onChange={handleImageUpload}
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
 }
