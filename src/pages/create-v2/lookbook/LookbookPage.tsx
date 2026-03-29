@@ -179,15 +179,28 @@ const handleExport = async () => {
 
     // ✅ Normalize ONLY uploaded images
     const processedImages = await Promise.all(
-      poses
-        .filter(p => p.imageUrl)
-        .map(async (p) => {
-          if (p.poseId === "DETAIL" && p.imageUrl?.startsWith("data:")) {
-            return await resizeImage(p.imageUrl);
-          }
-          return p.imageUrl;
-        })
-    );
+  poses
+  .map(async (p) => {
+    const poseAny = p as any;
+
+    const img =
+      poseAny.imageUrl ||
+      poseAny.outputImageUrl ||
+      poseAny.resultUrl;
+
+    if (!img) return null;
+
+    // ✅ Resize ONLY user uploaded DETAIL image
+    if (poseAny.poseId === "DETAIL" && img.startsWith("data:")) {
+      return await resizeImage(img);
+    }
+
+    return img;
+  })
+);
+
+// ✅ Remove nulls AFTER processing
+const finalImages = processedImages.filter(Boolean);
 
     const res = await fetch(`${API_BASE}/api/p2m/lookbook/export`, {
       method: "POST",
@@ -196,8 +209,8 @@ const handleExport = async () => {
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        images: processedImages,
-      }),
+  images: finalImages,
+}),
     });
 
     if (!res.ok) {
