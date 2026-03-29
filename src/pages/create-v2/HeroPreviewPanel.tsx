@@ -1,7 +1,7 @@
 import "./HeroPreviewPanel.css";
 import { useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
-import { API_BASE } from "../../../config/api"; // ✅ ADDED
+import { API_BASE } from "../../config/api"; // ✅ ADDED
 
 type Props = {
   heroImageUrl: string | null;
