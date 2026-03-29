@@ -90,8 +90,8 @@ export default function LookbookPage() {
         const order = ["HERO", "BACK", "P1", "P2", "P3", "P4"];
 
         const sorted = order
-  .map(id => poseData.find(p => p.poseId === id))
-  .filter((p): p is Pose => Boolean(p));
+          .map(id => poseData.find(p => p.poseId === id))
+          .filter((p): p is Pose => Boolean(p));
 
         const remaining = poseData.filter(
           p => !order.includes(p.poseId)
@@ -143,7 +143,7 @@ export default function LookbookPage() {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await fetch(`${API_BASE}/api/lookbook/export`, {
+      const res = await fetch(`${API_BASE}/api/p2m/lookbook/export`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -184,6 +184,38 @@ export default function LookbookPage() {
     } catch (err) {
       console.error("Export error:", err);
       alert("Download failed");
+    }
+  };
+
+  /* ✅ REEL GENERATION (ADDED ONLY THIS) */
+  const handleGenerateReel = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(`${API_BASE}/api/p2m/reel/generate-v1`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          images: poses
+            .filter(p => p.imageUrl)
+            .map(p => p.imageUrl),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data?.reelVideoUrl) {
+        window.open(data.reelVideoUrl, "_blank");
+      } else {
+        alert("Reel generation failed");
+      }
+
+    } catch (err) {
+      console.error("Reel error:", err);
+      alert("Reel generation failed");
     }
   };
 
@@ -230,6 +262,13 @@ export default function LookbookPage() {
             ) : (
               selectedImage && <img src={selectedImage} alt="Preview" />
             )}
+          </div>
+
+          {/* ✅ REEL BUTTON (ADDED ONLY THIS) */}
+          <div className="hero-actions">
+            <button className="reel-btn" onClick={handleGenerateReel}>
+              ▶ Create Reel
+            </button>
           </div>
         </div>
 
