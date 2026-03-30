@@ -1,82 +1,72 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "./ReelViewerPage.css";
+import { API_BASE } from "../../config/api";
 
 export default function ReelViewerPage() {
 
   const location = useLocation();
   const navigate = useNavigate();
 
-  const params = new URLSearchParams(location.search);
-  const heroFromQuery = params.get("hero");
-
-  const heroPreviewUrl =
-    heroFromQuery || location.state?.heroPreviewUrl;
+  const jobId = location.state?.jobId;
+  const heroPreviewUrl = location.state?.heroPreviewUrl;
 
   const [loading, setLoading] = useState(true);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
 
   useEffect(() => {
 
-    if (!heroPreviewUrl) {
+    if (!jobId || !heroPreviewUrl) {
       navigate("/create-v2");
       return;
     }
 
-    const generateReel = async () => {
+    const token = localStorage.getItem("token");
 
+    if (!token) {
+      navigate("/create-v2");
+      return;
+    }
+
+    let interval: ReturnType<typeof setInterval>;
+
+    const pollReel = async () => {
       try {
 
-        const jobId = crypto.randomUUID();
-
-        const res = await fetch("/api/p2m/reel/generate-v1", {
-          method: "POST",
+        const res = await fetch(`${API_BASE}/api/p2m/reel/status/${jobId}`, {
           headers: {
-            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            jobId,
-            heroPreviewUrl
-          })
         });
 
-        let data: any = null;
+        const data = await res.json();
 
-        try {
-          data = await res.json();
-        } catch {
-          console.warn("Non-JSON response");
-        }
-
-        /* 🔥 ACCEPT RESULT EVEN IF STATUS NOT OK */
-        if (!res.ok && !data?.reelVideoUrl) {
-          throw new Error("Reel generation failed");
-        }
-
-        if (data?.reelVideoUrl) {
+        if (data?.status === "completed" && data?.reelVideoUrl) {
           setVideoUrl(data.reelVideoUrl);
-        } else {
-          throw new Error("No video returned");
+          setLoading(false);
+          clearInterval(interval);
+        }
+
+        if (data?.status === "failed") {
+          throw new Error("Reel failed");
         }
 
       } catch (err) {
-
-        console.error("Reel generation failed:", err);
-
-        // ❌ removed alert → bad UX
+        console.error("Polling failed:", err);
+        clearInterval(interval);
         navigate("/create-v2");
-
-      } finally {
-
-        setLoading(false);
-
       }
-
     };
 
-    generateReel();
+    // 🔁 poll every 2s
+    interval = setInterval(pollReel, 2000);
 
-  }, [heroPreviewUrl, navigate]);
+    // run immediately once
+    pollReel();
+
+    return () => clearInterval(interval);
+
+  }, [jobId, heroPreviewUrl, navigate]);
 
   const handleDownload = () => {
     if (!videoUrl) return;
@@ -95,10 +85,9 @@ export default function ReelViewerPage() {
 
         <h2>🎬 MagicReel Studio</h2>
 
-        {/* 🔥 SINGLE STAGE (HERO → VIDEO) */}
         <div className="reel-stage">
 
-          {/* HERO (before video) */}
+          {/* HERO PREVIEW */}
           {!videoUrl && heroPreviewUrl && (
             <img
               src={heroPreviewUrl}
@@ -107,28 +96,28 @@ export default function ReelViewerPage() {
             />
           )}
 
-          {/* LOADING OVERLAY */}
+          {/* LOADING */}
           {loading && (
             <div className="reel-overlay">
 
               <div className="reel-loader" />
 
               <div className="reel-loading-title">
-  🎬 Creating your Reel...
-</div>
+                🎬 Creating your Reel...
+              </div>
 
-<div className="reel-loading-sub">
-  Adding motion, lighting & cinematic styling
-</div>
+              <div className="reel-loading-sub">
+                Adding motion, lighting & cinematic styling
+              </div>
 
-<div className="reel-loading-time">
-  Usually ready in 1–3 minutes
-</div>
+              <div className="reel-loading-time">
+                Usually ready in 1–3 minutes
+              </div>
 
             </div>
           )}
 
-          {/* VIDEO replaces hero */}
+          {/* VIDEO */}
           {videoUrl && (
             <video
               src={videoUrl}
@@ -141,7 +130,6 @@ export default function ReelViewerPage() {
 
         </div>
 
-        {/* ACTIONS */}
         {videoUrl && (
           <div className="reel-actions">
 

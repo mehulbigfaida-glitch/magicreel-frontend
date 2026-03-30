@@ -104,47 +104,55 @@ export default function HeroPreviewPanel({
      GENERATE REEL (✅ FIXED)
   ----------------------------- */
   const handleGenerateReel = async () => {
-    if (!heroImageUrl || reelStarting) return;
+  if (!heroImageUrl || reelStarting) return;
 
-    try {
-      setMenuOpen(false);
-      setReelStarting(true);
+  try {
+    setMenuOpen(false);
+    setReelStarting(true);
 
-      const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
-      if (!token) {
-        alert("Please login again");
-        setReelStarting(false);
-        return;
-      }
-
-      const res = await fetch(`${API_BASE}/api/p2m/reel/generate-v1`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          jobId: "hero",
-          heroPreviewUrl: heroImageUrl,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (data?.reelVideoUrl) {
-        window.open(data.reelVideoUrl, "_blank");
-      } else {
-        alert(data?.error || "Reel generation failed");
-      }
-
-    } catch (err) {
-      console.error("Hero reel error:", err);
-      alert("Reel generation failed");
-    } finally {
+    if (!token) {
+      alert("Please login again");
       setReelStarting(false);
+      return;
     }
-  };
+
+    const jobId = crypto.randomUUID(); // ✅ UNIQUE JOB ID
+
+    const res = await fetch(`${API_BASE}/api/p2m/reel/generate-v1`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        jobId,
+        heroPreviewUrl: heroImageUrl,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data?.error || "Reel generation failed");
+    }
+
+    // 🚀 NAVIGATE TO REEL VIEWER (KEY CHANGE)
+    navigate("/reel", {
+      state: {
+        jobId,
+        heroPreviewUrl: heroImageUrl,
+      },
+    });
+
+  } catch (err) {
+    console.error("Hero reel error:", err);
+    alert("Reel generation failed");
+  } finally {
+    setReelStarting(false);
+  }
+};
 
   /* -----------------------------
      TOGGLE MENU
