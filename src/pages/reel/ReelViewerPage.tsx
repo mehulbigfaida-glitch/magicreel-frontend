@@ -8,8 +8,13 @@ export default function ReelViewerPage() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const jobId = location.state?.jobId;
-  const heroPreviewUrl = location.state?.heroPreviewUrl;
+  const params = new URLSearchParams(location.search);
+
+  const jobId =
+    location.state?.jobId || params.get("jobId");
+
+  const heroPreviewUrl =
+    location.state?.heroPreviewUrl || params.get("hero");
 
   const [loading, setLoading] = useState(true);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
@@ -29,15 +34,20 @@ export default function ReelViewerPage() {
     }
 
     let interval: ReturnType<typeof setInterval>;
+    let timeout: ReturnType<typeof setTimeout>;
+    let attempts = 0;
 
-    const pollReel = async () => {
+    const poll = async () => {
       try {
 
-        const res = await fetch(`${API_BASE}/api/p2m/reel/status/${jobId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await fetch(
+          `${API_BASE}/api/p2m/reel/status/${jobId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         const data = await res.json();
 
@@ -51,6 +61,13 @@ export default function ReelViewerPage() {
           throw new Error("Reel failed");
         }
 
+        attempts++;
+
+        // ⛔ timeout ~240 sec (after polling starts)
+        if (attempts > 80) {
+          throw new Error("Timeout");
+        }
+
       } catch (err) {
         console.error("Polling failed:", err);
         clearInterval(interval);
@@ -58,13 +75,19 @@ export default function ReelViewerPage() {
       }
     };
 
-    // 🔁 poll every 2s
-    interval = setInterval(pollReel, 2000);
+    // 🔥 INITIAL DELAY: 90 sec
+    timeout = setTimeout(() => {
+      poll();
 
-    // run immediately once
-    pollReel();
+      // 🔁 THEN POLL EVERY 3 sec
+      interval = setInterval(poll, 3000);
 
-    return () => clearInterval(interval);
+    }, 90000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
 
   }, [jobId, heroPreviewUrl, navigate]);
 
@@ -111,7 +134,7 @@ export default function ReelViewerPage() {
               </div>
 
               <div className="reel-loading-time">
-                Usually ready in 1–3 minutes
+                Usually ready in 2–4 minutes
               </div>
 
             </div>
@@ -130,6 +153,7 @@ export default function ReelViewerPage() {
 
         </div>
 
+        {/* ACTIONS */}
         {videoUrl && (
           <div className="reel-actions">
 

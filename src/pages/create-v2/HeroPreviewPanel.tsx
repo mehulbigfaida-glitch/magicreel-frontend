@@ -100,10 +100,10 @@ export default function HeroPreviewPanel({
     });
   };
 
-  /* -----------------------------
-     GENERATE REEL (✅ FIXED)
-  ----------------------------- */
-  const handleGenerateReel = async () => {
+/* -----------------------------
+   GENERATE REEL (FINAL)
+----------------------------- */
+const handleGenerateReel = async () => {
   if (!heroImageUrl || reelStarting) return;
 
   try {
@@ -118,7 +118,7 @@ export default function HeroPreviewPanel({
       return;
     }
 
-    const jobId = crypto.randomUUID(); // ✅ UNIQUE JOB ID
+    const jobId = crypto.randomUUID();
 
     const res = await fetch(`${API_BASE}/api/p2m/reel/generate-v1`, {
       method: "POST",
@@ -138,13 +138,15 @@ export default function HeroPreviewPanel({
       throw new Error(data?.error || "Reel generation failed");
     }
 
-    // 🚀 NAVIGATE TO REEL VIEWER (KEY CHANGE)
-    navigate("/reel", {
-      state: {
-        jobId,
-        heroPreviewUrl: heroImageUrl,
-      },
-    });
+    navigate(
+      `/reel?jobId=${jobId}&hero=${encodeURIComponent(heroImageUrl)}`,
+      {
+        state: {
+          jobId,
+          heroPreviewUrl: heroImageUrl,
+        },
+      }
+    );
 
   } catch (err) {
     console.error("Hero reel error:", err);

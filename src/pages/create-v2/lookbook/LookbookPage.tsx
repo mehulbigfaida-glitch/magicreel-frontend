@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import "./lookbook.css";
 
 import { API_BASE } from "../../../config/api";
@@ -14,6 +14,7 @@ const DEV_MODE = false;
 
 export default function LookbookPage() {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const heroImageUrl = location.state?.heroImageUrl as string | undefined;
   const backHeroImageUrl = location.state?.backHeroImageUrl as string | undefined;
@@ -86,7 +87,6 @@ export default function LookbookPage() {
           return;
         }
 
-        // 🔥 ORDER FIX (HERO → BACK → others)
         const order = ["HERO", "BACK", "P1", "P2", "P3", "P4"];
 
         const sorted = order
@@ -136,184 +136,163 @@ export default function LookbookPage() {
     reader.readAsDataURL(file);
   };
 
+  /* Resize helper */
+  const resizeImage = (base64: string): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.src = base64;
+
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+
+        const targetWidth = 1080;
+        const targetHeight = 1920;
+
+        canvas.width = targetWidth;
+        canvas.height = targetHeight;
+
+        const ctx = canvas.getContext("2d");
+
+        const ratio = Math.max(
+          targetWidth / img.width,
+          targetHeight / img.height
+        );
+
+        const newWidth = img.width * ratio;
+        const newHeight = img.height * ratio;
+
+        const x = (targetWidth - newWidth) / 2;
+        const y = (targetHeight - newHeight) / 2;
+
+        ctx?.drawImage(img, x, y, newWidth, newHeight);
+
+        resolve(canvas.toDataURL("image/jpeg", 0.9));
+      };
+    });
+  };
+
   /* Export ZIP */
-const resizeImage = (base64: string): Promise<string> => {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.src = base64;
+  const handleExport = async () => {
+    if (!poses.length) return;
 
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
+    try {
+      const token = localStorage.getItem("token");
 
-      const targetWidth = 1080;
-      const targetHeight = 1920;
+      const processedImages = await Promise.all(
+        poses.map(async (p) => {
+          const poseAny = p as any;
 
-      canvas.width = targetWidth;
-      canvas.height = targetHeight;
+          const img =
+            poseAny.imageUrl ||
+            poseAny.outputImageUrl ||
+            poseAny.resultUrl;
 
-      const ctx = canvas.getContext("2d");
+          if (!img) return null;
 
-      const ratio = Math.max(
-        targetWidth / img.width,
-        targetHeight / img.height
+          if (poseAny.poseId === "DETAIL" && img.startsWith("data:")) {
+            return await resizeImage(img);
+          }
+
+          return img;
+        })
       );
 
-      const newWidth = img.width * ratio;
-      const newHeight = img.height * ratio;
+      const finalImages = processedImages.filter(Boolean);
 
-      const x = (targetWidth - newWidth) / 2;
-      const y = (targetHeight - newHeight) / 2;
+      const res = await fetch(`${API_BASE}/api/p2m/lookbook/export`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          images: finalImages,
+        }),
+      });
 
-      ctx?.drawImage(img, x, y, newWidth, newHeight);
+      if (!res.ok) {
+        alert("Export failed");
+        return;
+      }
 
-      resolve(canvas.toDataURL("image/jpeg", 0.9));
-    };
-  });
-};
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
 
-const handleExport = async () => {
-  if (!poses.length) return;
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "magicreel-lookbook.zip";
+      link.click();
 
-  try {
-    const token = localStorage.getItem("token");
+      window.URL.revokeObjectURL(url);
 
-    // ✅ Normalize ONLY uploaded images
-    const processedImages = await Promise.all(
-  poses
-  .map(async (p) => {
-    const poseAny = p as any;
-
-    const img =
-      poseAny.imageUrl ||
-      poseAny.outputImageUrl ||
-      poseAny.resultUrl;
-
-    if (!img) return null;
-
-    // ✅ Resize ONLY user uploaded DETAIL image
-    if (poseAny.poseId === "DETAIL" && img.startsWith("data:")) {
-      return await resizeImage(img);
+    } catch (err) {
+      console.error("Export error:", err);
+      alert("Download failed");
     }
+  };
 
-    return img;
-  })
-);
-
-// ✅ Remove nulls AFTER processing
-const finalImages = processedImages.filter(Boolean);
-
-    const res = await fetch(`${API_BASE}/api/p2m/lookbook/export`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-  images: finalImages,
-}),
-    });
-
-    if (!res.ok) {
-      const text = await res.text();
-      console.error("Export failed:", text);
-      alert("Export failed");
-      return;
-    }
-
-    const blob = await res.blob();
-
-    if (!blob || blob.size === 0) {
-      alert("Empty file received");
-      return;
-    }
-
-    const url = window.URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "magicreel-lookbook.zip";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-
-    window.URL.revokeObjectURL(url);
-
-  } catch (err) {
-    console.error("Export error:", err);
-    alert("Download failed");
-  }
-};
-
-  /* ✅ REEL GENERATION (ADDED ONLY THIS) */
+  /* 🔥 FINAL REEL GENERATION */
   const handleGenerateReel = async () => {
-  try {
-    const token = localStorage.getItem("token");
+    try {
+      const token = localStorage.getItem("token");
 
-    if (!token) {
-      alert("Please login again");
-      return;
+      if (!token) {
+        alert("Please login again");
+        return;
+      }
+
+      const jobId = crypto.randomUUID();
+
+      const baseImage =
+        selectedImage ||
+        poses.find(p => p.poseId === "HERO")?.imageUrl ||
+        poses[0]?.imageUrl;
+
+      if (!baseImage) {
+        alert("No image available for Reel");
+        return;
+      }
+
+      const res = await fetch(`${API_BASE}/api/p2m/reel/generate-v1`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          jobId,
+          heroPreviewUrl: baseImage,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.error || "Reel generation failed");
+      }
+
+      navigate(
+        `/reel?jobId=${jobId}&hero=${encodeURIComponent(baseImage)}`,
+        {
+          state: {
+            jobId,
+            heroPreviewUrl: baseImage,
+          },
+        }
+      );
+
+    } catch (err) {
+      console.error("Reel error:", err);
+      alert("Reel generation failed");
     }
-
-    const jobId = crypto.randomUUID();
-
-    // ✅ Pick best image (selected or fallback)
-    const baseImage =
-      selectedImage ||
-      poses.find(p => p.poseId === "HERO")?.imageUrl ||
-      poses[0]?.imageUrl;
-
-    if (!baseImage) {
-      alert("No image available for Reel");
-      return;
-    }
-
-    const res = await fetch(`${API_BASE}/api/p2m/reel/generate-v1`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        jobId,
-        heroPreviewUrl: baseImage, // ✅ unified input
-      }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data?.error || "Reel generation failed");
-    }
-
-    // 🚀 Navigate to Reel Viewer (same as Hero)
-    window.location.href = "/reel"; // fallback safety
-
-    // better navigation with state
-    window.history.replaceState(
-      {
-        jobId,
-        heroPreviewUrl: baseImage,
-      },
-      "",
-      "/reel"
-    );
-
-  } catch (err) {
-    console.error("Reel error:", err);
-    alert("Reel generation failed");
-  }
-};
+  };
 
   const detailCount = poses.filter(p => p.poseId === "DETAIL").length;
 
   return (
     <div className="lookbook-page">
-      {/* HEADER */}
       <div className="lookbook-header">
-        <div className="header-left">
-          MagicReel Lookbook
-        </div>
-
+        <div className="header-left">MagicReel Lookbook</div>
         <div className="header-right">
           <button className="export-btn" onClick={handleExport}>
             Download Lookbook
@@ -322,7 +301,6 @@ const finalImages = processedImages.filter(Boolean);
       </div>
 
       <div className="lookbook-main">
-        {/* HERO */}
         <div className="hero-column">
           <div style={{ marginBottom: 12, fontWeight: 600 }}>
             Main Preview
@@ -332,24 +310,13 @@ const finalImages = processedImages.filter(Boolean);
             {loading ? (
               <div className="loading-state">
                 <div className="loader"></div>
-                <div className="loading-title">
-                  Creating your lookbook
-                </div>
-                <div className="loading-steps">
-                  <div>• Generating poses</div>
-                  <div>• Styling compositions</div>
-                  <div>• Finalizing images</div>
-                </div>
-                <div className="loading-subtext">
-                  This may take up to 2–3 minutes
-                </div>
+                <div className="loading-title">Creating your lookbook</div>
               </div>
             ) : (
-              selectedImage && <img src={selectedImage} alt="Preview" />
+              selectedImage && <img src={selectedImage} />
             )}
           </div>
 
-          {/* ✅ REEL BUTTON (ADDED ONLY THIS) */}
           <div className="hero-actions">
             <button className="reel-btn" onClick={handleGenerateReel}>
               ▶ Create Reel
@@ -357,56 +324,47 @@ const finalImages = processedImages.filter(Boolean);
           </div>
         </div>
 
-        {/* GRID */}
         <div className="thumbnail-panel">
-          <div style={{ marginBottom: 18 }}>
-            <div style={{ fontSize: 20, fontWeight: 600 }}>
-              Lookbook Shots
-            </div>
-            <div style={{ fontSize: 13, color: "#666" }}>
-              Generated poses + detail frames
-            </div>
-          </div>
 
-          {error && <div>{error}</div>}
+  {error && (
+    <div style={{ color: "red", marginBottom: 12 }}>
+      {error}
+    </div>
+  )}
 
-          <div className="thumbnail-grid">
-            {poses.map((pose) => (
-              <div
-                key={pose.poseId + (pose.imageUrl || "")}
-                className={`thumb-card ${
-                  selectedImage === pose.imageUrl ? "selected" : ""
-                }`}
-                onClick={() => {
-                  if (!pose.imageUrl) return;
-                  setSelectedImage(pose.imageUrl);
-                }}
-              >
-                <img src={pose.imageUrl || ""} alt={pose.poseId} />
-                <div className="pose-label">{pose.poseId}</div>
-              </div>
-            ))}
+  <div className="thumbnail-grid">
+    {poses.map((pose) => (
+      <div
+        key={pose.poseId + (pose.imageUrl || "")}
+        className={`thumb-card ${
+          selectedImage === pose.imageUrl ? "selected" : ""
+        }`}
+        onClick={() => {
+          if (!pose.imageUrl) return;
+          setSelectedImage(pose.imageUrl);
+        }}
+      >
+        <img src={pose.imageUrl || ""} />
+        <div className="pose-label">{pose.poseId}</div>
+      </div>
+    ))}
 
-            {detailCount < 3 && (
-              <div
-                className="thumb-card upload-card"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <div className="upload-title">Add Close-Up Shot</div>
-                <div className="upload-subtext">
-                  Fabric, logo or stitching
-                </div>
-
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  style={{ display: "none" }}
-                  onChange={handleImageUpload}
-                />
-              </div>
-            )}
-          </div>
-        </div>
+    {detailCount < 3 && (
+      <div
+        className="thumb-card upload-card"
+        onClick={() => fileInputRef.current?.click()}
+      >
+        Add Close-Up Shot
+        <input
+          ref={fileInputRef}
+          type="file"
+          style={{ display: "none" }}
+          onChange={handleImageUpload}
+        />
+      </div>
+    )}
+  </div>
+</div>
       </div>
     </div>
   );
