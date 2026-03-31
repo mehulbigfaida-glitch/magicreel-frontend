@@ -84,6 +84,10 @@ export default function CreateV2Page() {
   const [heroError, setHeroError] =
     useState<string | null>(null);
 
+  /* 🔥 ADD THESE 2 LINES */
+  const [reelUrl, setReelUrl] = useState<string | null>(null);
+  const [reelLoading, setReelLoading] = useState(false);
+
   const pollRef = useRef<number | null>(null);
 
   const navigate = useNavigate();
@@ -180,67 +184,106 @@ export default function CreateV2Page() {
 
   /* ================= HERO GENERATION ================= */
 
-  const generateHero = async () => {
+const generateHero = async () => {
 
-    if (heroLoading) return;
+  if (heroLoading) return;
 
-    if (pollRef.current) {
-      clearInterval(pollRef.current);
-      pollRef.current = null;
-    }
+  if (pollRef.current) {
+    clearInterval(pollRef.current);
+    pollRef.current = null;
+  }
 
-    try {
+  try {
 
-      setHeroError(null);
-      setHeroLoading(true);
+    setHeroError(null);
+    setHeroLoading(true);
 
-      setFrontHeroImageUrl(null);
-      setBackHeroImageUrl(null);
+    setFrontHeroImageUrl(null);
+    setBackHeroImageUrl(null);
 
-      const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
-      const res = await fetch(
-        `${API_BASE}/api/p2m/hero/generate-v2`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            categoryKey: selection.subType!,
-            avatarGender: selectedAvatar!.gender,
-            avatarFaceImageUrl: selectedAvatar!.modelImage,
-            garmentFrontImageUrl: productImageUrl,
-            avatarBackImageUrl: backImageUrl
-              ? selectedAvatar!.backModelImage
-              : undefined,
-            garmentBackImageUrl: backImageUrl || undefined,
-            styling: selection.pill || null,
-          }),
-        }
-      );
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Hero failed");
+    const res = await fetch(
+      `${API_BASE}/api/p2m/hero/generate-v2`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          categoryKey: selection.subType!,
+          avatarGender: selectedAvatar!.gender,
+          avatarFaceImageUrl: selectedAvatar!.modelImage,
+          garmentFrontImageUrl: productImageUrl,
+          avatarBackImageUrl: backImageUrl
+            ? selectedAvatar!.backModelImage
+            : undefined,
+          garmentBackImageUrl: backImageUrl || undefined,
+          styling: selection.pill || null,
+        }),
       }
+    );
 
-      setFrontRunId(data.frontRunId);
-      setBackRunId(data.backRunId || null);
+    const data = await res.json();
 
-      await refreshUser();
-
-    } catch (err: any) {
-
-      setHeroError(err.message);
-      setHeroLoading(false);
-
+    if (!res.ok) {
+      throw new Error(data.error || "Hero failed");
     }
 
-  };
+    setFrontRunId(data.frontRunId);
+    setBackRunId(data.backRunId || null);
 
+    await refreshUser();
+
+  } catch (err: any) {
+
+    setHeroError(err.message);
+    setHeroLoading(false);
+
+  }
+
+};
+
+/* 🔥 ADD THIS FULL FUNCTION BELOW */
+
+const generateReel = async (heroUrl: string) => {
+  if (!heroUrl || reelLoading) return;
+
+  try {
+    setReelLoading(true);
+
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(
+      `${API_BASE}/api/reel/generate-v1`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          jobId: frontRunId,
+          heroPreviewUrl: heroUrl,
+        }),
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || "Reel failed");
+    }
+
+    setReelUrl(data.reelVideoUrl);
+
+  } catch (err) {
+    console.warn("Reel error:", err);
+  } finally {
+    setReelLoading(false);
+  }
+};
   /* ================= HERO POLLING (CONTROLLED) ================= */
 
 useEffect(() => {
@@ -361,6 +404,16 @@ useEffect(() => {
   };
 
 }, [frontRunId, backRunId, frontHeroImageUrl, backHeroImageUrl]);
+
+/* ================= REEL AUTO TRIGGER ================= */
+
+useEffect(() => {
+  if (frontHeroImageUrl && !reelUrl) {
+    console.log("🎬 Triggering Reel Generation...");
+    generateReel(frontHeroImageUrl);
+  }
+}, [frontHeroImageUrl]);
+
   /* ================= UI ================= */
 
   return (

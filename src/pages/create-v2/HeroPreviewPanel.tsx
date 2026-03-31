@@ -2,7 +2,6 @@ import "./HeroPreviewPanel.css";
 import { useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 
-
 type Props = {
   heroImageUrl: string | null;
   backHeroImageUrl?: string | null;
@@ -14,6 +13,10 @@ type Props = {
   activeView?: "front" | "back";
   onToggle?: (view: "front" | "back") => void;
   categoryKey?: string | null;
+
+  /* 🔥 REEL */
+  reelUrl?: string | null;
+  reelLoading?: boolean;
 };
 
 export default function HeroPreviewPanel({
@@ -27,6 +30,11 @@ export default function HeroPreviewPanel({
   activeView = "front",
   onToggle,
   categoryKey,
+
+  /* 🔥 FIX: ADD THESE */
+  reelUrl,
+  reelLoading,
+
 }: Props) {
 
   const navigate = useNavigate();
@@ -100,29 +108,17 @@ export default function HeroPreviewPanel({
     });
   };
 
-/* -----------------------------
-   GENERATE REEL (FINAL - NEW TAB FLOW)
------------------------------ */
-const handleGenerateReel = async () => {
-  if (!heroImageUrl || reelStarting) return;
-
-  try {
-    setMenuOpen(false);
+  /* -----------------------------
+     GENERATE REEL (UI ONLY)
+  ----------------------------- */
+  const handleGenerateReel = () => {
+    console.log("Reel handled from CreateV2Page");
     setReelStarting(true);
 
-    const jobId = crypto.randomUUID();
-
-    const url = `/reel?jobId=${jobId}&hero=${encodeURIComponent(heroImageUrl)}`;
-
-    // ✅ OPEN IN NEW TAB (KEEP HERO PAGE INTACT)
-    window.open(url, "_blank");
-
-  } catch (err) {
-    console.error("Hero reel error:", err);
-  } finally {
-    setReelStarting(false);
-  }
-};
+    setTimeout(() => {
+      setReelStarting(false);
+    }, 1500);
+  };
 
   /* -----------------------------
      TOGGLE MENU
@@ -195,14 +191,12 @@ const handleGenerateReel = async () => {
             </div>
           )}
 
-          {/* ✨ READY TEXT */}
           {showReady && (
             <div className="hero-ready-text">
               ✨ Your AI Model is Ready
             </div>
           )}
 
-          {/* 🔥 AI ACTION BUTTON */}
           {heroImageUrl && !loading && (
             <div className="ai-actions-container" ref={menuRef}>
 
@@ -241,6 +235,28 @@ const handleGenerateReel = async () => {
               )}
 
             </div>
+          )}
+
+          {/* 🔥 REEL OUTPUT */}
+
+          {reelLoading && (
+            <div style={{ marginTop: 12 }}>
+              Generating Reel...
+            </div>
+          )}
+
+          {reelUrl && (
+            <video
+              src={reelUrl}
+              controls
+              autoPlay
+              loop
+              style={{
+                width: "100%",
+                borderRadius: 12,
+                marginTop: 12,
+              }}
+            />
           )}
 
         </div>
