@@ -4,7 +4,6 @@ import "./ReelViewerPage.css";
 import { API_BASE } from "../../config/api";
 
 export default function ReelViewerPage() {
-
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -16,29 +15,48 @@ export default function ReelViewerPage() {
   const heroPreviewUrl =
     location.state?.heroPreviewUrl || params.get("hero");
 
-  const [loading, setLoading] = useState(true);
+  const [confirmed, setConfirmed] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
 
+  /* -----------------------------
+     START GENERATION (AFTER CONFIRM)
+  ----------------------------- */
   useEffect(() => {
+    if (!confirmed || !jobId || !heroPreviewUrl) return;
 
-    if (!jobId || !heroPreviewUrl) {
-      navigate("/create-v2");
-      return;
-    }
-
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      navigate("/create-v2");
-      return;
-    }
-
-    let interval: ReturnType<typeof setInterval>;
-    let timeout: ReturnType<typeof setTimeout>;
-    let attempts = 0;
-
-    const poll = async () => {
+    const startReel = async () => {
       try {
+        setLoading(true);
+
+        const token = localStorage.getItem("token");
+
+        const res = await fetch(`${API_BASE}/api/p2m/reel/generate-v1`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            jobId,
+            heroPreviewUrl,
+          }),
+        });
+
+        await res.json();
+
+        /* 🔁 START POLLING */
+        setTimeout(pollStatus, 90000); // initial delay
+
+      } catch (err) {
+        console.error("Reel start failed:", err);
+        navigate("/create-v2");
+      }
+    };
+
+    const pollStatus = async () => {
+      try {
+        const token = localStorage.getItem("token");
 
         const res = await fetch(
           `${API_BASE}/api/p2m/reel/status/${jobId}`,
@@ -51,127 +69,128 @@ export default function ReelViewerPage() {
 
         const data = await res.json();
 
-        if (data?.status === "completed" && data?.reelVideoUrl) {
+        if (data.status === "completed") {
           setVideoUrl(data.reelVideoUrl);
           setLoading(false);
-          clearInterval(interval);
+          return;
         }
 
-        if (data?.status === "failed") {
+        if (data.status === "failed") {
           throw new Error("Reel failed");
         }
 
-        attempts++;
-
-        // ⛔ timeout ~240 sec (after polling starts)
-        if (attempts > 80) {
-          throw new Error("Timeout");
-        }
+        setTimeout(pollStatus, 3000);
 
       } catch (err) {
         console.error("Polling failed:", err);
-        clearInterval(interval);
         navigate("/create-v2");
       }
     };
 
-    // 🔥 INITIAL DELAY: 90 sec
-    timeout = setTimeout(() => {
-      poll();
+    startReel();
 
-      // 🔁 THEN POLL EVERY 3 sec
-      interval = setInterval(poll, 3000);
+  }, [confirmed, jobId, heroPreviewUrl, navigate]);
 
-    }, 90000);
+  /* -----------------------------
+     ACTIONS
+  ----------------------------- */
 
-    return () => {
-      clearInterval(interval);
-      clearTimeout(timeout);
-    };
+  const handleConfirm = () => {
+    setConfirmed(true);
+  };
 
-  }, [jobId, heroPreviewUrl, navigate]);
+  const handleCancel = () => {
+    navigate("/create-v2");
+  };
 
   const handleDownload = () => {
     if (!videoUrl) return;
     window.open(videoUrl, "_blank");
   };
 
-  const handleBack = () => {
-    navigate("/create-v2");
-  };
+  /* -----------------------------
+     UI
+  ----------------------------- */
 
   return (
-
     <div className="reel-page">
-
       <div className="reel-container">
 
         <h2>🎬 MagicReel Studio</h2>
 
-        <div className="reel-stage">
+        {/* ✅ CONFIRMATION MODAL */}
+        {!confirmed && (
+          <div className="reel-confirm">
+            <h3>Are you sure you want to create Reel?</h3>
 
-          {/* HERO PREVIEW */}
-          {!videoUrl && heroPreviewUrl && (
-            <img
-              src={heroPreviewUrl}
-              alt="Hero preview"
-              className="reel-preview-image"
-            />
-          )}
+            <div className="reel-confirm-actions">
+              <button onClick={handleConfirm}>
+                Yes, Create Reel
+              </button>
 
-          {/* LOADING */}
-          {loading && (
-            <div className="reel-overlay">
-
-              <div className="reel-loader" />
-
-              <div className="reel-loading-title">
-                🎬 Creating your Reel...
-              </div>
-
-              <div className="reel-loading-sub">
-                Adding motion, lighting & cinematic styling
-              </div>
-
-              <div className="reel-loading-time">
-                Usually ready in 2–4 minutes
-              </div>
-
+              <button onClick={handleCancel}>
+                Cancel
+              </button>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* VIDEO */}
-          {videoUrl && (
-            <video
-              src={videoUrl}
-              controls
-              autoPlay
-              loop
-              className="reel-video"
-            />
-          )}
+        {/* ✅ MAIN STAGE */}
+        {confirmed && (
+          <div className="reel-stage">
 
-        </div>
+            {!videoUrl && heroPreviewUrl && (
+              <img
+                src={heroPreviewUrl}
+                className="reel-preview-image"
+              />
+            )}
 
-        {/* ACTIONS */}
-        {videoUrl && (
-          <div className="reel-actions">
+            {loading && (
+              <div className="reel-overlay">
+                <div className="reel-loader" />
 
-            <button onClick={handleDownload}>
-              ⬇ Download Reel
-            </button>
+                <div className="reel-loading-title">
+                  🎬 Creating your Reel...
+                </div>
 
-            <button onClick={handleBack}>
-              Back to Editor
-            </button>
+                <div className="reel-loading-sub">
+                  Adding motion, lighting & cinematic styling
+                </div>
+
+                <div className="reel-loading-time">
+                  Usually ready in 1–3 minutes
+                </div>
+              </div>
+            )}
+
+            {videoUrl && (
+              <video
+                src={videoUrl}
+                controls
+                autoPlay
+                loop
+                className="reel-video"
+              />
+            )}
 
           </div>
         )}
 
+        {/* ACTIONS */}
+        {videoUrl && (
+          <div className="reel-actions">
+            <button onClick={handleDownload}>
+              ⬇ Download Reel
+            </button>
+
+            <button onClick={() => navigate("/create-v2")}>
+              Back to Editor
+            </button>
+          </div>
+        )}
+
       </div>
-
     </div>
-
   );
-
 }
