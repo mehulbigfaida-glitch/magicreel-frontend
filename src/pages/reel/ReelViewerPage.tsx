@@ -10,10 +10,10 @@ export default function ReelViewerPage() {
   const params = new URLSearchParams(location.search);
 
   const jobId =
-    location.state?.jobId || params.get("jobId");
+  location.state?.jobId || params.get("jobId");
 
-  const heroPreviewUrl =
-    location.state?.heroPreviewUrl || params.get("hero");
+const heroPreviewUrl =
+  location.state?.heroPreviewUrl || params.get("hero");
 
   const [confirmed, setConfirmed] = useState(false);
   const [loading, setLoading] = useState(false);
