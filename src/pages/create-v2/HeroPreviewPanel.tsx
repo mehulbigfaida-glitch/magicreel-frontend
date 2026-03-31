@@ -1,7 +1,7 @@
 import "./HeroPreviewPanel.css";
 import { useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
-import { API_BASE } from "../../config/api"; // ✅ ADDED
+
 
 type Props = {
   heroImageUrl: string | null;
@@ -101,7 +101,7 @@ export default function HeroPreviewPanel({
   };
 
 /* -----------------------------
-   GENERATE REEL (FINAL)
+   GENERATE REEL (FINAL - NEW TAB FLOW)
 ----------------------------- */
 const handleGenerateReel = async () => {
   if (!heroImageUrl || reelStarting) return;
@@ -110,47 +110,15 @@ const handleGenerateReel = async () => {
     setMenuOpen(false);
     setReelStarting(true);
 
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      alert("Please login again");
-      setReelStarting(false);
-      return;
-    }
-
     const jobId = crypto.randomUUID();
 
-    const res = await fetch(`${API_BASE}/api/p2m/reel/generate-v1`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        jobId,
-        heroPreviewUrl: heroImageUrl,
-      }),
-    });
+    const url = `/reel?jobId=${jobId}&hero=${encodeURIComponent(heroImageUrl)}`;
 
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data?.error || "Reel generation failed");
-    }
-
-    navigate(
-      `/reel?jobId=${jobId}&hero=${encodeURIComponent(heroImageUrl)}`,
-      {
-        state: {
-          jobId,
-          heroPreviewUrl: heroImageUrl,
-        },
-      }
-    );
+    // ✅ OPEN IN NEW TAB (KEEP HERO PAGE INTACT)
+    window.open(url, "_blank");
 
   } catch (err) {
     console.error("Hero reel error:", err);
-    alert("Reel generation failed");
   } finally {
     setReelStarting(false);
   }
