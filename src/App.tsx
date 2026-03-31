@@ -208,27 +208,33 @@ function AppRoutes() {
   return (
     <Routes>
 
-      <Route path="/" element={<HomePage />} />
-      <Route path="/create" element={<CreatePage />} />
-      <Route path="/create-v2" element={<CreateV2Page />} />
-      <Route path="/lookbook" element={<LookbookPage />} />
-      <Route path="/cinematic" element={<CinematicPage />} />
-      <Route path="/plans" element={<PlansPage />} />
-      <Route path="/tryon-demo" element={<TryOnDemo />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/view" element={<ViewPage />} />
-      <Route path="/predictions" element={<PredictionsPage />} />
-      <Route path="/reel-viewer" element={<ReelViewerPage />} />
-      <Route path="/dashboard" element={<DashboardPage />} />
-      <Route path="/v3" element={<CreatePageV3 />} />
+  <Route path="/" element={<HomePage />} />
+  <Route path="/create" element={<CreatePage />} />
+  <Route path="/create-v2" element={<CreateV2Page />} />
+  <Route path="/lookbook" element={<LookbookPage />} />
+  <Route path="/cinematic" element={<CinematicPage />} />
+  <Route path="/plans" element={<PlansPage />} />
+  <Route path="/tryon-demo" element={<TryOnDemo />} />
+  <Route path="/login" element={<Login />} />
+  <Route path="/view" element={<ViewPage />} />
+  <Route path="/predictions" element={<PredictionsPage />} />
 
-      {/* 🔥 NEW ROUTE */}
-      <Route
-        path="/docs/image-quality"
-        element={<ImageQualityPage />}
-      />
+  {/* ✅ FIX: ADD CORRECT REEL ROUTE */}
+  <Route path="/reel" element={<ReelViewerPage />} />
 
-    </Routes>
+  {/* (optional keep old, but not used anymore) */}
+  <Route path="/reel-viewer" element={<ReelViewerPage />} />
+
+  <Route path="/dashboard" element={<DashboardPage />} />
+  <Route path="/v3" element={<CreatePageV3 />} />
+
+  {/* 🔥 NEW ROUTE */}
+  <Route
+    path="/docs/image-quality"
+    element={<ImageQualityPage />}
+  />
+
+</Routes>
   );
 }
 
