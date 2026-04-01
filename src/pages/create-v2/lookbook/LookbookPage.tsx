@@ -20,13 +20,13 @@ export default function LookbookPage() {
   const backHeroImageUrl = location.state?.backHeroImageUrl as string | undefined;
 
   const [poses, setPoses] = useState<Pose[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const hasGenerated = useRef(false);
-
+  const [hasStarted, setHasStarted] = useState(false);
+  
   /* Lock scroll */
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -35,85 +35,6 @@ export default function LookbookPage() {
     };
   }, []);
 
-  /* Generate Lookbook */
-  useEffect(() => {
-    if (hasGenerated.current) return;
-    hasGenerated.current = true;
-
-    if (DEV_MODE) return;
-
-    const generateLookbook = async () => {
-      try {
-        setLoading(true);
-
-        const token = localStorage.getItem("token");
-
-        if (!token) {
-          setError("Please login again");
-          setLoading(false);
-          return;
-        }
-
-        if (!heroImageUrl) {
-          setError("Missing hero image");
-          setLoading(false);
-          return;
-        }
-
-        const res = await fetch(`${API_BASE}/api/p2m/lookbook/generate-v2`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            heroImageUrl,
-            backHeroImageUrl,
-          }),
-        });
-
-        if (!res.ok) {
-          setError("Lookbook generation failed");
-          setLoading(false);
-          return;
-        }
-
-        const data = await res.json();
-        let poseData: Pose[] = data?.poses || [];
-
-        if (!poseData.length) {
-          setError("No poses generated");
-          setLoading(false);
-          return;
-        }
-
-        const order = ["HERO", "BACK", "P1", "P2", "P3", "P4"];
-
-        const sorted = order
-          .map(id => poseData.find(p => p.poseId === id))
-          .filter((p): p is Pose => Boolean(p));
-
-        const remaining = poseData.filter(
-          p => !order.includes(p.poseId)
-        );
-
-        poseData = [...sorted, ...remaining];
-
-        const heroPose = poseData.find(p => p.poseId === "HERO");
-
-        setPoses(poseData);
-        setSelectedImage(heroPose?.imageUrl || poseData[0].imageUrl || null);
-
-        setLoading(false);
-      } catch (err) {
-        console.error("Lookbook error:", err);
-        setError("Lookbook generation failed");
-        setLoading(false);
-      }
-    };
-
-    generateLookbook();
-  }, [heroImageUrl, backHeroImageUrl]);
 
   /* Upload detail */
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -231,6 +152,78 @@ export default function LookbookPage() {
     }
   };
 
+const handleStartGeneration = async () => {
+  try {
+    if (DEV_MODE) return;
+
+    setLoading(true);
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      setError("Please login again");
+      setLoading(false);
+      return;
+    }
+
+    if (!heroImageUrl) {
+      setError("Missing hero image");
+      setLoading(false);
+      return;
+    }
+
+    const res = await fetch(`${API_BASE}/api/p2m/lookbook/generate-v2`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        heroImageUrl,
+        backHeroImageUrl,
+      }),
+    });
+
+    if (!res.ok) {
+      setError("Lookbook generation failed");
+      setLoading(false);
+      return;
+    }
+
+    const data = await res.json();
+    let poseData: Pose[] = data?.poses || [];
+
+    if (!poseData.length) {
+      setError("No poses generated");
+      setLoading(false);
+      return;
+    }
+
+    const order = ["HERO", "BACK", "P1", "P2", "P3", "P4"];
+
+    const sorted = order
+      .map(id => poseData.find(p => p.poseId === id))
+      .filter((p): p is Pose => Boolean(p));
+
+    const remaining = poseData.filter(
+      p => !order.includes(p.poseId)
+    );
+
+    poseData = [...sorted, ...remaining];
+
+    const heroPose = poseData.find(p => p.poseId === "HERO");
+
+    setPoses(poseData);
+    setSelectedImage(heroPose?.imageUrl || poseData[0].imageUrl || null);
+
+    setLoading(false);
+  } catch (err) {
+    console.error("Lookbook error:", err);
+    setError("Lookbook generation failed");
+    setLoading(false);
+  }
+};
+
   /* 🔥 FINAL REEL GENERATION */
   const handleGenerateReel = async () => {
     try {
@@ -288,6 +281,31 @@ export default function LookbookPage() {
   };
 
   const detailCount = poses.filter(p => p.poseId === "DETAIL").length;
+
+if (!hasStarted) {
+  return (
+    <div className="lookbook-entry">
+      {heroImageUrl && (
+        <img
+          src={heroImageUrl}
+          className="lookbook-preview"
+        />
+      )}
+
+      <h2>✨ Ready to create your Lookbook</h2>
+
+      <button
+  disabled={loading}
+  onClick={() => {
+    setHasStarted(true);
+    handleStartGeneration();
+  }}
+>
+  {loading ? "Generating..." : "Generate Lookbook"}
+</button>
+    </div>
+  );
+}
 
   return (
     <div className="lookbook-page">

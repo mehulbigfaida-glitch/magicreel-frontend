@@ -452,3 +452,17 @@ body {
   transform: translateY(-4px) scale(1.02);
   box-shadow: 0 12px 30px rgba(37,99,235,0.25);
 }
+
+.lookbook-entry {
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.lookbook-preview {
+  width: 240px;
+  border-radius: 12px;
+}
