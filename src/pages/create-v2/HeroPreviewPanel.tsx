@@ -1,5 +1,6 @@
 import "./HeroPreviewPanel.css";
 import { useState, useRef, useEffect } from "react";
+import { API_BASE } from "../../config/api";
 
 type Props = {
   heroImageUrl: string | null;
@@ -104,14 +105,52 @@ export default function HeroPreviewPanel({
   /* -----------------------------
      GENERATE REEL (UI ONLY)
   ----------------------------- */
-  const handleGenerateReel = () => {
-    console.log("Reel handled from CreateV2Page");
-    setReelStarting(true);
+  const handleGenerateReel = async () => {
+  try {
+    if (!heroImageUrl) return;
 
-    setTimeout(() => {
-      setReelStarting(false);
-    }, 1500);
-  };
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      alert("Please login again");
+      return;
+    }
+
+    setReelStarting(true);
+    setMenuOpen(false);
+
+    const res = await fetch(
+      `${API_BASE}/api/p2m/reel/generate-v1`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          imageUrl: heroImageUrl, // ✅ CORRECT
+        }),
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data?.error || "Reel generation failed");
+    }
+
+    const reelUrl = data.reelVideoUrl;
+
+    // ✅ Navigate to Reel page
+    window.location.href = `/reel?video=${encodeURIComponent(reelUrl)}`;
+
+  } catch (err) {
+    console.error("Reel error:", err);
+    alert("Reel generation failed");
+  } finally {
+    setReelStarting(false);
+  }
+};
 
   /* -----------------------------
      TOGGLE MENU
