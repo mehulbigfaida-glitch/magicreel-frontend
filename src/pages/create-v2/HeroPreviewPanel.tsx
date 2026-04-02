@@ -106,18 +106,28 @@ export default function HeroPreviewPanel({
      GENERATE REEL (UI ONLY)
   ----------------------------- */
   const handleGenerateReel = async () => {
+  console.log("🔥 Reel CLICKED");
+
   try {
-    if (!heroImageUrl) return;
+    console.log("heroImageUrl:", heroImageUrl);
+
+    if (!heroImageUrl) {
+      alert("No hero image");
+      return;
+    }
 
     const token = localStorage.getItem("token");
+    console.log("token:", token);
 
     if (!token) {
-      alert("Please login again");
+      alert("No token");
       return;
     }
 
     setReelStarting(true);
     setMenuOpen(false);
+
+    console.log("🚀 Calling API...");
 
     const res = await fetch(
       `${API_BASE}/api/p2m/reel/generate-v1`,
@@ -128,12 +138,15 @@ export default function HeroPreviewPanel({
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          imageUrl: heroImageUrl, // ✅ CORRECT
+          imageUrl: heroImageUrl,
         }),
       }
     );
 
+    console.log("📡 Response received");
+
     const data = await res.json();
+    console.log("📦 Data:", data);
 
     if (!res.ok) {
       throw new Error(data?.error || "Reel generation failed");
@@ -141,11 +154,12 @@ export default function HeroPreviewPanel({
 
     const reelUrl = data.reelVideoUrl;
 
-    // ✅ Navigate to Reel page
+    console.log("🎬 Redirecting...");
+
     window.location.href = `/reel?video=${encodeURIComponent(reelUrl)}`;
 
   } catch (err) {
-    console.error("Reel error:", err);
+    console.error("❌ Reel error:", err);
     alert("Reel generation failed");
   } finally {
     setReelStarting(false);
