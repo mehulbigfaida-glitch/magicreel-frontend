@@ -85,8 +85,7 @@ export default function CreateV2Page() {
     useState<string | null>(null);
 
   /* 🔥 ADD THESE 2 LINES */
-  const [reelUrl, setReelUrl] = useState<string | null>(null);
-  const [reelLoading, setReelLoading] = useState(false);
+  
 
   const pollRef = useRef<number | null>(null);
 
@@ -245,45 +244,7 @@ const generateHero = async () => {
 
 };
 
-/* 🔥 ADD THIS FULL FUNCTION BELOW */
 
-const generateReel = async (heroUrl: string) => {
-  if (!heroUrl || reelLoading) return;
-
-  try {
-    setReelLoading(true);
-
-    const token = localStorage.getItem("token");
-
-    const res = await fetch(
-      `${API_BASE}/api/reel/generate-v1`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          jobId: frontRunId,
-          heroPreviewUrl: heroUrl,
-        }),
-      }
-    );
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || "Reel failed");
-    }
-
-    setReelUrl(data.reelVideoUrl);
-
-  } catch (err) {
-    console.warn("Reel error:", err);
-  } finally {
-    setReelLoading(false);
-  }
-};
   /* ================= HERO POLLING (CONTROLLED) ================= */
 
 useEffect(() => {
@@ -407,14 +368,8 @@ useEffect(() => {
 
 /* ================= REEL AUTO TRIGGER ================= */
 
-useEffect(() => {
-  if (frontHeroImageUrl && !reelUrl) {
-    console.log("🎬 Triggering Reel Generation...");
-    generateReel(frontHeroImageUrl);
-  }
-}, [frontHeroImageUrl]);
 
-  /* ================= UI ================= */
+/* ================= UI ================= */
 
   return (
     <>
@@ -588,28 +543,29 @@ useEffect(() => {
 
         preview={
           <HeroPreviewPanel
-            categoryKey={selection.subType}
-            heroImageUrl={
-              activeHeroView === "front"
-                ? frontHeroImageUrl
-                : backHeroImageUrl
-            }
-            backHeroImageUrl={backHeroImageUrl}
-            loading={heroLoading}
-            error={heroError}
-            avatarFaceImageUrl={
-              selectedAvatar?.modelImage || ""
-            }
-            garmentFrontImageUrl={
-              productImageUrl || ""
-            }
-            showToggle={
-              !!frontHeroImageUrl &&
-              !!backHeroImageUrl
-            }
-            activeView={activeHeroView}
-            onToggle={setActiveHeroView}
-          />
+  categoryKey={selection.subType}
+  heroImageUrl={
+    activeHeroView === "front"
+      ? frontHeroImageUrl
+      : backHeroImageUrl
+  }
+  backHeroImageUrl={backHeroImageUrl}
+  loading={heroLoading}
+  error={heroError}
+  avatarFaceImageUrl={
+    selectedAvatar?.modelImage || ""
+  }
+  garmentFrontImageUrl={
+    productImageUrl || ""
+  }
+  showToggle={
+    !!frontHeroImageUrl &&
+    !!backHeroImageUrl
+  }
+  activeView={activeHeroView}
+  onToggle={setActiveHeroView}
+
+/>
         }
       />
 

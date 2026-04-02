@@ -234,61 +234,58 @@ const handleStartGeneration = async () => {
 };
 
   /* 🔥 FINAL REEL GENERATION */
-  const handleGenerateReel = async () => {
-    try {
-      const token = localStorage.getItem("token");
+const handleGenerateReel = async () => {
+  try {
+    const token = localStorage.getItem("token");
 
-      if (!token) {
-        alert("Please login again");
-        return;
-      }
-
-      const jobId = crypto.randomUUID();
-
-      const baseImage =
-        selectedImage ||
-        poses.find(p => p.poseId === "HERO")?.imageUrl ||
-        poses[0]?.imageUrl;
-
-      if (!baseImage) {
-        alert("No image available for Reel");
-        return;
-      }
-
-      const res = await fetch(`${API_BASE}/api/p2m/reel/generate-v1`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          jobId,
-          heroPreviewUrl: baseImage,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data?.error || "Reel generation failed");
-      }
-
-      navigate(
-        `/reel?jobId=${jobId}&hero=${encodeURIComponent(baseImage)}`,
-        {
-          state: {
-            jobId,
-            heroPreviewUrl: baseImage,
-          },
-        }
-      );
-
-    } catch (err) {
-      console.error("Reel error:", err);
-      alert("Reel generation failed");
+    if (!token) {
+      alert("Please login again");
+      return;
     }
-  };
 
+    
+    const baseImage =
+      selectedImage ||
+      poses.find((p) => p.poseId === "HERO")?.imageUrl ||
+      poses[0]?.imageUrl;
+
+    if (!baseImage) {
+      alert("No image available for Reel");
+      return;
+    }
+
+    const res = await fetch(`${API_BASE}/api/p2m/reel/generate-v1`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        imageUrl: baseImage, // ✅ FIX (CRITICAL)
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data?.error || "Reel generation failed");
+    }
+
+    // ✅ Use backend result directly
+    const reelUrl = data.reelVideoUrl;
+
+    navigate(`/reel`, {
+      state: {
+        reelVideoUrl: reelUrl,
+        heroPreviewUrl: baseImage,
+      },
+    });
+
+  } catch (err) {
+    console.error("Reel error:", err);
+    alert("Reel generation failed");
+  }
+};
   const detailCount = poses.filter(p => p.poseId === "DETAIL").length;
 
 if (!hasStarted) {
