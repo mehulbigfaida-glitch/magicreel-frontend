@@ -466,3 +466,32 @@ body {
   width: 240px;
   border-radius: 12px;
 }
+
+/* -----------------------------
+   FULL SCREEN LOADER
+----------------------------- */
+
+.lookbook-loading-full {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.loader-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #eee;
+  border-top: 4px solid #000;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

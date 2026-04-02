@@ -16,8 +16,17 @@ export default function LookbookPage() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const heroImageUrl = location.state?.heroImageUrl as string | undefined;
-  const backHeroImageUrl = location.state?.backHeroImageUrl as string | undefined;
+  const params = new URLSearchParams(location.search);
+
+const heroImageUrl =
+  location.state?.heroImageUrl ||
+  params.get("hero") ||
+  undefined;
+
+const backHeroImageUrl =
+  location.state?.backHeroImageUrl ||
+  params.get("back") ||
+  undefined;
 
   const [poses, setPoses] = useState<Pose[]>([]);
   const [loading, setLoading] = useState(false);
@@ -307,6 +316,16 @@ if (!hasStarted) {
   );
 }
 
+/* ✅ ADD THIS BLOCK */
+if (loading && hasStarted) {
+  return (
+    <div className="lookbook-loading-full">
+      <div className="loader-spinner" />
+      <p>✨ Creating your Lookbook...</p>
+    </div>
+  );
+}
+
   return (
     <div className="lookbook-page">
       <div className="lookbook-header">
@@ -325,14 +344,7 @@ if (!hasStarted) {
           </div>
 
           <div className="hero-frame">
-            {loading ? (
-              <div className="loading-state">
-                <div className="loader"></div>
-                <div className="loading-title">Creating your lookbook</div>
-              </div>
-            ) : (
-              selectedImage && <img src={selectedImage} />
-            )}
+            {selectedImage && <img src={selectedImage} />}
           </div>
 
           <div className="hero-actions">

@@ -1,5 +1,4 @@
 import "./HeroPreviewPanel.css";
-import { useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 
 type Props = {
@@ -24,20 +23,16 @@ export default function HeroPreviewPanel({
   backHeroImageUrl,
   loading,
   error,
-  avatarFaceImageUrl,
-  garmentFrontImageUrl,
   showToggle = false,
   activeView = "front",
   onToggle,
-  categoryKey,
+  
 
   /* 🔥 FIX: ADD THESE */
   reelUrl,
   reelLoading,
 
 }: Props) {
-
-  const navigate = useNavigate();
 
   const [reelStarting, setReelStarting] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -93,20 +88,18 @@ export default function HeroPreviewPanel({
      GENERATE LOOKBOOK
   ----------------------------- */
   const handleGenerateLookbook = () => {
-    if (!heroImageUrl) return;
+  if (!heroImageUrl) return;
 
-    setMenuOpen(false);
+  setMenuOpen(false);
 
-    navigate("/lookbook", {
-      state: {
-        heroImageUrl,
-        backHeroImageUrl,
-        avatarFaceImageUrl,
-        garmentFrontImageUrl,
-        categoryKey,
-      },
-    });
-  };
+  const url = `/lookbook?hero=${encodeURIComponent(heroImageUrl)}${
+    backHeroImageUrl
+      ? `&back=${encodeURIComponent(backHeroImageUrl)}`
+      : ""
+  }`;
+
+  window.open(url, "_blank");
+};
 
   /* -----------------------------
      GENERATE REEL (UI ONLY)
@@ -210,9 +203,12 @@ export default function HeroPreviewPanel({
               {menuOpen && (
                 <div className="ai-dropdown">
 
-                  <button onClick={handleGenerateLookbook}>
-                    Generate Lookbook
-                  </button>
+                  <button
+  onClick={handleGenerateLookbook}
+  disabled={!heroImageUrl}
+>
+  Generate Lookbook
+</button>
 
                   <button
                     onClick={handleGenerateReel}
