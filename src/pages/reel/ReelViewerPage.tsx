@@ -72,7 +72,14 @@ export default function ReelViewerPage() {
     return;
   }
 
+  if (!res.ok) {
+  if (data?.error === "INSUFFICIENT_CREDITS") {
+    setShowPaywall(true);
+    return;
+  }
+
   throw new Error(data?.error || "Reel failed");
+}
 }
 
         setVideoUrl(data.reelVideoUrl);
@@ -83,7 +90,7 @@ export default function ReelViewerPage() {
 
       } catch (err) {
         console.error("Reel failed:", err);
-        navigate("/create-v2");
+        ;
       }
     };
 
