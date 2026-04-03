@@ -18,7 +18,7 @@ export default function ReelViewerPage() {
     "🎬 Creating your Reel..."
   );
   const [showSuccess, setShowSuccess] = useState(false);
-
+  const [showPaywall, setShowPaywall] = useState(false);
   /* -----------------------------
      DYNAMIC LOADER TEXT
   ----------------------------- */
@@ -67,8 +67,13 @@ export default function ReelViewerPage() {
         const data = await res.json();
 
         if (!res.ok) {
-          throw new Error(data?.error || "Reel failed");
-        }
+  if (data?.error === "INSUFFICIENT_CREDITS") {
+    setShowPaywall(true);
+    return;
+  }
+
+  throw new Error(data?.error || "Reel failed");
+}
 
         setVideoUrl(data.reelVideoUrl);
 
@@ -192,6 +197,37 @@ export default function ReelViewerPage() {
         )}
 
       </div>
+      {showPaywall && (
+  <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+    <div className="bg-white text-black p-6 rounded-xl w-[400px] text-center">
+      
+      <h3 className="text-xl font-semibold mb-2">
+        Not Enough Credits
+      </h3>
+
+      <p className="mb-4 text-sm">
+        You need 3 credits to generate a Reel.
+      </p>
+
+      <div className="flex gap-3 justify-center">
+        <button
+          className="bg-black text-white px-4 py-2 rounded"
+          onClick={() => navigate("/pricing")}
+        >
+          Upgrade Plan
+        </button>
+
+        <button
+          className="border px-4 py-2 rounded"
+          onClick={() => setShowPaywall(false)}
+        >
+          Cancel
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
     </div>
   );
 }
