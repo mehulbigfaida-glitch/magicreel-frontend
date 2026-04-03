@@ -1,6 +1,5 @@
 import "./HeroPreviewPanel.css";
 import { useState, useRef, useEffect } from "react";
-import { API_BASE } from "../../config/api";
 
 type Props = {
   heroImageUrl: string | null;
@@ -35,7 +34,6 @@ export default function HeroPreviewPanel({
 
 }: Props) {
 
-  const [reelStarting, setReelStarting] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showReady, setShowReady] = useState(false);
 
@@ -103,67 +101,17 @@ export default function HeroPreviewPanel({
 };
 
   /* -----------------------------
-     GENERATE REEL (UI ONLY)
-  ----------------------------- */
-  const handleGenerateReel = async () => {
-  console.log("🔥 Reel CLICKED");
+   GENERATE REEL (LOOKBOOK FLOW)
+----------------------------- */
+const handleGenerateReel = () => {
+  if (!heroImageUrl) return;
 
-  try {
-    console.log("heroImageUrl:", heroImageUrl);
+  setMenuOpen(false);
 
-    if (!heroImageUrl) {
-      alert("No hero image");
-      return;
-    }
-
-    const token = localStorage.getItem("token");
-    console.log("token:", token);
-
-    if (!token) {
-      alert("No token");
-      return;
-    }
-
-    setReelStarting(true);
-    setMenuOpen(false);
-
-    console.log("🚀 Calling API...");
-
-    const res = await fetch(
-      `${API_BASE}/api/p2m/reel/generate-v1`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          imageUrl: heroImageUrl,
-        }),
-      }
-    );
-
-    console.log("📡 Response received");
-
-    const data = await res.json();
-    console.log("📦 Data:", data);
-
-    if (!res.ok) {
-      throw new Error(data?.error || "Reel generation failed");
-    }
-
-    const reelUrl = data.reelVideoUrl;
-
-    console.log("🎬 Redirecting...");
-
-    window.location.href = `/reel?video=${encodeURIComponent(reelUrl)}`;
-
-  } catch (err) {
-    console.error("❌ Reel error:", err);
-    alert("Reel generation failed");
-  } finally {
-    setReelStarting(false);
-  }
+  window.open(
+    `/reel?hero=${encodeURIComponent(heroImageUrl)}`,
+    "_blank"
+  );
 };
 
   /* -----------------------------
@@ -265,11 +213,9 @@ export default function HeroPreviewPanel({
 
                   <button
                     onClick={handleGenerateReel}
-                    disabled={reelStarting}
+                    disabled={false}
                   >
-                    {reelStarting
-                      ? "Generating Reel..."
-                      : "Generate Reel"}
+                    Generate Reel
                   </button>
 
                   <button disabled>
