@@ -13,9 +13,41 @@ export default function ReelViewerPage() {
     params.get("hero") || location.state?.heroPreviewUrl || null;
 
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [confirmed, setConfirmed] = useState(false);
+  const [loadingText, setLoadingText] = useState(
+    "🎬 Creating your Reel..."
+  );
+  const [showSuccess, setShowSuccess] = useState(false);
 
+  /* -----------------------------
+     DYNAMIC LOADER TEXT
+  ----------------------------- */
   useEffect(() => {
-    if (!heroPreviewUrl) return;
+    if (!confirmed || videoUrl) return;
+
+    const messages = [
+      "🎬 Creating your Reel...",
+      "✨ Applying cinematic motion...",
+      "💡 Enhancing lighting & depth...",
+      "🎞️ Rendering smooth transitions...",
+      "🚀 Almost ready...",
+    ];
+
+    let i = 0;
+
+    const interval = setInterval(() => {
+      i = (i + 1) % messages.length;
+      setLoadingText(messages[i]);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [confirmed, videoUrl]);
+
+  /* -----------------------------
+     GENERATE REEL
+  ----------------------------- */
+  useEffect(() => {
+    if (!heroPreviewUrl || !confirmed) return;
 
     const generateReel = async () => {
       try {
@@ -40,6 +72,10 @@ export default function ReelViewerPage() {
 
         setVideoUrl(data.reelVideoUrl);
 
+        // success moment
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 2000);
+
       } catch (err) {
         console.error("Reel failed:", err);
         navigate("/create-v2");
@@ -47,12 +83,25 @@ export default function ReelViewerPage() {
     };
 
     generateReel();
-  }, [heroPreviewUrl, navigate]);
+  }, [heroPreviewUrl, confirmed, navigate]);
+
+  /* -----------------------------
+     ACTIONS
+  ----------------------------- */
 
   const handleDownload = () => {
     if (!videoUrl) return;
     window.open(videoUrl, "_blank");
   };
+
+  const handleShare = () => {
+    navigator.clipboard.writeText(videoUrl || "");
+    alert("Link copied to clipboard");
+  };
+
+  /* -----------------------------
+     UI
+  ----------------------------- */
 
   return (
     <div className="reel-page">
@@ -60,45 +109,80 @@ export default function ReelViewerPage() {
 
         <h2>🎬 MagicReel Studio</h2>
 
-        <div className="reel-stage">
+        {/* ✅ CONFIRM SCREEN */}
+        {!confirmed && (
+          <div className="reel-confirm">
+            <h3>✨ Create your cinematic Reel?</h3>
 
-          {!videoUrl && heroPreviewUrl && (
-            <img
-              src={heroPreviewUrl}
-              className="reel-preview-image"
-            />
-          )}
+            <div className="reel-confirm-actions">
+              <button onClick={() => setConfirmed(true)}>
+                Create Reel
+              </button>
 
-          {!videoUrl && (
-            <div className="reel-overlay">
-              <div className="reel-loader" />
-
-              <div className="reel-loading-title">
-                🎬 Creating your Reel...
-              </div>
+              <button onClick={() => navigate("/create-v2")}>
+                Cancel
+              </button>
             </div>
-          )}
+          </div>
+        )}
 
-          {videoUrl && (
-            <video
-              src={videoUrl}
-              controls
-              autoPlay
-              loop
-              className="reel-video"
-            />
-          )}
+        {/* ✅ MAIN STAGE */}
+        {confirmed && (
+          <div className="reel-stage">
 
-        </div>
+            {/* preview image */}
+            {!videoUrl && heroPreviewUrl && (
+              <img
+                src={heroPreviewUrl}
+                className="reel-preview-image"
+              />
+            )}
 
+            {/* loader */}
+            {!videoUrl && (
+              <div className="reel-overlay">
+                <div className="reel-loader" />
+
+                <div className="reel-loading-title">
+                  {loadingText}
+                </div>
+
+                <div className="reel-loading-sub">
+                  Usually ready in 3–5 minutes
+                </div>
+              </div>
+            )}
+
+            {/* success text */}
+            {showSuccess && (
+              <div className="reel-success">
+                ✨ Your Reel is Ready
+              </div>
+            )}
+
+            {/* video */}
+            {videoUrl && (
+              <video
+                src={videoUrl}
+                controls
+                autoPlay
+                loop
+                className="reel-video"
+              />
+            )}
+
+          </div>
+        )}
+
+        {/* ✅ ACTIONS */}
         {videoUrl && (
           <div className="reel-actions">
             <button onClick={handleDownload}>
               ⬇ Download Reel
             </button>
 
-            <button onClick={() => navigate("/create-v2")}>
-              Back to Editor
+            <button onClick={handleShare}>
+              🔗 Share Reel
             </button>
           </div>
         )}
