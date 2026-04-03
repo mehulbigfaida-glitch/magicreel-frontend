@@ -94,9 +94,13 @@ export default function ReelViewerPage() {
     window.open(videoUrl, "_blank");
   };
 
+  // ✅ UPDATED: Redirect to Share Studio
   const handleShare = () => {
-    navigator.clipboard.writeText(videoUrl || "");
-    alert("Link copied to clipboard");
+    if (!videoUrl) return;
+
+    navigate("/reel/share", {
+      state: { reelUrl: videoUrl },
+    });
   };
 
   /* -----------------------------

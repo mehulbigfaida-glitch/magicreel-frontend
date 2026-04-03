@@ -23,6 +23,8 @@ import DashboardPage from "./pages/dashboard/DashboardPage";
 import { GenerateProvider } from "./context/GenerateContext";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import CreatePageV3 from "./v3/pages/CreatePageV3";
+import ShareStudioPage from "./pages/reel/ShareStudioPage";
+import ReelMobileView from "./pages/reel/ReelMobileView";
 
 /* 🔥 NEW IMPORT */
 import ImageQualityPage from "./pages/docs/ImageQualityPage";
@@ -218,6 +220,8 @@ function AppRoutes() {
   <Route path="/login" element={<Login />} />
   <Route path="/view" element={<ViewPage />} />
   <Route path="/predictions" element={<PredictionsPage />} />
+  <Route path="/reel/share" element={<ShareStudioPage />} />
+  <Route path="/reel/view" element={<ReelMobileView />} />
 
   {/* ✅ FIX: ADD CORRECT REEL ROUTE */}
   <Route path="/reel" element={<ReelViewerPage />} />
