@@ -1,5 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import "./ReelViewerPage.css";
+import { API_BASE } from "../../config/api";
 
 export default function ReelViewerPage() {
   const location = useLocation();
@@ -7,24 +9,50 @@ export default function ReelViewerPage() {
 
   const params = new URLSearchParams(location.search);
 
-  const videoUrl =
-    params.get("video") || location.state?.reelVideoUrl || null;
-
   const heroPreviewUrl =
     params.get("hero") || location.state?.heroPreviewUrl || null;
 
-  /* -----------------------------
-     ACTIONS
-  ----------------------------- */
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!heroPreviewUrl) return;
+
+    const generateReel = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const res = await fetch(`${API_BASE}/api/p2m/reel/generate-v1`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            imageUrl: heroPreviewUrl,
+          }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data?.error || "Reel failed");
+        }
+
+        setVideoUrl(data.reelVideoUrl);
+
+      } catch (err) {
+        console.error("Reel failed:", err);
+        navigate("/create-v2");
+      }
+    };
+
+    generateReel();
+  }, [heroPreviewUrl, navigate]);
 
   const handleDownload = () => {
     if (!videoUrl) return;
     window.open(videoUrl, "_blank");
   };
-
-  /* -----------------------------
-     UI
-  ----------------------------- */
 
   return (
     <div className="reel-page">
@@ -46,7 +74,7 @@ export default function ReelViewerPage() {
               <div className="reel-loader" />
 
               <div className="reel-loading-title">
-                Loading your Reel...
+                🎬 Creating your Reel...
               </div>
             </div>
           )}
@@ -63,7 +91,6 @@ export default function ReelViewerPage() {
 
         </div>
 
-        {/* ACTIONS */}
         {videoUrl && (
           <div className="reel-actions">
             <button onClick={handleDownload}>
