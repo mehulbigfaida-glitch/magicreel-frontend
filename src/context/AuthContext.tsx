@@ -34,11 +34,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      const res = await fetch(`${API_BASE}/api/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(`${API_BASE}/api/auth/me`, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
       // Backend reachable but user not authenticated
       if (!res.ok) {
