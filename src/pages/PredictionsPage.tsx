@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Predictions.css";
+import { API_BASE } from "../config/api";
 
 type Prediction = {
   runId: string;
@@ -17,7 +18,7 @@ export default function PredictionsPage() {
 
   const loadPredictions = async () => {
     try {
-      const res = await fetch("/api/predictions");
+      const res = await fetch(`${API_BASE}/api/predictions`);
       const data = await res.json();
 
       const jobsData: Prediction[] = data.jobs || [];
