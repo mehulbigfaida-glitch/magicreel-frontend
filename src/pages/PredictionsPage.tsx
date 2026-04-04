@@ -126,9 +126,59 @@ export default function PredictionsPage() {
     </>
   )}
 
-  <a href={job.heroImageUrl || "#"} download>
-    Download
+  <div className="prediction-actions">
+
+  {job.status === "completed" && (
+    <>
+      <button
+        className="primary"
+        onClick={() =>
+          navigate("/reel", {
+            state: {
+              heroPreviewUrl: job.heroImageUrl,
+              runId: job.runId,
+            },
+          })
+        }
+      >
+        🎬 Generate Reel
+      </button>
+
+      <button
+        className="secondary"
+        onClick={() =>
+          navigate(`/lookbook?runId=${job.runId}`)
+        }
+      >
+        Lookbook
+      </button>
+    </>
+  )}
+
+  {/* ✅ NEW SHARE BUTTON */}
+  <button
+    className="share"
+    onClick={() =>
+      navigate("/reel/share", {
+        state: {
+          reelUrl: job.heroImageUrl, // using hero for now
+        },
+      })
+    }
+  >
+    🔗 Share
+  </button>
+
+  {/* ✅ KEEP DOWNLOAD */}
+  <a
+    href={job.heroImageUrl || "#"}
+    download
+    className="download"
+  >
+    ⬇ Download
   </a>
+
+</div>
 
 </div>
                 </>
