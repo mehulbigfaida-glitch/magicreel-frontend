@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Predictions.css";
 
 type Prediction = {
@@ -12,6 +13,7 @@ type Prediction = {
 export default function PredictionsPage() {
   const [jobs, setJobs] = useState<Prediction[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const loadPredictions = async () => {
     try {
@@ -21,20 +23,12 @@ export default function PredictionsPage() {
       const jobsData: Prediction[] = data.jobs || [];
       setJobs(jobsData);
 
-      // Only trigger status check for running jobs
-      jobsData.forEach((job) => {
-        if (job.status === "running") {
-          fetch(`/api/p2m/hero/status/${job.runId}`).catch(() => {});
-        }
-      });
-
-      setLoading(false);
-
       return jobsData.some((job) => job.status === "running");
     } catch (err) {
       console.error("Predictions fetch error:", err);
-      setLoading(false);
       return false;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -45,7 +39,7 @@ export default function PredictionsPage() {
       const hasRunningJobs = await loadPredictions();
 
       if (hasRunningJobs) {
-        interval = setInterval(loadPredictions, 5000);
+        interval = setInterval(loadPredictions, 4000);
       }
     };
 
@@ -56,10 +50,32 @@ export default function PredictionsPage() {
     };
   }, []);
 
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case "completed":
+        return "✅ Ready";
+      case "running":
+        return "⏳ Processing";
+      case "failed":
+        return "❌ Failed";
+      default:
+        return status;
+    }
+  };
+
   if (loading) {
     return (
       <div className="predictions-loading">
         Loading predictions...
+      </div>
+    );
+  }
+
+  if (jobs.length === 0) {
+    return (
+      <div className="predictions-empty">
+        <h2>No predictions yet</h2>
+        <p>Create your first look from the studio</p>
       </div>
     );
   }
@@ -80,35 +96,44 @@ export default function PredictionsPage() {
                 <>
                   <img src={job.heroImageUrl} alt="Hero result" />
 
-                  <div className="prediction-overlay">
+                  <div className="prediction-actions">
 
-                    <button
-                      disabled={job.status !== "completed"}
-                      onClick={() =>
-                        window.location.href = `/lookbook?runId=${job.runId}`
-                      }
-                    >
-                      Lookbook
-                    </button>
+  {job.status === "completed" && (
+    <>
+      <button
+  className="primary"
+  onClick={() =>
+    navigate("/reel", {
+      state: {
+        heroPreviewUrl: job.heroImageUrl,
+        runId: job.runId,
+      },
+    })
+  }
+>
+        🎬 Generate Reel
+      </button>
 
-                    <button
-                      disabled={job.status !== "completed"}
-                      onClick={() =>
-                        window.location.href = `/reel?runId=${job.runId}`
-                      }
-                    >
-                      Reel
-                    </button>
+      <button
+        className="secondary"
+        onClick={() =>
+          navigate(`/lookbook?runId=${job.runId}`)
+        }
+      >
+        Lookbook
+      </button>
+    </>
+  )}
 
-                    <a href={job.heroImageUrl} download>
-                      Download
-                    </a>
+  <a href={job.heroImageUrl || "#"} download>
+    Download
+  </a>
 
-                  </div>
+</div>
                 </>
               ) : (
                 <div className="prediction-placeholder">
-                  Generating hero...
+                  ⏳ Generating hero...
                 </div>
               )}
 
@@ -126,8 +151,8 @@ export default function PredictionsPage() {
 
               <span>•</span>
 
-              <span className="status">
-                {job.status}
+              <span className={`status ${job.status}`}>
+                {getStatusLabel(job.status)}
               </span>
 
             </div>

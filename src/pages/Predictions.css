@@ -145,3 +145,52 @@
 .prediction-meta .status{
   color:#4ade80;
 }
+
+.predictions-empty {
+  text-align: center;
+  padding: 80px 20px;
+  opacity: 0.7;
+}
+
+.status.completed {
+  color: #22c55e;
+}
+
+.status.running {
+  color: #f59e0b;
+}
+
+.status.failed {
+  color: #ef4444;
+}
+
+.prediction-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.prediction-actions button {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.prediction-actions .primary {
+  background: black;
+  color: white;
+}
+
+.prediction-actions .secondary {
+  background: #f1f1f1;
+}
+
+.prediction-actions a {
+  font-size: 12px;
+  text-decoration: none;
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
