@@ -381,23 +381,28 @@ useEffect(() => {
             activeAvatar={avatarCategory}
             activeSceneStyle={sceneStyle}
             onSceneStyleChange={setSceneStyle}
-            onCategoryChange={(c) =>
-              setSelection({
-                category: c,
-                subType: null,
-                pill: null,
-              })
-            }
-            onSubTypeChange={(s) =>
-              setSelection((prev) => ({
-                ...prev,
-                subType: s,
-                pill: null,
-              }))
-            }
-            onAvatarChange={(a) =>
-              setAvatarCategory(a)
-            }
+            onCategoryChange={(c) => {
+  console.log("CATEGORY CLICKED:", c); // 👈 DEBUG
+
+  setSelection({
+    category: c,
+    subType: null,
+    pill: null,
+  });
+}}
+            onSubTypeChange={(s) => {
+  console.log("SUBTYPE CLICKED:", s); // 👈 DEBUG
+
+  setSelection((prev) => ({
+    ...prev,
+    subType: s,
+    pill: null,
+  }));
+}}
+            onAvatarChange={(a) => {
+  console.log("AVATAR CLICKED:", a); // 👈 DEBUG
+  setAvatarCategory(a);
+}}
           />
         }
 
