@@ -25,7 +25,7 @@ export default function PredictionsPage() {
       // ✅ FIX: normalize backend response
       const jobsData: Prediction[] = (data || []).map((job: any) => ({
   runId: job.id,
-  heroImageUrl: job.imageUrl ?? null, // ✅ strict + safe
+  heroImageUrl: job.mediaUrl ?? job.imageUrl ?? null, // ✅ FIX
   status: job.status ?? "unknown",
   createdAt: job.createdAt,
   creditsUsed: 1,
