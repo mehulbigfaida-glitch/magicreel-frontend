@@ -110,21 +110,20 @@ const backHeroImageUrl =
 
       const processedImages = await Promise.all(
         poses.map(async (p) => {
-          const poseAny = p as any;
+  const poseAny = p as any;
 
-          const img =
-            poseAny.imageUrl ||
-            poseAny.outputImageUrl ||
-            poseAny.resultUrl;
+  const img =
+    poseAny.resultImageUrl ||
+    poseAny.imageUrl || null;
 
-          if (!img) return null;
+  if (!img) return null;
 
-          if (poseAny.poseId === "DETAIL" && img.startsWith("data:")) {
-            return await resizeImage(img);
-          }
+  if (poseAny.poseId === "DETAIL" && img.startsWith("data:")) {
+    return await resizeImage(img);
+  }
 
-          return img;
-        })
+  return img;
+})
       );
 
       const finalImages = processedImages.filter(Boolean);

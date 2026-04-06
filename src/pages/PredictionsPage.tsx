@@ -21,7 +21,15 @@ export default function PredictionsPage() {
       const res = await fetch(`${API_BASE}/api/predictions`);
       const data = await res.json();
 
-      const jobsData: Prediction[] = data.jobs || [];
+      // ✅ FIX: normalize backend response
+      const jobsData: Prediction[] = (data || []).map((job: any) => ({
+        runId: job.id,
+        heroImageUrl: job.imageUrl,
+        status: job.status,
+        createdAt: job.createdAt,
+        creditsUsed: 1, // temp
+      }));
+
       setJobs(jobsData);
 
       return jobsData.some((job) => job.status === "running");
@@ -83,115 +91,74 @@ export default function PredictionsPage() {
 
   return (
     <div className="predictions-page">
-
       <h1 className="predictions-title">Predictions</h1>
 
       <div className="predictions-grid">
-
         {jobs.map((job) => (
           <div className="prediction-card" key={job.runId}>
-
             <div className="prediction-image">
-
               {job.heroImageUrl ? (
                 <>
                   <img src={job.heroImageUrl} alt="Hero result" />
 
                   <div className="prediction-actions">
+                    {job.status === "completed" && (
+                      <>
+                        <button
+                          className="primary"
+                          onClick={() =>
+                            navigate("/reel", {
+                              state: {
+                                heroPreviewUrl: job.heroImageUrl,
+                                runId: job.runId,
+                              },
+                            })
+                          }
+                        >
+                          🎬 Generate Reel
+                        </button>
 
-  {job.status === "completed" && (
-    <>
-      <button
-  className="primary"
-  onClick={() =>
-    navigate("/reel", {
-      state: {
-        heroPreviewUrl: job.heroImageUrl,
-        runId: job.runId,
-      },
-    })
-  }
->
-        🎬 Generate Reel
-      </button>
+                        <button
+                          className="secondary"
+                          onClick={() =>
+                            navigate(`/lookbook?runId=${job.runId}`)
+                          }
+                        >
+                          Lookbook
+                        </button>
+                      </>
+                    )}
 
-      <button
-        className="secondary"
-        onClick={() =>
-          navigate(`/lookbook?runId=${job.runId}`)
-        }
-      >
-        Lookbook
-      </button>
-    </>
-  )}
+                    <button
+                      className="share"
+                      onClick={() =>
+                        navigate("/reel/share", {
+                          state: {
+                            reelUrl: job.heroImageUrl,
+                          },
+                        })
+                      }
+                    >
+                      🔗 Share
+                    </button>
 
-  <div className="prediction-actions">
-
-  {job.status === "completed" && (
-    <>
-      <button
-        className="primary"
-        onClick={() =>
-          navigate("/reel", {
-            state: {
-              heroPreviewUrl: job.heroImageUrl,
-              runId: job.runId,
-            },
-          })
-        }
-      >
-        🎬 Generate Reel
-      </button>
-
-      <button
-        className="secondary"
-        onClick={() =>
-          navigate(`/lookbook?runId=${job.runId}`)
-        }
-      >
-        Lookbook
-      </button>
-    </>
-  )}
-
-  {/* ✅ NEW SHARE BUTTON */}
-  <button
-    className="share"
-    onClick={() =>
-      navigate("/reel/share", {
-        state: {
-          reelUrl: job.heroImageUrl, // using hero for now
-        },
-      })
-    }
-  >
-    🔗 Share
-  </button>
-
-  {/* ✅ KEEP DOWNLOAD */}
-  <a
-    href={job.heroImageUrl || "#"}
-    download
-    className="download"
-  >
-    ⬇ Download
-  </a>
-
-</div>
-
-</div>
+                    <a
+                      href={job.heroImageUrl || "#"}
+                      download
+                      className="download"
+                    >
+                      ⬇ Download
+                    </a>
+                  </div>
                 </>
               ) : (
                 <div className="prediction-placeholder">
                   ⏳ Generating hero...
                 </div>
               )}
-
             </div>
 
             <div className="prediction-meta">
-
               <span>
                 {new Date(job.createdAt).toLocaleDateString()}
               </span>
@@ -205,14 +172,10 @@ export default function PredictionsPage() {
               <span className={`status ${job.status}`}>
                 {getStatusLabel(job.status)}
               </span>
-
             </div>
-
           </div>
         ))}
-
       </div>
-
     </div>
   );
 }
