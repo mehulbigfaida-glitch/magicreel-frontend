@@ -24,12 +24,12 @@ export default function PredictionsPage() {
 
       // ✅ FIX: normalize backend response
       const jobsData: Prediction[] = (data || []).map((job: any) => ({
-        runId: job.id,
-        heroImageUrl: job.imageUrl,
-        status: job.status,
-        createdAt: job.createdAt,
-        creditsUsed: 1, // temp
-      }));
+  runId: job.id,
+  heroImageUrl: job.imageUrl || job.mediaUrl || null,
+  status: job.status,
+  createdAt: job.createdAt,
+  creditsUsed: 1,
+}));
 
       setJobs(jobsData);
 
