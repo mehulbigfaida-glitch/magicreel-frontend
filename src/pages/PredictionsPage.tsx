@@ -5,8 +5,7 @@ import { API_BASE } from "../config/api";
 
 type Prediction = {
   runId: string;
-  mediaUrl: string | null;
-  type: "hero" | "reel";
+  heroImageUrl: string | null;
   status: string;
   createdAt: string;
   creditsUsed: number;
@@ -25,7 +24,7 @@ export default function PredictionsPage() {
       // ✅ FIX: normalize backend response
       const jobsData: Prediction[] = (data || []).map((job: any) => ({
   runId: job.id,
-  heroImageUrl: job.mediaUrl ?? job.imageUrl ?? null, // ✅ FIX
+  heroImageUrl: job.mediaUrl ?? job.imageUrl ?? null,
   status: job.status ?? "unknown",
   createdAt: job.createdAt,
   creditsUsed: 1,
@@ -91,86 +90,72 @@ export default function PredictionsPage() {
   }
 
   return (
-    <div className="predictions-page">
-      <h1 className="predictions-title">Predictions</h1>
+  <div className="predictions-page">
+    <h1 className="predictions-title">Predictions</h1>
 
-      <div className="predictions-grid">
-        {jobs.map((job) => (
-          <div className="prediction-card" key={job.runId}>
-            <div className="prediction-image">
-              {job.mediaUrl ? (
-  <>
-    {job.type === "reel" ? (
-      <video
-        src={job.mediaUrl}
-        controls
-        className="prediction-video"
-      />
-    ) : (
-      <img
-        src={job.mediaUrl}
-        alt="Generated result"
-        className="prediction-img"
-      />
-    )}
+    <div className="predictions-grid">
+      {jobs.map((job) => (
+        <div className="prediction-card" key={job.runId}>
+          <div className="prediction-image">
 
-    <div className="prediction-actions">
+            {job.heroImageUrl ? (
+              <>
+                <img
+                  src={job.heroImageUrl}
+                  alt="Generated result"
+                  className="prediction-img"
+                />
 
-      <button
-        className="share"
-        onClick={(e) => {
-          e.stopPropagation();
-          navigate("/reel/share", {
-            state: {
-              reelUrl: job.mediaUrl,
-            },
-          });
-        }}
-      >
-        🔗 Share
-      </button>
+                <div className="prediction-actions">
+                  <button
+                    className="share"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate("/reel/share", {
+                        state: {
+                          reelUrl: job.heroImageUrl,
+                        },
+                      });
+                    }}
+                  >
+                    🔗 Share
+                  </button>
 
-      <a
-        href={job.mediaUrl}
-        download
-        className="download"
-        onClick={(e) => e.stopPropagation()}
-      >
-        ⬇ Download
-      </a>
+                  <a
+                    href={job.heroImageUrl || "#"}
+                    download
+                    className="download"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    ⬇ Download
+                  </a>
+                </div>
+              </>
+            ) : (
+              <div className="prediction-placeholder">
+                ⏳ Processing...
+              </div>
+            )}
 
+          </div>
+
+          <div className="prediction-meta">
+            <span>
+              {new Date(job.createdAt).toLocaleDateString()}
+            </span>
+
+            <span>•</span>
+
+            <span>{job.creditsUsed} credit</span>
+
+            <span>•</span>
+
+            <span className={`status ${job.status}`}>
+              {getStatusLabel(job.status)}
+            </span>
+          </div>
+        </div>
+      ))}
     </div>
-  </>
-) : (
-  <div className="prediction-placeholder">
-    ⏳ Processing...
   </div>
 )}
-              ) : (
-                <div className="prediction-placeholder">
-                  ⏳ Generating hero...
-                </div>
-              )
-            </div>
-
-            <div className="prediction-meta">
-              <span>
-                {new Date(job.createdAt).toLocaleDateString()}
-              </span>
-
-              <span>•</span>
-
-              <span>{job.creditsUsed} credit</span>
-
-              <span>•</span>
-
-              <span className={`status ${job.status}`}>
-                {getStatusLabel(job.status)}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
