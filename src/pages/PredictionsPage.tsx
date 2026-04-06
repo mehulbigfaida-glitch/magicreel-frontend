@@ -5,7 +5,8 @@ import { API_BASE } from "../config/api";
 
 type Prediction = {
   runId: string;
-  heroImageUrl: string | null;
+  mediaUrl: string | null;
+  type: "hero" | "reel";
   status: string;
   createdAt: string;
   creditsUsed: number;
@@ -97,65 +98,59 @@ export default function PredictionsPage() {
         {jobs.map((job) => (
           <div className="prediction-card" key={job.runId}>
             <div className="prediction-image">
-              {job.heroImageUrl ? (
-                <>
-                  <img src={job.heroImageUrl} alt="Hero result" />
+              {job.mediaUrl ? (
+  <>
+    {job.type === "reel" ? (
+      <video
+        src={job.mediaUrl}
+        controls
+        className="prediction-video"
+      />
+    ) : (
+      <img
+        src={job.mediaUrl}
+        alt="Generated result"
+        className="prediction-img"
+      />
+    )}
 
-                  <div className="prediction-actions">
-                    {job.status === "completed" && (
-                      <>
-                        <button
-                          className="primary"
-                          onClick={() =>
-                            navigate("/reel", {
-                              state: {
-                                heroPreviewUrl: job.heroImageUrl,
-                                runId: job.runId,
-                              },
-                            })
-                          }
-                        >
-                          🎬 Generate Reel
-                        </button>
+    <div className="prediction-actions">
 
-                        <button
-                          className="secondary"
-                          onClick={() =>
-                            navigate(`/lookbook?runId=${job.runId}`)
-                          }
-                        >
-                          Lookbook
-                        </button>
-                      </>
-                    )}
+      <button
+        className="share"
+        onClick={(e) => {
+          e.stopPropagation();
+          navigate("/reel/share", {
+            state: {
+              reelUrl: job.mediaUrl,
+            },
+          });
+        }}
+      >
+        🔗 Share
+      </button>
 
-                    <button
-                      className="share"
-                      onClick={() =>
-                        navigate("/reel/share", {
-                          state: {
-                            reelUrl: job.heroImageUrl,
-                          },
-                        })
-                      }
-                    >
-                      🔗 Share
-                    </button>
+      <a
+        href={job.mediaUrl}
+        download
+        className="download"
+        onClick={(e) => e.stopPropagation()}
+      >
+        ⬇ Download
+      </a>
 
-                    <a
-                      href={job.heroImageUrl || "#"}
-                      download
-                      className="download"
-                    >
-                      ⬇ Download
-                    </a>
-                  </div>
-                </>
+    </div>
+  </>
+) : (
+  <div className="prediction-placeholder">
+    ⏳ Processing...
+  </div>
+)}
               ) : (
                 <div className="prediction-placeholder">
                   ⏳ Generating hero...
                 </div>
-              )}
+              )
             </div>
 
             <div className="prediction-meta">
