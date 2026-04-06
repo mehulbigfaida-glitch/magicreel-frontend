@@ -28,16 +28,37 @@ export default function PredictionsPage() {
       const res = await fetch(`${API_BASE}/api/predictions`);
       const data = await res.json();
 
-      // ✅ SAFE NORMALIZATION (HERO + REEL + LOOKBOOK)
       const jobsData: Prediction[] = (data || []).map((job: any) => {
         const mediaUrl = job.mediaUrl ?? job.imageUrl ?? null;
 
-        const isVideo =
-          typeof mediaUrl === "string" &&
-          (mediaUrl.endsWith(".mp4") || mediaUrl.includes("/video/"));
+        // ✅ LOOKBOOK DETECTION
+        const lookbookSources =
+          job.mediaUrls ||
+          job.images ||
+          job.outputImages ||
+          job.resultImages;
 
-        const isLookbook =
-          Array.isArray(job.mediaUrls) && job.mediaUrls.length > 1;
+        if (Array.isArray(lookbookSources) && lookbookSources.length > 1) {
+          return {
+            runId: job.id,
+            type: "lookbook",
+            heroImageUrl: null,
+            lookbookImages: lookbookSources,
+            status: job.status ?? "unknown",
+            createdAt: job.createdAt,
+            creditsUsed: 2,
+          };
+        }
+
+        // ✅ REEL DETECTION
+        const isVideo =
+          job.type === "reel" ||
+          job.kind === "video" ||
+          job.outputType === "video" ||
+          (typeof mediaUrl === "string" &&
+            (mediaUrl.includes(".mp4") ||
+              mediaUrl.includes(".webm") ||
+              mediaUrl.includes("video")));
 
         if (isVideo) {
           return {
@@ -47,23 +68,11 @@ export default function PredictionsPage() {
             reelUrl: mediaUrl,
             status: job.status ?? "unknown",
             createdAt: job.createdAt,
-            creditsUsed: 1,
+            creditsUsed: 3,
           };
         }
 
-        if (isLookbook) {
-          return {
-            runId: job.id,
-            type: "lookbook",
-            heroImageUrl: null,
-            lookbookImages: job.mediaUrls,
-            status: job.status ?? "unknown",
-            createdAt: job.createdAt,
-            creditsUsed: 2,
-          };
-        }
-
-        // ✅ DEFAULT HERO (DO NOT BREAK PIPELINE)
+        // ✅ HERO DEFAULT (SAFE)
         return {
           runId: job.id,
           type: "hero",
