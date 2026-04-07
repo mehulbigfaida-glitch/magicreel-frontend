@@ -152,62 +152,75 @@ export default function PredictionsPage() {
             <div className="prediction-image">
 
               {/* HERO */}
-              {job.type === "hero" && job.heroImageUrl && (
-                <>
-                  <img
-                    src={job.heroImageUrl}
-                    alt="Generated result"
-                    className="prediction-img"
-                  />
+{job.type === "hero" && job.heroImageUrl && (
+  <>
+    <img
+      src={job.heroImageUrl}
+      alt="Generated result"
+      className="prediction-img"
+    />
 
-                  <div className="prediction-actions">
-                    <button
-                      className="share"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate("/reel/share", {
-                          state: {
-                            reelUrl: job.heroImageUrl,
-                          },
-                        });
-                      }}
-                    >
-                      🔗 Share
-                    </button>
+    <div className="prediction-actions">
+      <button
+        className="share"
+        onClick={(e) => {
+          e.stopPropagation();
+          navigate("/reel/share", {
+            state: {
+              reelUrl: job.heroImageUrl,
+            },
+          });
+        }}
+      >
+        🔗 Share
+      </button>
 
-                    <a
-                      href={job.heroImageUrl}
-                      download
-                      className="download"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      ⬇ Download
-                    </a>
-                  </div>
-                </>
-              )}
+      <a
+        href={job.heroImageUrl}
+        download
+        className="download"
+        onClick={(e) => e.stopPropagation()}
+      >
+        ⬇ Download
+      </a>
+    </div>
+  </>
+)}
 
-              {/* REEL */}
-              {job.type === "reel" && job.reelUrl && (
-                <video
-                  src={job.reelUrl}
-                  controls
-                  className="prediction-img"
-                />
-              )}
+{/* REEL */}
+{job.type === "reel" && (
+  job.reelUrl ? (
+    <video
+      src={job.reelUrl}
+      controls
+      className="prediction-img"
+    />
+  ) : (
+    <div className="prediction-placeholder">
+      🎬 Processing Reel...
+    </div>
+  )
+)}
 
-              {/* LOOKBOOK */}
-              {job.type === "lookbook" && job.lookbookImages && (
-                <div className="lookbook-grid">
-                  {job.lookbookImages.map((img, i) => (
-                    <img
-                      key={i}
-                      src={img}
-                      className="lookbook-img"
-                    />
-                  ))}
-                </div>
-              )}
+{/* LOOKBOOK */}
+{job.type === "lookbook" && job.lookbookImages && (
+  <div className="lookbook-grid">
+    {job.lookbookImages.map((img, i) => (
+      <img
+        key={i}
+        src={img}
+        className="lookbook-img"
+      />
+    ))}
+  </div>
+)}
+
+{/* FALLBACK (ONLY FOR HERO NOW) */}
+{job.type === "hero" && !job.heroImageUrl && (
+  <div className="prediction-placeholder">
+    ⏳ Processing...
+  </div>
+)}
 
               {/* FALLBACK */}
               {!job.heroImageUrl &&
