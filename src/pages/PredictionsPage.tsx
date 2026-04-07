@@ -33,22 +33,23 @@ export default function PredictionsPage() {
 
         // ✅ LOOKBOOK DETECTION
         const lookbookSources =
-          job.mediaUrls ||
-          job.images ||
-          job.outputImages ||
-          job.resultImages;
+  job.mediaUrls ||
+  job.images ||
+  job.outputImages ||
+  job.resultImages ||
+  [];
 
-        if (Array.isArray(lookbookSources) && lookbookSources.length > 1) {
-          return {
-            runId: job.id,
-            type: "lookbook",
-            heroImageUrl: null,
-            lookbookImages: lookbookSources,
-            status: job.status ?? "unknown",
-            createdAt: job.createdAt,
-            creditsUsed: 2,
-          };
-        }
+if (job.type === "lookbook") {
+  return {
+    runId: job.id,
+    type: "lookbook",
+    heroImageUrl: null,
+    lookbookImages: lookbookSources,
+    status: job.status ?? "completed",
+    createdAt: job.createdAt,
+    creditsUsed: 2,
+  };
+}
 
         // ✅ REEL DETECTION
         const isVideo =
