@@ -159,10 +159,10 @@ if (job.type === "lookbook") {
                 {job.type === "lookbook" && (
                   images.length > 0 ? (
                     <div className="lookbook-grid">
-                      {images.slice(0, 4).map((img, i) => (
-                        <img
-                          key={i}
-                          src={img}
+                      {images.slice(0, 4).map((img) => (
+  <img
+    key={img}
+    src={img}
                           onError={(e) => {
                             (e.currentTarget as HTMLImageElement).style.display =
                               "none";
