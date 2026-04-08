@@ -186,35 +186,71 @@ export default function PredictionsPage() {
 
               {/* 🔥 LOOKBOOK FINAL FIX */}
               {job.type === "lookbook" && (
-                job.lookbookImages && job.lookbookImages.length > 0 ? (
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr 1fr",
-                      gap: "4px",
-                      width: "100%",
-                      height: "100%",
-                    }}
-                  >
-                    {job.lookbookImages.slice(0, 4).map((img, i) => (
-                      <img
-                        key={i}
-                        src={img}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                          borderRadius: "6px",
-                        }}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="prediction-placeholder">
-                    ⏳ Processing Lookbook...
-                  </div>
-                )
-              )}
+  job.lookbookImages && job.lookbookImages.length > 0 ? (
+    <>
+      {/* GRID */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "4px",
+          width: "100%",
+          height: "100%",
+        }}
+      >
+        {job.lookbookImages.slice(0, 4).map((img, i) => (
+          <img
+            key={i}
+            src={img}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              borderRadius: "6px",
+            }}
+          />
+        ))}
+      </div>
+
+      {/* ACTIONS 🔥 */}
+      <div className="prediction-actions">
+        <button
+          className="share"
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate("/reel/share", {
+              state: {
+                lookbookImages: job.lookbookImages || [],
+              },
+            });
+          }}
+        >
+          🔗 Share
+        </button>
+
+        <button
+          className="download"
+          onClick={(e) => {
+            e.stopPropagation();
+
+            (job.lookbookImages || []).forEach((url, i) => {
+              const link = document.createElement("a");
+              link.href = url;
+              link.download = `lookbook-${i + 1}.jpg`;
+              link.click();
+            });
+          }}
+        >
+          ⬇ Download
+        </button>
+      </div>
+    </>
+  ) : (
+    <div className="prediction-placeholder">
+      ⏳ Processing Lookbook...
+    </div>
+  )
+)}
 
             </div>
 
