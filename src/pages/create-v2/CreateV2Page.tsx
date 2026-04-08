@@ -202,6 +202,9 @@ const generateHero = async () => {
 
     const token = localStorage.getItem("token");
 
+  // 🔥 ADD THIS LINE HERE
+    console.log("API_BASE:", API_BASE);
+
     const res = await fetch(
       `${API_BASE}/api/p2m/hero/generate-v2`,
       {
