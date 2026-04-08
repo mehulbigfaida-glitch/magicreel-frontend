@@ -151,9 +151,18 @@ export default function PredictionsPage() {
               {job.type === "lookbook" && (
                 job.lookbookImages && job.lookbookImages.length > 0 ? (
                   <div className="lookbook-grid">
-                    {job.lookbookImages.slice(0, 4).map((img, i) => (
-                      <img key={i} src={img} />
-                    ))}
+                    {job.lookbookImages
+  .filter((img) => img && img.startsWith("http"))
+  .slice(0, 4)
+  .map((img, i) => (
+    <img
+      key={i}
+      src={img}
+      onError={(e) => {
+        (e.currentTarget as HTMLImageElement).style.display = "none";
+      }}
+    />
+  ))}
                   </div>
                 ) : (
                   <div className="prediction-placeholder">
