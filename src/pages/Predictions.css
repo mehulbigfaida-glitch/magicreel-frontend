@@ -20,11 +20,6 @@
   box-shadow:0 0 0 1px rgba(255,255,255,0.05);
 }
 
-.prediction-image img{
-  width:100%;
-  display:block;
-}
-
 .prediction-meta{
   padding:10px;
   font-size:12px;
@@ -88,10 +83,12 @@
   transform:translateY(-4px);
 }
 
-.prediction-image{
-  position:relative;
-  aspect-ratio:2/3;
-  overflow:hidden;
+.prediction-image {
+  position: relative;
+  width: 100%;
+  height: 320px;   /* ✅ FIXED HEIGHT (MANDATORY) */
+  overflow: hidden;
+  border-radius: 12px;
 }
 
 .prediction-image img{
@@ -231,17 +228,24 @@
   border-radius: 12px;
 }
 
+/* ✅ FINAL STABLE LOOKBOOK GRID */
 .lookbook-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4px;
+  gap: 6px;
+
   width: 100%;
   height: 100%;
+
+  padding: 6px;
+  box-sizing: border-box;
 }
 
 .lookbook-grid img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 6px;
+
+  border-radius: 8px;
+  background: #111;
 }
