@@ -31,35 +31,24 @@ export default function PredictionsPage() {
       const jobsData: Prediction[] = (data || []).map((job: any) => {
         const mediaUrl = job.mediaUrl ?? job.imageUrl ?? null;
 
-        // ✅ LOOKBOOK DETECTION
-        const lookbookSources =
-  job.mediaUrls ||
-  job.images ||
-  job.outputImages ||
-  job.resultImages ||
-  [];
+        // ✅ LOOKBOOK
+        if (job.type === "lookbook") {
+          return {
+            runId: job.id,
+            type: "lookbook",
+            heroImageUrl: null,
+            lookbookImages: job.mediaUrls || [],
+            status: job.status ?? "completed",
+            createdAt: job.createdAt,
+            creditsUsed: 2,
+          };
+        }
 
-if (job.type === "lookbook") {
-  return {
-    runId: job.id,
-    type: "lookbook",
-    heroImageUrl: null,
-    lookbookImages: lookbookSources,
-    status: job.status ?? "completed",
-    createdAt: job.createdAt,
-    creditsUsed: 2,
-  };
-}
-
-        // ✅ REEL DETECTION
+        // ✅ REEL
         const isVideo =
           job.type === "reel" ||
-          job.kind === "video" ||
-          job.outputType === "video" ||
           (typeof mediaUrl === "string" &&
-            (mediaUrl.includes(".mp4") ||
-              mediaUrl.includes(".webm") ||
-              mediaUrl.includes("video")));
+            (mediaUrl.includes(".mp4") || mediaUrl.includes("video")));
 
         if (isVideo) {
           return {
@@ -67,18 +56,18 @@ if (job.type === "lookbook") {
             type: "reel",
             heroImageUrl: null,
             reelUrl: mediaUrl,
-            status: job.status ?? "unknown",
+            status: job.status ?? "completed",
             createdAt: job.createdAt,
             creditsUsed: 3,
           };
         }
 
-        // ✅ HERO DEFAULT (SAFE)
+        // ✅ HERO
         return {
           runId: job.id,
           type: "hero",
           heroImageUrl: mediaUrl,
-          status: job.status ?? "unknown",
+          status: job.status ?? "completed",
           createdAt: job.createdAt,
           creditsUsed: 1,
         };
@@ -127,11 +116,7 @@ if (job.type === "lookbook") {
   };
 
   if (loading) {
-    return (
-      <div className="predictions-loading">
-        Loading predictions...
-      </div>
-    );
+    return <div className="predictions-loading">Loading predictions...</div>;
   }
 
   if (jobs.length === 0) {
@@ -153,84 +138,83 @@ if (job.type === "lookbook") {
             <div className="prediction-image">
 
               {/* HERO */}
-{job.type === "hero" && job.heroImageUrl && (
-  <>
-    <img
-      src={job.heroImageUrl}
-      alt="Generated result"
-      className="prediction-img"
-    />
+              {job.type === "hero" && job.heroImageUrl && (
+                <>
+                  <img
+                    src={job.heroImageUrl}
+                    className="prediction-img"
+                  />
 
-    <div className="prediction-actions">
-      <button
-        className="share"
-        onClick={(e) => {
-          e.stopPropagation();
-          navigate("/reel/share", {
-            state: {
-              reelUrl: job.heroImageUrl,
-            },
-          });
-        }}
-      >
-        🔗 Share
-      </button>
+                  <div className="prediction-actions">
+                    <button
+                      className="share"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate("/reel/share", {
+                          state: { reelUrl: job.heroImageUrl },
+                        });
+                      }}
+                    >
+                      🔗 Share
+                    </button>
 
-      <a
-        href={job.heroImageUrl}
-        download
-        className="download"
-        onClick={(e) => e.stopPropagation()}
-      >
-        ⬇ Download
-      </a>
-    </div>
-  </>
-)}
-
-{/* REEL */}
-{job.type === "reel" && (
-  job.reelUrl ? (
-    <video
-      src={job.reelUrl}
-      controls
-      className="prediction-img"
-    />
-  ) : (
-    <div className="prediction-placeholder">
-      🎬 Processing Reel...
-    </div>
-  )
-)}
-
-{/* LOOKBOOK */}
-{job.type === "lookbook" && job.lookbookImages && (
-  <div className="lookbook-grid">
-    {job.lookbookImages.map((img, i) => (
-      <img
-        key={i}
-        src={img}
-        className="lookbook-img"
-      />
-    ))}
-  </div>
-)}
-
-{/* FALLBACK (ONLY FOR HERO NOW) */}
-{job.type === "hero" && !job.heroImageUrl && (
-  <div className="prediction-placeholder">
-    ⏳ Processing...
-  </div>
-)}
-
-              {/* FALLBACK */}
-              {!job.heroImageUrl &&
-                !job.reelUrl &&
-                !job.lookbookImages && (
-                  <div className="prediction-placeholder">
-                    ⏳ Processing...
+                    <a
+                      href={job.heroImageUrl}
+                      download
+                      className="download"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      ⬇ Download
+                    </a>
                   </div>
-                )}
+                </>
+              )}
+
+              {/* REEL */}
+              {job.type === "reel" &&
+                (job.reelUrl ? (
+                  <video
+                    src={job.reelUrl}
+                    controls
+                    className="prediction-img"
+                  />
+                ) : (
+                  <div className="prediction-placeholder">
+                    🎬 Processing Reel...
+                  </div>
+                ))}
+
+              {/* 🔥 LOOKBOOK FINAL FIX */}
+              {job.type === "lookbook" && (
+                job.lookbookImages && job.lookbookImages.length > 0 ? (
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr",
+                      gap: "4px",
+                      width: "100%",
+                      height: "100%",
+                    }}
+                  >
+                    {job.lookbookImages.slice(0, 4).map((img, i) => (
+                      <img
+                        key={i}
+                        src={img}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          borderRadius: "6px",
+                        }}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="prediction-placeholder">
+                    ⏳ Processing Lookbook...
+                  </div>
+                )
+              )}
 
             </div>
 
