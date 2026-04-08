@@ -245,7 +245,7 @@ const generateHero = async () => {
 };
 
 
-  /* ================= HERO POLLING (CONTROLLED) ================= */
+/* ================= HERO POLLING (STABLE FINAL) ================= */
 
 useEffect(() => {
 
@@ -253,15 +253,19 @@ useEffect(() => {
 
   let cancelled = false;
   let attempts = 0;
-  const MAX = 25; // ~100 sec max
+  const MAX = 25;
+
+  let isPolling = false;
 
   const poll = async () => {
 
-    if (cancelled) return;
+    if (cancelled || isPolling) return;
+    isPolling = true;
 
     if (attempts >= MAX) {
       setHeroError("Timeout");
       setHeroLoading(false);
+      isPolling = false;
       return;
     }
 
@@ -271,23 +275,17 @@ useEffect(() => {
 
       const token = localStorage.getItem("token");
 
-      let frontDone = false;
-      let backDone = false;
+      let frontDone = !frontRunId || !!frontHeroImageUrl;
+      let backDone = !backRunId || !!backHeroImageUrl;
 
       /* ---------------- FRONT ---------------- */
 
-      if (frontRunId && !frontHeroImageUrl) {
+      if (!frontDone && frontRunId) {
 
         const res = await fetch(
           `${API_BASE}/api/p2m/hero/poll/${frontRunId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-
-        if (res.status === 429) {
-          console.warn("Front rate limited → slowing down");
-          setTimeout(poll, 6000);
-          return;
-        }
 
         if (res.ok) {
           const d = await res.json();
@@ -303,24 +301,16 @@ useEffect(() => {
           }
         }
 
-      } else {
-        frontDone = true;
       }
 
       /* ---------------- BACK ---------------- */
 
-      if (backRunId && !backHeroImageUrl) {
+      if (!backDone && backRunId) {
 
         const res = await fetch(
           `${API_BASE}/api/p2m/hero/poll/${backRunId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-
-        if (res.status === 429) {
-          console.warn("Back rate limited → slowing down");
-          setTimeout(poll, 6000);
-          return;
-        }
 
         if (res.ok) {
           const d = await res.json();
@@ -336,14 +326,13 @@ useEffect(() => {
           }
         }
 
-      } else {
-        backDone = true;
       }
 
       /* ---------------- COMPLETE ---------------- */
 
       if (frontDone && backDone) {
         setHeroLoading(false);
+        isPolling = false;
         return;
       }
 
@@ -351,21 +340,20 @@ useEffect(() => {
       console.warn("Polling error:", err);
     }
 
-    /* 🔥 NORMAL POLL DELAY */
+    isPolling = false;
+
     setTimeout(poll, 4000);
 
   };
 
-  /* 🔥 INITIAL DELAY (VERY IMPORTANT) */
-  const timer = setTimeout(poll, 8000);
+  const timer = setTimeout(poll, 5000);
 
   return () => {
     cancelled = true;
     clearTimeout(timer);
   };
 
-}, [frontRunId, backRunId, frontHeroImageUrl, backHeroImageUrl]);
-
+}, [frontRunId, backRunId]);
 /* ================= REEL AUTO TRIGGER ================= */
 
 
