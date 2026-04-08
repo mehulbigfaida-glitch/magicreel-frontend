@@ -1,106 +1,157 @@
-/* =========================
-   PAGE
-========================= */
-.predictions-page {
-  padding: 40px;
+.predictions-page{
+  padding:40px;
 }
 
-.predictions-title {
-  font-size: 28px;
-  margin-bottom: 30px;
+.predictions-title{
+  font-size:28px;
+  margin-bottom:30px;
 }
 
-/* =========================
-   GRID (LOCKED)
-========================= */
-.predictions-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 24px;
+.predictions-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,260px);
+  gap:24px;
 }
 
-/* =========================
-   CARD (LOCKED)
-========================= */
-.prediction-card {
-  background: #111;
-  border-radius: 12px;
-  overflow: hidden;
-  transition: transform 0.2s ease;
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.05);
+.prediction-card{
+  background:#121212;
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 0 0 1px rgba(255,255,255,0.05);
 }
 
-.prediction-card:hover {
-  transform: translateY(-4px);
+.prediction-image img{
+  width:100%;
+  display:block;
 }
 
-/* =========================
-   IMAGE CONTAINER (CRITICAL)
-========================= */
-.prediction-image {
-  width: 100%;
-  aspect-ratio: 2 / 3;   /* ✅ KEY FIX (instead of fixed height) */
-  position: relative;
-  overflow: hidden;
-  background: #0a0a0a;
+.prediction-meta{
+  padding:10px;
+  font-size:12px;
+  color:#fff;
+  opacity:0.9;
 }
 
-/* HERO + REEL */
-.prediction-image img,
-.prediction-image video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.prediction-placeholder{
+  height:140px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#aaa;
+  font-size:13px;
+  background:#1a1a1a;
+  border-radius:8px;
 }
 
-/* =========================
-   LOOKBOOK GRID (FINAL LOCK)
-========================= */
-.lookbook-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-
-  gap: 6px;
-  padding: 6px;
-
-  width: 100%;
-  height: 100%;
-
-  box-sizing: border-box;
+.predictions-empty{
+  margin-top:40px;
+  font-size:16px;
+  color:#999;
 }
 
-.lookbook-grid img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 8px;
-  display: block;
+.prediction-actions{
+  display:flex;
+  justify-content:space-between;
+  padding:12px;
 }
 
-.lookbook-grid img,
-.lookbook-grid div {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 8px;
-  background: #111;
+.prediction-actions button,
+.prediction-actions a{
+  background:#1f1f1f;
+  border:none;
+  color:white;
+  font-size:12px;
+  padding:6px 10px;
+  border-radius:6px;
+  cursor:pointer;
+  text-decoration:none;
 }
 
-/* =========================
-   META
-========================= */
-.prediction-meta {
-  padding: 10px;
-  font-size: 12px;
-  color: #aaa;
-
-  display: flex;
-  justify-content: center;
-  gap: 6px;
+.prediction-actions button:hover,
+.prediction-actions a:hover{
+  background:#2a2a2a;
 }
 
-/* STATUS COLORS */
+.predictions-loading{
+  padding:40px;
+  font-size:18px;
+}
+
+.prediction-card{
+  border-radius:12px;
+  overflow:hidden;
+  background:#111;
+  transition:transform 0.2s ease;
+}
+
+.prediction-card:hover{
+  transform:translateY(-4px);
+}
+
+.prediction-image{
+  position:relative;
+  aspect-ratio:2/3;
+  overflow:hidden;
+}
+
+.prediction-image img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  transition:transform 0.3s ease;
+}
+
+.prediction-card:hover img{
+  transform:scale(1.05);
+}
+
+.prediction-overlay{
+  position:absolute;
+  inset:0;
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  align-items:center;
+  background:rgba(0,0,0,0.55);
+  opacity:0;
+  transition:opacity 0.2s ease;
+}
+
+.prediction-card:hover .prediction-overlay{
+  opacity:1;
+}
+
+.prediction-overlay button,
+.prediction-overlay a{
+  background:white;
+  color:black;
+  border:none;
+  padding:8px 12px;
+  border-radius:6px;
+  font-size:12px;
+  cursor:pointer;
+  text-decoration:none;
+}
+
+.prediction-meta{
+  padding:10px;
+  font-size:12px;
+  color:#aaa;
+  display:flex;
+  gap:6px;
+  justify-content:center;
+}
+
+.prediction-meta .status{
+  color:#4ade80;
+}
+
+.predictions-empty {
+  text-align: center;
+  padding: 80px 20px;
+  opacity: 0.7;
+}
+
 .status.completed {
   color: #22c55e;
 }
@@ -113,41 +164,69 @@
   color: #ef4444;
 }
 
-/* =========================
-   PLACEHOLDER
-========================= */
-.prediction-placeholder {
-  position: absolute;
-  inset: 0;
-
+.prediction-actions {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
 
-  color: #aaa;
+.prediction-actions button {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
   font-size: 13px;
-  background: #1a1a1a;
 }
 
-/* =========================
-   LOADING / EMPTY
-========================= */
-.predictions-loading {
-  padding: 40px;
-  font-size: 18px;
+.prediction-actions .primary {
+  background: black;
+  color: white;
 }
 
-.predictions-empty {
-  text-align: center;
-  padding: 80px 20px;
-  opacity: 0.7;
+.prediction-actions .secondary {
+  background: #f1f1f1;
 }
 
-/* 🔧 FIX: ensure images render inside grid */
-.lookbook-grid {
-  z-index: 1;
+.prediction-actions a {
+  font-size: 12px;
+  text-decoration: none;
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
 }
 
-.lookbook-grid img {
-  display: block;
+.prediction-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.prediction-actions .primary {
+  background: black;
+  color: white;
+}
+
+.prediction-actions .secondary {
+  background: #f1f1f1;
+}
+
+.prediction-actions .share {
+  background: #6366f1;
+  color: white;
+}
+
+.prediction-actions .download {
+  border: 1px solid #ddd;
+  padding: 6px 10px;
+  border-radius: 6px;
+  text-decoration: none;
+}
+
+.prediction-video,
+.prediction-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
 }

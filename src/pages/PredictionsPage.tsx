@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Predictions.css";
 import { API_BASE } from "../config/api";
 
@@ -20,6 +21,7 @@ type Prediction = {
 export default function PredictionsPage() {
   const [jobs, setJobs] = useState<Prediction[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const loadPredictions = async () => {
     try {
@@ -27,53 +29,55 @@ export default function PredictionsPage() {
       const data = await res.json();
 
       const jobsData: Prediction[] = (data || []).map((job: any) => {
-        const mediaUrl = job.mediaUrl ?? null;
+        const mediaUrl = job.mediaUrl ?? job.imageUrl ?? null;
 
-                
-// LOOKBOOK
-if (job.type === "lookbook") {
-  let images: string[] = [];
+        // ✅ LOOKBOOK DETECTION
+        const lookbookSources =
+          job.mediaUrls ||
+          job.images ||
+          job.outputImages ||
+          job.resultImages;
 
-  if (Array.isArray(job.mediaUrls)) {
-    images = job.mediaUrls;
-  } else if (typeof job.mediaUrl === "string") {
-    images = [job.mediaUrl];
-  }
+        if (Array.isArray(lookbookSources) && lookbookSources.length > 1) {
+          return {
+            runId: job.id,
+            type: "lookbook",
+            heroImageUrl: null,
+            lookbookImages: lookbookSources,
+            status: job.status ?? "unknown",
+            createdAt: job.createdAt,
+            creditsUsed: 2,
+          };
+        }
 
-  const cleanImages = images.filter(
-    (url) => typeof url === "string" && url.length > 0
-  );
+        // ✅ REEL DETECTION
+        const isVideo =
+          job.type === "reel" ||
+          job.kind === "video" ||
+          job.outputType === "video" ||
+          (typeof mediaUrl === "string" &&
+            (mediaUrl.includes(".mp4") ||
+              mediaUrl.includes(".webm") ||
+              mediaUrl.includes("video")));
 
-  return {
-    runId: job.id,
-    type: "lookbook",
-    heroImageUrl: null,
-    lookbookImages: cleanImages,
-    status: job.status ?? "completed",
-    createdAt: job.createdAt,
-    creditsUsed: 2,
-  };
-}
-
-        // REEL
-        if (job.type === "reel") {
+        if (isVideo) {
           return {
             runId: job.id,
             type: "reel",
             heroImageUrl: null,
             reelUrl: mediaUrl,
-            status: job.status ?? "completed",
+            status: job.status ?? "unknown",
             createdAt: job.createdAt,
             creditsUsed: 3,
           };
         }
 
-        // HERO
+        // ✅ HERO DEFAULT (SAFE)
         return {
           runId: job.id,
           type: "hero",
           heroImageUrl: mediaUrl,
-          status: job.status ?? "completed",
+          status: job.status ?? "unknown",
           createdAt: job.createdAt,
           creditsUsed: 1,
         };
@@ -122,7 +126,20 @@ if (job.type === "lookbook") {
   };
 
   if (loading) {
-    return <div className="predictions-loading">Loading predictions...</div>;
+    return (
+      <div className="predictions-loading">
+        Loading predictions...
+      </div>
+    );
+  }
+
+  if (jobs.length === 0) {
+    return (
+      <div className="predictions-empty">
+        <h2>No predictions yet</h2>
+        <p>Create your first look from the studio</p>
+      </div>
+    );
   }
 
   return (
@@ -130,77 +147,109 @@ if (job.type === "lookbook") {
       <h1 className="predictions-title">Predictions</h1>
 
       <div className="predictions-grid">
-        {jobs.map((job) => {
-          
-          return (
-            <div className="prediction-card" key={job.runId}>
-              <div className="prediction-image">
+        {jobs.map((job) => (
+          <div className="prediction-card" key={job.runId}>
+            <div className="prediction-image">
 
-                {/* HERO */}
-                {job.type === "hero" && job.heroImageUrl && (
-                  <img src={job.heroImageUrl} />
-                )}
+              {/* HERO */}
+{job.type === "hero" && job.heroImageUrl && (
+  <>
+    <img
+      src={job.heroImageUrl}
+      alt="Generated result"
+      className="prediction-img"
+    />
 
-                {/* REEL */}
-                {job.type === "reel" &&
-                  (job.reelUrl ? (
-                    <video src={job.reelUrl} controls />
-                  ) : (
-                    <div className="prediction-placeholder">
-                      🎬 Processing Reel...
-                    </div>
-                  ))}
+    <div className="prediction-actions">
+      <button
+        className="share"
+        onClick={(e) => {
+          e.stopPropagation();
+          navigate("/reel/share", {
+            state: {
+              reelUrl: job.heroImageUrl,
+            },
+          });
+        }}
+      >
+        🔗 Share
+      </button>
 
-                {/* LOOKBOOK */}
-{job.type === "lookbook" && (
-  job.lookbookImages && job.lookbookImages.length > 0 ? (
-    <div className="lookbook-grid">
-      {job.lookbookImages.slice(0, 4).map((img, i) => (
-        <img
-          key={`${job.runId}-${i}`}
-          src={img}
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).style.display = "none";
-          }}
-        />
-      ))}
-
-      {Array.from({ length: 4 - job.lookbookImages.length }).map((_, i) => (
-        <div
-          key={`empty-${i}`}
-          style={{
-            background: "#111",
-            borderRadius: "8px",
-          }}
-        />
-      ))}
+      <a
+        href={job.heroImageUrl}
+        download
+        className="download"
+        onClick={(e) => e.stopPropagation()}
+      >
+        ⬇ Download
+      </a>
     </div>
+  </>
+)}
+
+{/* REEL */}
+{job.type === "reel" && (
+  job.reelUrl ? (
+    <video
+      src={job.reelUrl}
+      controls
+      className="prediction-img"
+    />
   ) : (
     <div className="prediction-placeholder">
-      ⏳ Processing Lookbook...
+      🎬 Processing Reel...
     </div>
   )
 )}
-              </div>
 
-              <div className="prediction-meta">
-                <span>
-                  {new Date(job.createdAt).toLocaleDateString()}
-                </span>
+{/* LOOKBOOK */}
+{job.type === "lookbook" && job.lookbookImages && (
+  <div className="lookbook-grid">
+    {job.lookbookImages.map((img, i) => (
+      <img
+        key={i}
+        src={img}
+        className="lookbook-img"
+      />
+    ))}
+  </div>
+)}
 
-                <span>•</span>
+{/* FALLBACK (ONLY FOR HERO NOW) */}
+{job.type === "hero" && !job.heroImageUrl && (
+  <div className="prediction-placeholder">
+    ⏳ Processing...
+  </div>
+)}
 
-                <span>{job.creditsUsed} credit</span>
+              {/* FALLBACK */}
+              {!job.heroImageUrl &&
+                !job.reelUrl &&
+                !job.lookbookImages && (
+                  <div className="prediction-placeholder">
+                    ⏳ Processing...
+                  </div>
+                )}
 
-                <span>•</span>
-
-                <span className={`status ${job.status}`}>
-                  {getStatusLabel(job.status)}
-                </span>
-              </div>
             </div>
-          );
-        })}
+
+            <div className="prediction-meta">
+              <span>
+                {new Date(job.createdAt).toLocaleDateString()}
+              </span>
+
+              <span>•</span>
+
+              <span>{job.creditsUsed} credit</span>
+
+              <span>•</span>
+
+              <span className={`status ${job.status}`}>
+                {getStatusLabel(job.status)}
+              </span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
