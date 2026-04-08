@@ -29,11 +29,19 @@ export default function PredictionsPage() {
       const jobsData: Prediction[] = (data || []).map((job: any) => {
         const mediaUrl = job.mediaUrl ?? null;
 
-        // LOOKBOOK
-        // LOOKBOOK
+                
+// LOOKBOOK
 if (job.type === "lookbook") {
-  const cleanImages = (job.mediaUrls || []).filter(
-    (url: string) => typeof url === "string" && url.length > 0
+  let images: string[] = [];
+
+  if (Array.isArray(job.mediaUrls)) {
+    images = job.mediaUrls;
+  } else if (typeof job.mediaUrl === "string") {
+    images = [job.mediaUrl];
+  }
+
+  const cleanImages = images.filter(
+    (url) => typeof url === "string" && url.length > 0
   );
 
   return {
