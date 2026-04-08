@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { API_BASE } from "../config/api";
 
 type User = {
   id: string;
@@ -33,11 +32,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      const res = await fetch(`${API_BASE}/api/auth/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+  `${import.meta.env.VITE_API_URL}/api/auth/me`,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
 
       if (!res.ok) {
         setUser(null);
