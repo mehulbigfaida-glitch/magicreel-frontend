@@ -30,21 +30,22 @@ export default function PredictionsPage() {
         const mediaUrl = job.mediaUrl ?? null;
 
         // LOOKBOOK
-        if (job.type === "lookbook") {
-          const cleanImages = (job.mediaUrls || []).filter(
-            (url: string) => !!url && url.startsWith("http")
-          );
+        // LOOKBOOK
+if (job.type === "lookbook") {
+  const cleanImages = (job.mediaUrls || []).filter(
+    (url: string) => typeof url === "string" && url.length > 0
+  );
 
-          return {
-            runId: job.id,
-            type: "lookbook",
-            heroImageUrl: null,
-            lookbookImages: cleanImages,
-            status: job.status ?? "completed",
-            createdAt: job.createdAt,
-            creditsUsed: 2,
-          };
-        }
+  return {
+    runId: job.id,
+    type: "lookbook",
+    heroImageUrl: null,
+    lookbookImages: cleanImages,
+    status: job.status ?? "completed",
+    createdAt: job.createdAt,
+    creditsUsed: 2,
+  };
+}
 
         // REEL
         if (job.type === "reel") {
