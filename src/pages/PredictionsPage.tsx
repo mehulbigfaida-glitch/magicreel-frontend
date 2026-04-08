@@ -31,7 +31,7 @@ export default function PredictionsPage() {
       const jobsData: Prediction[] = (data || []).map((job: any) => {
         const mediaUrl = job.mediaUrl ?? job.imageUrl ?? null;
 
-        // ✅ LOOKBOOK
+        // LOOKBOOK
         if (job.type === "lookbook") {
           return {
             runId: job.id,
@@ -44,7 +44,7 @@ export default function PredictionsPage() {
           };
         }
 
-        // ✅ REEL
+        // REEL
         const isVideo =
           job.type === "reel" ||
           (typeof mediaUrl === "string" &&
@@ -62,7 +62,7 @@ export default function PredictionsPage() {
           };
         }
 
-        // ✅ HERO
+        // HERO
         return {
           runId: job.id,
           type: "hero",
@@ -74,7 +74,6 @@ export default function PredictionsPage() {
       });
 
       setJobs(jobsData);
-
       return jobsData.some((job) => job.status === "running");
     } catch (err) {
       console.error("Predictions fetch error:", err);
@@ -89,7 +88,6 @@ export default function PredictionsPage() {
 
     const init = async () => {
       const hasRunningJobs = await loadPredictions();
-
       if (hasRunningJobs) {
         interval = setInterval(loadPredictions, 4000);
       }
@@ -135,15 +133,12 @@ export default function PredictionsPage() {
       <div className="predictions-grid">
         {jobs.map((job) => (
           <div className="prediction-card" key={job.runId}>
-            <div className="prediction-image">
+            <div className="prediction-image" style={{ position: "relative" }}>
 
               {/* HERO */}
               {job.type === "hero" && job.heroImageUrl && (
                 <>
-                  <img
-                    src={job.heroImageUrl}
-                    className="prediction-img"
-                  />
+                  <img src={job.heroImageUrl} className="prediction-img" />
 
                   <div className="prediction-actions">
                     <button
@@ -173,84 +168,82 @@ export default function PredictionsPage() {
               {/* REEL */}
               {job.type === "reel" &&
                 (job.reelUrl ? (
-                  <video
-                    src={job.reelUrl}
-                    controls
-                    className="prediction-img"
-                  />
+                  <video src={job.reelUrl} controls className="prediction-img" />
                 ) : (
                   <div className="prediction-placeholder">
                     🎬 Processing Reel...
                   </div>
                 ))}
 
-              {/* 🔥 LOOKBOOK FINAL FIX */}
+              {/* LOOKBOOK 🔥 FINAL */}
               {job.type === "lookbook" && (
-  job.lookbookImages && job.lookbookImages.length > 0 ? (
-    <>
-      {/* GRID */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "4px",
-          width: "100%",
-          height: "100%",
-        }}
-      >
-        {job.lookbookImages.slice(0, 4).map((img, i) => (
-          <img
-            key={i}
-            src={img}
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              borderRadius: "6px",
-            }}
-          />
-        ))}
-      </div>
+                <>
+                  {/* GRID */}
+                  {job.lookbookImages && job.lookbookImages.length >= 4 ? (
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr 1fr",
+                        gap: "4px",
+                        width: "100%",
+                        height: "100%",
+                      }}
+                    >
+                      {job.lookbookImages.slice(0, 4).map((img, i) => (
+                        <img
+                          key={i}
+                          src={img}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            borderRadius: "6px",
+                          }}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="prediction-placeholder">
+                      ⏳ Processing Lookbook...
+                    </div>
+                  )}
 
-      {/* ACTIONS 🔥 */}
-      <div className="prediction-actions">
-        <button
-          className="share"
-          onClick={(e) => {
-            e.stopPropagation();
-            navigate("/reel/share", {
-              state: {
-                lookbookImages: job.lookbookImages || [],
-              },
-            });
-          }}
-        >
-          🔗 Share
-        </button>
+                  {/* ACTIONS */}
+                  {job.lookbookImages && job.lookbookImages.length > 0 && (
+                    <div className="prediction-actions">
+                      <button
+                        className="share"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate("/reel/share", {
+                            state: {
+                              lookbookImages: job.lookbookImages || [],
+                            },
+                          });
+                        }}
+                      >
+                        🔗 Share
+                      </button>
 
-        <button
-          className="download"
-          onClick={(e) => {
-            e.stopPropagation();
+                      <button
+                        className="download"
+                        onClick={(e) => {
+                          e.stopPropagation();
 
-            (job.lookbookImages || []).forEach((url, i) => {
-              const link = document.createElement("a");
-              link.href = url;
-              link.download = `lookbook-${i + 1}.jpg`;
-              link.click();
-            });
-          }}
-        >
-          ⬇ Download
-        </button>
-      </div>
-    </>
-  ) : (
-    <div className="prediction-placeholder">
-      ⏳ Processing Lookbook...
-    </div>
-  )
-)}
+                          (job.lookbookImages || []).forEach((url, i) => {
+                            const link = document.createElement("a");
+                            link.href = url;
+                            link.download = `lookbook-${i + 1}.jpg`;
+                            link.click();
+                          });
+                        }}
+                      >
+                        ⬇ Download
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
 
             </div>
 
