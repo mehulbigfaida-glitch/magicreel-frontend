@@ -20,35 +20,34 @@ type Prediction = {
 export default function PredictionsPage() {
   const [jobs, setJobs] = useState<Prediction[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   const loadPredictions = async () => {
     try {
       const res = await fetch(`${API_BASE}/api/predictions`);
       const data = await res.json();
 
       const jobsData: Prediction[] = (data || []).map((job: any) => {
-        const mediaUrl = job.mediaUrl ?? job.imageUrl ?? null;
+        const mediaUrl = job.mediaUrl ?? null;
 
-        // LOOKBOOK
+        // ✅ LOOKBOOK (FINAL CLEAN)
         if (job.type === "lookbook") {
+          const cleanImages = (job.mediaUrls || []).filter(
+            (url: string) => !!url && url.includes("http")
+          );
+
           return {
             runId: job.id,
             type: "lookbook",
             heroImageUrl: null,
-            lookbookImages: job.mediaUrls || [],
+            lookbookImages: cleanImages,
             status: job.status ?? "completed",
             createdAt: job.createdAt,
             creditsUsed: 2,
           };
         }
 
-        // REEL
-        const isVideo =
-          job.type === "reel" ||
-          (typeof mediaUrl === "string" &&
-            (mediaUrl.includes(".mp4") || mediaUrl.includes("video")));
-
-        if (isVideo) {
+        // ✅ REEL
+        if (job.type === "reel") {
           return {
             runId: job.id,
             type: "reel",
@@ -60,7 +59,7 @@ export default function PredictionsPage() {
           };
         }
 
-        // HERO
+        // ✅ HERO
         return {
           runId: job.id,
           type: "hero",
@@ -72,6 +71,7 @@ export default function PredictionsPage() {
       });
 
       setJobs(jobsData);
+
       return jobsData.some((job) => job.status === "running");
     } catch (err) {
       console.error("Predictions fetch error:", err);
@@ -86,6 +86,7 @@ export default function PredictionsPage() {
 
     const init = async () => {
       const hasRunningJobs = await loadPredictions();
+
       if (hasRunningJobs) {
         interval = setInterval(loadPredictions, 4000);
       }
@@ -113,15 +114,6 @@ export default function PredictionsPage() {
 
   if (loading) {
     return <div className="predictions-loading">Loading predictions...</div>;
-  }
-
-  if (jobs.length === 0) {
-    return (
-      <div className="predictions-empty">
-        <h2>No predictions yet</h2>
-        <p>Create your first look from the studio</p>
-      </div>
-    );
   }
 
   return (
@@ -155,29 +147,12 @@ export default function PredictionsPage() {
                   </div>
                 ))}
 
-              {/* LOOKBOOK (FINAL STABLE GRID) */}
+              {/* ✅ LOOKBOOK FINAL */}
               {job.type === "lookbook" && (
-                job.lookbookImages && job.lookbookImages.length >= 4 ? (
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr 1fr",
-                      gap: "4px",
-                      width: "100%",
-                      height: "100%",
-                    }}
-                  >
+                job.lookbookImages && job.lookbookImages.length > 0 ? (
+                  <div className="lookbook-grid">
                     {job.lookbookImages.slice(0, 4).map((img, i) => (
-                      <img
-                        key={i}
-                        src={img}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                          borderRadius: "6px",
-                        }}
-                      />
+                      <img key={i} src={img} />
                     ))}
                   </div>
                 ) : (
