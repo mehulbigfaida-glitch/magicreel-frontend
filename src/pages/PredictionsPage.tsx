@@ -176,74 +176,78 @@ export default function PredictionsPage() {
                 ))}
 
               {/* LOOKBOOK 🔥 FINAL */}
-              {job.type === "lookbook" && (
-                <>
-                  {/* GRID */}
-                  {job.lookbookImages && job.lookbookImages.length >= 4 ? (
-                    <div
-                      style={{
-                        display: "grid",
-                        gridTemplateColumns: "1fr 1fr",
-                        gap: "4px",
-                        width: "100%",
-                        height: "100%",
-                      }}
-                    >
-                      {job.lookbookImages.slice(0, 4).map((img, i) => (
-                        <img
-                          key={i}
-                          src={img}
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                            borderRadius: "6px",
-                          }}
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="prediction-placeholder">
-                      ⏳ Processing Lookbook...
-                    </div>
-                  )}
+              {job.type === "lookbook" && (() => {
+  const images = (job.lookbookImages || []).filter(Boolean);
 
-                  {/* ACTIONS */}
-                  {job.lookbookImages && job.lookbookImages.length > 0 && (
-                    <div className="prediction-actions">
-                      <button
-                        className="share"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate("/reel/share", {
-                            state: {
-                              lookbookImages: job.lookbookImages || [],
-                            },
-                          });
-                        }}
-                      >
-                        🔗 Share
-                      </button>
+  const isReady = images.length >= 4;
 
-                      <button
-                        className="download"
-                        onClick={(e) => {
-                          e.stopPropagation();
+  return (
+    <>
+      {/* GRID ONLY WHEN READY */}
+      {isReady ? (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "4px",
+            width: "100%",
+            height: "100%",
+          }}
+        >
+          {images.slice(0, 4).map((img, i) => (
+            <img
+              key={i}
+              src={img}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                borderRadius: "6px",
+              }}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="prediction-placeholder">
+          ⏳ Processing Lookbook...
+        </div>
+      )}
 
-                          (job.lookbookImages || []).forEach((url, i) => {
-                            const link = document.createElement("a");
-                            link.href = url;
-                            link.download = `lookbook-${i + 1}.jpg`;
-                            link.click();
-                          });
-                        }}
-                      >
-                        ⬇ Download
-                      </button>
-                    </div>
-                  )}
-                </>
-              )}
+      {/* ACTIONS ONLY WHEN READY */}
+      {isReady && (
+        <div className="prediction-actions">
+          <button
+            className="share"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate("/reel/share", {
+                state: { lookbookImages: images },
+              });
+            }}
+          >
+            🔗 Share
+          </button>
+
+          <button
+            className="download"
+            onClick={(e) => {
+              e.stopPropagation();
+
+              images.forEach((url, i) => {
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = `lookbook-${i + 1}.jpg`;
+                link.click();
+              });
+            }}
+          >
+            ⬇ Download
+          </button>
+        </div>
+      )}
+    </>
+  );
+})()}
 
             </div>
 
