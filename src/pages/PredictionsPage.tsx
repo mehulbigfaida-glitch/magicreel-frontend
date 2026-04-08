@@ -29,10 +29,10 @@ export default function PredictionsPage() {
       const jobsData: Prediction[] = (data || []).map((job: any) => {
         const mediaUrl = job.mediaUrl ?? null;
 
-        // ✅ LOOKBOOK (FINAL CLEAN)
+        // LOOKBOOK
         if (job.type === "lookbook") {
           const cleanImages = (job.mediaUrls || []).filter(
-            (url: string) => !!url && url.includes("http")
+            (url: string) => !!url && url.startsWith("http")
           );
 
           return {
@@ -46,7 +46,7 @@ export default function PredictionsPage() {
           };
         }
 
-        // ✅ REEL
+        // REEL
         if (job.type === "reel") {
           return {
             runId: job.id,
@@ -59,7 +59,7 @@ export default function PredictionsPage() {
           };
         }
 
-        // ✅ HERO
+        // HERO
         return {
           runId: job.id,
           type: "hero",
@@ -121,75 +121,84 @@ export default function PredictionsPage() {
       <h1 className="predictions-title">Predictions</h1>
 
       <div className="predictions-grid">
-        {jobs.map((job) => (
-          <div className="prediction-card" key={job.runId}>
-            <div className="prediction-image">
+        {jobs.map((job) => {
+          const images =
+            (job.lookbookImages || []).filter(
+              (img) => img && img.startsWith("http")
+            ) || [];
 
-              {/* HERO */}
-              {job.type === "hero" && job.heroImageUrl && (
-                <img
-                  src={job.heroImageUrl}
-                  className="prediction-img"
-                />
-              )}
+          return (
+            <div className="prediction-card" key={job.runId}>
+              <div className="prediction-image">
 
-              {/* REEL */}
-              {job.type === "reel" &&
-                (job.reelUrl ? (
-                  <video
-                    src={job.reelUrl}
-                    controls
-                    className="prediction-img"
-                  />
-                ) : (
-                  <div className="prediction-placeholder">
-                    🎬 Processing Reel...
-                  </div>
-                ))}
+                {/* HERO */}
+                {job.type === "hero" && job.heroImageUrl && (
+                  <img src={job.heroImageUrl} />
+                )}
 
-              {/* ✅ LOOKBOOK FINAL */}
-              {job.type === "lookbook" && (
-                job.lookbookImages && job.lookbookImages.length > 0 ? (
-                  <div className="lookbook-grid">
-                    {job.lookbookImages
-  .filter((img) => img && img.startsWith("http"))
-  .slice(0, 4)
-  .map((img, i) => (
-    <img
-      key={i}
-      src={img}
-      onError={(e) => {
-        (e.currentTarget as HTMLImageElement).style.display = "none";
-      }}
-    />
-  ))}
-                  </div>
-                ) : (
-                  <div className="prediction-placeholder">
-                    ⏳ Processing Lookbook...
-                  </div>
-                )
-              )}
+                {/* REEL */}
+                {job.type === "reel" &&
+                  (job.reelUrl ? (
+                    <video src={job.reelUrl} controls />
+                  ) : (
+                    <div className="prediction-placeholder">
+                      🎬 Processing Reel...
+                    </div>
+                  ))}
 
+                {/* LOOKBOOK */}
+                {job.type === "lookbook" && (
+                  images.length > 0 ? (
+                    <div className="lookbook-grid">
+                      {images.slice(0, 4).map((img, i) => (
+                        <img
+                          key={i}
+                          src={img}
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).style.display =
+                              "none";
+                          }}
+                        />
+                      ))}
+
+                      {/* Fill empty slots */}
+                      {Array.from({ length: 4 - images.length }).map((_, i) => (
+                        <div
+                          key={`empty-${i}`}
+                          style={{
+                            background: "#111",
+                            borderRadius: "8px",
+                          }}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="prediction-placeholder">
+                      ⏳ Processing Lookbook...
+                    </div>
+                  )
+                )}
+
+              </div>
+
+              <div className="prediction-meta">
+                <span>
+                  {new Date(job.createdAt).toLocaleDateString()}
+                </span>
+
+                <span>•</span>
+
+                <span>{job.creditsUsed} credit</span>
+
+                <span>•</span>
+
+                <span className={`status ${job.status}`}>
+                  {getStatusLabel(job.status)}
+                </span>
+              </div>
             </div>
-
-            <div className="prediction-meta">
-              <span>
-                {new Date(job.createdAt).toLocaleDateString()}
-              </span>
-
-              <span>•</span>
-
-              <span>{job.creditsUsed} credit</span>
-
-              <span>•</span>
-
-              <span className={`status ${job.status}`}>
-                {getStatusLabel(job.status)}
-              </span>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
