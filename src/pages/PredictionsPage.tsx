@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import "./Predictions.css";
 import { API_BASE } from "../config/api";
 
@@ -21,8 +20,7 @@ type Prediction = {
 export default function PredictionsPage() {
   const [jobs, setJobs] = useState<Prediction[]>([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-
+  
   const loadPredictions = async () => {
     try {
       const res = await fetch(`${API_BASE}/api/predictions`);
@@ -133,121 +131,61 @@ export default function PredictionsPage() {
       <div className="predictions-grid">
         {jobs.map((job) => (
           <div className="prediction-card" key={job.runId}>
-            <div className="prediction-image" style={{ position: "relative" }}>
+            <div className="prediction-image">
 
               {/* HERO */}
               {job.type === "hero" && job.heroImageUrl && (
-                <>
-                  <img src={job.heroImageUrl} className="prediction-img" />
-
-                  <div className="prediction-actions">
-                    <button
-                      className="share"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate("/reel/share", {
-                          state: { reelUrl: job.heroImageUrl },
-                        });
-                      }}
-                    >
-                      🔗 Share
-                    </button>
-
-                    <a
-                      href={job.heroImageUrl}
-                      download
-                      className="download"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      ⬇ Download
-                    </a>
-                  </div>
-                </>
+                <img
+                  src={job.heroImageUrl}
+                  className="prediction-img"
+                />
               )}
 
               {/* REEL */}
               {job.type === "reel" &&
                 (job.reelUrl ? (
-                  <video src={job.reelUrl} controls className="prediction-img" />
+                  <video
+                    src={job.reelUrl}
+                    controls
+                    className="prediction-img"
+                  />
                 ) : (
                   <div className="prediction-placeholder">
                     🎬 Processing Reel...
                   </div>
                 ))}
 
-              {/* LOOKBOOK 🔥 FINAL */}
-              {job.type === "lookbook" && (() => {
-  const images = (job.lookbookImages || []).filter(Boolean);
-
-  const isReady = images.length >= 4;
-
-  return (
-    <>
-      {/* GRID ONLY WHEN READY */}
-      {isReady ? (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "4px",
-            width: "100%",
-            height: "100%",
-          }}
-        >
-          {images.slice(0, 4).map((img, i) => (
-            <img
-              key={i}
-              src={img}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                borderRadius: "6px",
-              }}
-            />
-          ))}
-        </div>
-      ) : (
-        <div className="prediction-placeholder">
-          ⏳ Processing Lookbook...
-        </div>
-      )}
-
-      {/* ACTIONS ONLY WHEN READY */}
-      {isReady && (
-        <div className="prediction-actions">
-          <button
-            className="share"
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate("/reel/share", {
-                state: { lookbookImages: images },
-              });
-            }}
-          >
-            🔗 Share
-          </button>
-
-          <button
-            className="download"
-            onClick={(e) => {
-              e.stopPropagation();
-
-              images.forEach((url, i) => {
-                const link = document.createElement("a");
-                link.href = url;
-                link.download = `lookbook-${i + 1}.jpg`;
-                link.click();
-              });
-            }}
-          >
-            ⬇ Download
-          </button>
-        </div>
-      )}
-    </>
-  );
-})()}
+              {/* LOOKBOOK (FINAL STABLE GRID) */}
+              {job.type === "lookbook" && (
+                job.lookbookImages && job.lookbookImages.length >= 4 ? (
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr",
+                      gap: "4px",
+                      width: "100%",
+                      height: "100%",
+                    }}
+                  >
+                    {job.lookbookImages.slice(0, 4).map((img, i) => (
+                      <img
+                        key={i}
+                        src={img}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          borderRadius: "6px",
+                        }}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="prediction-placeholder">
+                    ⏳ Processing Lookbook...
+                  </div>
+                )
+              )}
 
             </div>
 
