@@ -27,7 +27,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const token = localStorage.getItem("token");
 
-      // No token → guest mode
       if (!token) {
         setUser(null);
         setLoading(false);
@@ -35,12 +34,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       const res = await fetch(`${API_BASE}/api/auth/me`, {
-  headers: {
-    Authorization: `Bearer ${token}`,
-  },
-});
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-      // Backend reachable but user not authenticated
       if (!res.ok) {
         setUser(null);
         setLoading(false);
@@ -48,10 +46,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       const data = await res.json();
-      setUser(data);
+
+      // 🔥 FIX: ensure credits always available
+      setUser({
+        ...data,
+        creditsAvailable: data.creditsAvailable ?? 0,
+      });
 
     } catch (err) {
-      // Backend unreachable / server restarting
       console.warn("Auth server unreachable. Running in guest mode.");
       setUser(null);
     } finally {

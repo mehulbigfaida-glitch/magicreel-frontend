@@ -176,8 +176,8 @@ function GlobalHeader() {
         <div className="mr-header-right">
 
           <span className="mr-credits">
-            {user?.creditsAvailable} Credits
-          </span>
+  {(user?.creditsAvailable ?? 0)} Credits
+</span>
 
           <div className="mr-profile-menu">
 
