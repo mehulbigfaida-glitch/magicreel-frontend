@@ -131,11 +131,7 @@ if (job.type === "lookbook") {
 
       <div className="predictions-grid">
         {jobs.map((job) => {
-          const images =
-            (job.lookbookImages || []).filter(
-              (img) => img && img.startsWith("http")
-            ) || [];
-
+          
           return (
             <div className="prediction-card" key={job.runId}>
               <div className="prediction-image">
@@ -156,38 +152,35 @@ if (job.type === "lookbook") {
                   ))}
 
                 {/* LOOKBOOK */}
-                {job.type === "lookbook" && (
-                  images.length > 0 ? (
-                    <div className="lookbook-grid">
-                      {images.slice(0, 4).map((img) => (
-  <img
-    key={img}
-    src={img}
-                          onError={(e) => {
-                            (e.currentTarget as HTMLImageElement).style.display =
-                              "none";
-                          }}
-                        />
-                      ))}
+{job.type === "lookbook" && (
+  job.lookbookImages && job.lookbookImages.length > 0 ? (
+    <div className="lookbook-grid">
+      {job.lookbookImages.slice(0, 4).map((img, i) => (
+        <img
+          key={`${job.runId}-${i}`}
+          src={img}
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).style.display = "none";
+          }}
+        />
+      ))}
 
-                      {/* Fill empty slots */}
-                      {Array.from({ length: 4 - images.length }).map((_, i) => (
-                        <div
-                          key={`empty-${i}`}
-                          style={{
-                            background: "#111",
-                            borderRadius: "8px",
-                          }}
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="prediction-placeholder">
-                      ⏳ Processing Lookbook...
-                    </div>
-                  )
-                )}
-
+      {Array.from({ length: 4 - job.lookbookImages.length }).map((_, i) => (
+        <div
+          key={`empty-${i}`}
+          style={{
+            background: "#111",
+            borderRadius: "8px",
+          }}
+        />
+      ))}
+    </div>
+  ) : (
+    <div className="prediction-placeholder">
+      ⏳ Processing Lookbook...
+    </div>
+  )
+)}
               </div>
 
               <div className="prediction-meta">
