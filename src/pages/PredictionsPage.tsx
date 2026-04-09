@@ -106,20 +106,7 @@ export default function PredictionsPage() {
     };
   }, []);
 
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "✅ Ready";
-      case "running":
-        return "⏳ Processing";
-      case "failed":
-        return "❌ Failed";
-      default:
-        return status;
-    }
-  };
-
-  if (loading) {
+    if (loading) {
     return <div className="predictions-loading">Loading predictions...</div>;
   }
 
@@ -180,20 +167,28 @@ export default function PredictionsPage() {
               </div> {/* ✅ FIX: CLOSED IMAGE DIV */}
 
               <div className="prediction-meta">
-                <span>
-                  {new Date(job.createdAt).toLocaleDateString()}
-                </span>
+  <span>
+    {new Date(job.createdAt).toLocaleDateString()}
+  </span>
 
-                <span>•</span>
+  <span>{job.creditsUsed} credit</span>
 
-                <span>{job.creditsUsed} credit</span>
-
-                <span>•</span>
-
-                <span className={`status ${job.status}`}>
-                  {getStatusLabel(job.status)}
-                </span>
-              </div>
+  <span
+    className={`status-badge ${
+      job.status === "completed"
+        ? "status-ready"
+        : job.status === "running"
+        ? "status-processing"
+        : "status-failed"
+    }`}
+  >
+    {job.status === "completed"
+      ? "✔ Ready"
+      : job.status === "running"
+      ? "⏳ Processing"
+      : "✖ Failed"}
+  </span>
+</div>
             </div>
           );
         })}
