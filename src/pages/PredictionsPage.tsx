@@ -150,21 +150,32 @@ export default function PredictionsPage() {
 
                 {/* LOOKBOOK */}
                 {job.type === "lookbook" && (
-                  job.lookbookImages && job.lookbookImages.length > 0 ? (
-                    <img
-                      src={job.lookbookImages[0]}
-                      alt="Lookbook"
-                      loading="lazy"
-                      onError={(e) => {
-                        e.currentTarget.style.display = "none";
-                      }}
-                    />
-                  ) : (
-                    <div className="prediction-placeholder">
-                      ⏳ Processing Lookbook...
-                    </div>
-                  )
-                )}
+  job.lookbookImages && job.lookbookImages.length > 0 ? (
+    <img
+      src={job.lookbookImages[0]}
+      alt="Lookbook"
+      loading="lazy"
+      onError={(e) => {
+        // 🔥 fallback to hero if image fails
+        if (job.heroImageUrl) {
+          e.currentTarget.src = job.heroImageUrl;
+        } else {
+          e.currentTarget.style.display = "none";
+        }
+      }}
+    />
+  ) : job.heroImageUrl ? (
+    <img
+      src={job.heroImageUrl}
+      alt="Fallback Hero"
+      loading="lazy"
+    />
+  ) : (
+    <div className="prediction-placeholder">
+      ⏳ Generating Lookbook...
+    </div>
+  )
+)}
 
               </div> {/* ✅ FIX: CLOSED IMAGE DIV */}
 
