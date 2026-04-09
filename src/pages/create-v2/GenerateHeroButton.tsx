@@ -1,6 +1,4 @@
-// magicreel-tryon-frontend/src/pages/create-v2/GenerateHeroButton.tsx
-
-import { useState } from "react";
+// FILE: src/pages/create-v2/GenerateHeroButton.tsx (FULL REPLACEMENT)
 
 type GenerateHeroButtonProps = {
   canGenerate: boolean;
@@ -11,29 +9,21 @@ export default function GenerateHeroButton({
   canGenerate,
   generate,
 }: GenerateHeroButtonProps) {
-  const [loading, setLoading] = useState(false);
-
   const handleClick = async () => {
-    if (!canGenerate || loading) return;
-
-    try {
-      setLoading(true);
-      await generate();
-    } finally {
-      setLoading(false);
-    }
+    if (!canGenerate) return;
+    await generate();
   };
 
   return (
     <div className="mr-generate-wrapper">
       <button
         onClick={handleClick}
-        disabled={!canGenerate || loading}
+        disabled={!canGenerate}
         className={`mr-generate-btn ${
-          !canGenerate || loading ? "disabled" : ""
+          !canGenerate ? "disabled" : ""
         }`}
       >
-        {loading ? "Generating…" : "Generate Hero Image"}
+        {canGenerate ? "Generate Hero Image" : "Generating…"}
       </button>
     </div>
   );
