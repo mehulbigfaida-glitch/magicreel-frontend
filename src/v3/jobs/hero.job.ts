@@ -1,5 +1,4 @@
-// src/v3/jobs/hero.job.ts
-// 🔒 UPDATED: token handled internally, no external dependency
+// FILE: src/v3/jobs/hero.job.ts (FULL REPLACEMENT)
 
 import { API_BASE } from "../../config/api";
 import axios from "axios";
@@ -16,17 +15,24 @@ export async function runHeroJob(payload: any) {
   }
 
   /* ----------------------------------
+     AXIOS INSTANCE WITH AUTH
+  ---------------------------------- */
+
+  const api = axios.create({
+    baseURL: API_BASE,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  /* ----------------------------------
      STEP 1: GENERATE HERO
   ---------------------------------- */
 
-  const generateRes = await axios.post(
-    `${API_BASE}/api/p2m/hero/generate-v2`,
-    payload,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
+  const generateRes = await api.post(
+    `/api/p2m/hero/generate-v2`,
+    payload
   );
 
   const { frontRunId, backRunId } = generateRes.data;
@@ -46,15 +52,7 @@ export async function runHeroJob(payload: any) {
     /* -------- FRONT -------- */
 
     if (frontRunId && !frontResult) {
-      const res = await axios.get(
-        `${API_BASE}/api/p2m/hero/poll/${frontRunId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+      const res = await api.get(`/api/p2m/hero/poll/${frontRunId}`);
       const data = res.data;
 
       if (data.status === "completed") {
@@ -69,15 +67,7 @@ export async function runHeroJob(payload: any) {
     /* -------- BACK -------- */
 
     if (backRunId && !backResult) {
-      const res = await axios.get(
-        `${API_BASE}/api/p2m/hero/poll/${backRunId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+      const res = await api.get(`/api/p2m/hero/poll/${backRunId}`);
       const data = res.data;
 
       if (data.status === "completed") {
