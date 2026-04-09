@@ -46,7 +46,7 @@ export default function PredictionsPage() {
           return {
             runId: job.id,
             type: "lookbook",
-            heroImageUrl: job.heroImageUrl || null, // ✅ important fix
+            heroImageUrl: job.heroImageUrl || null,
             lookbookImages: cleanImages,
             status: job.status ?? "completed",
             createdAt: job.createdAt,
@@ -167,28 +167,25 @@ export default function PredictionsPage() {
 
             {/* META */}
             <div className="prediction-meta">
-              <div className="meta-top">
-                <span>{new Date(job.createdAt).toLocaleDateString()}</span>
-                <span>{job.creditsUsed} credit</span>
-              </div>
+              <span>
+                {new Date(job.createdAt).toLocaleDateString()} • {job.creditsUsed} credit
+              </span>
 
-              <div className="meta-bottom">
-                <span
-                  className={`status-badge ${
-                    job.status === "completed"
-                      ? "status-ready"
-                      : job.status === "running"
-                      ? "status-processing"
-                      : "status-failed"
-                  }`}
-                >
-                  {job.status === "completed"
-                    ? "✔ Ready"
+              <span
+                className={`status ${
+                  job.status === "completed"
+                    ? "completed"
                     : job.status === "running"
-                    ? "⏳ Processing"
-                    : "✖ Failed"}
-                </span>
-              </div>
+                    ? "running"
+                    : "failed"
+                }`}
+              >
+                {job.status === "completed"
+                  ? "✅ Ready"
+                  : job.status === "running"
+                  ? "⏳ Processing"
+                  : "❌ Failed"}
+              </span>
             </div>
 
           </div>
