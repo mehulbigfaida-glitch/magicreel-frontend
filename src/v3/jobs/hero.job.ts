@@ -1,5 +1,3 @@
-// FILE: src/v3/jobs/hero.job.ts (FULL REPLACEMENT)
-
 import { API_BASE } from "../../config/api";
 import axios from "axios";
 
@@ -53,9 +51,7 @@ export async function runHeroJob(payload: any) {
       (frontRunId ? frontResult : true) &&
       (backRunId ? backResult : true)
     ) {
-      // 🔥 CREDIT SYNC TRIGGER
       window.dispatchEvent(new Event("creditsUpdated"));
-
       return { front: frontResult, back: backResult };
     }
 
