@@ -79,7 +79,6 @@ export default function PredictionsPage() {
       });
 
       setJobs(jobsData);
-
       return jobsData.some((job) => job.status === "running");
     } catch (err) {
       console.error("Predictions fetch error:", err);
@@ -136,22 +135,13 @@ export default function PredictionsPage() {
 
                 {/* HERO */}
                 {job.type === "hero" && job.heroImageUrl && (
-                  <img
-                    src={job.heroImageUrl}
-                    alt="Hero"
-                    loading="lazy"
-                  />
+                  <img src={job.heroImageUrl} alt="Hero" loading="lazy" />
                 )}
 
                 {/* REEL */}
                 {job.type === "reel" &&
                   (job.reelUrl ? (
-                    <video
-                      src={job.reelUrl}
-                      controls
-                      playsInline
-                      muted
-                    />
+                    <video src={job.reelUrl} controls playsInline muted />
                   ) : (
                     <div className="prediction-placeholder">
                       🎬 Processing Reel...
@@ -159,34 +149,24 @@ export default function PredictionsPage() {
                   ))}
 
                 {/* LOOKBOOK */}
-                {job.type === "lookbook" &&
-                  (job.lookbookImages && job.lookbookImages.length > 0 ? (
-                    <div className="lookbook-grid">
-                      {job.lookbookImages.slice(0, 4).map((img, i) => (
-                        <img
-                          key={`${job.runId}-${i}`}
-                          src={img}
-                          alt={`Lookbook ${i}`}
-                          loading="lazy"
-                          onError={(e) => {
-                            e.currentTarget.style.opacity = "0";
-                          }}
-                        />
-                      ))}
-
-                      {/* Fill empty slots */}
-                      {Array.from({
-                        length: Math.max(0, 4 - job.lookbookImages.length),
-                      }).map((_, i) => (
-                        <div key={`empty-${i}`} />
-                      ))}
-                    </div>
+                {job.type === "lookbook" && (
+                  job.lookbookImages && job.lookbookImages.length > 0 ? (
+                    <img
+                      src={job.lookbookImages[0]}
+                      alt="Lookbook"
+                      loading="lazy"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                    />
                   ) : (
                     <div className="prediction-placeholder">
                       ⏳ Processing Lookbook...
                     </div>
-                  ))}
-              </div>
+                  )
+                )}
+
+              </div> {/* ✅ FIX: CLOSED IMAGE DIV */}
 
               <div className="prediction-meta">
                 <span>
