@@ -46,7 +46,7 @@ export default function PredictionsPage() {
           return {
             runId: job.id,
             type: "lookbook",
-            heroImageUrl: null,
+            heroImageUrl: job.heroImageUrl || null, // ✅ important fix
             lookbookImages: cleanImages,
             status: job.status ?? "completed",
             createdAt: job.createdAt,
@@ -106,7 +106,7 @@ export default function PredictionsPage() {
     };
   }, []);
 
-    if (loading) {
+  if (loading) {
     return <div className="predictions-loading">Loading predictions...</div>;
   }
 
@@ -115,83 +115,84 @@ export default function PredictionsPage() {
       <h1 className="predictions-title">Predictions</h1>
 
       <div className="predictions-grid">
-        {jobs.map((job) => {
-          return (
-            <div className="prediction-card" key={job.runId}>
-              <div className="prediction-image">
+        {jobs.map((job) => (
+          <div className="prediction-card" key={job.runId}>
+            
+            <div className="prediction-image">
 
-                {/* HERO */}
-                {job.type === "hero" && job.heroImageUrl && (
-                  <img src={job.heroImageUrl} alt="Hero" loading="lazy" />
-                )}
+              {/* HERO */}
+              {job.type === "hero" && job.heroImageUrl && (
+                <img src={job.heroImageUrl} alt="Hero" loading="lazy" />
+              )}
 
-                {/* REEL */}
-                {job.type === "reel" &&
-                  (job.reelUrl ? (
-                    <video src={job.reelUrl} controls playsInline muted />
-                  ) : (
-                    <div className="prediction-placeholder">
-                      🎬 Processing Reel...
-                    </div>
-                  ))}
+              {/* REEL */}
+              {job.type === "reel" &&
+                (job.reelUrl ? (
+                  <video src={job.reelUrl} controls playsInline muted />
+                ) : (
+                  <div className="prediction-placeholder">
+                    🎬 Processing Reel...
+                  </div>
+                ))}
 
-                {/* LOOKBOOK */}
-                {job.type === "lookbook" && (
-  job.lookbookImages && job.lookbookImages.length > 0 ? (
-    <img
-      src={job.lookbookImages[0]}
-      alt="Lookbook"
-      loading="lazy"
-      onError={(e) => {
-        // 🔥 fallback to hero if image fails
-        if (job.heroImageUrl) {
-          e.currentTarget.src = job.heroImageUrl;
-        } else {
-          e.currentTarget.style.display = "none";
-        }
-      }}
-    />
-  ) : job.heroImageUrl ? (
-    <img
-      src={job.heroImageUrl}
-      alt="Fallback Hero"
-      loading="lazy"
-    />
-  ) : (
-    <div className="prediction-placeholder">
-      ⏳ Generating Lookbook...
-    </div>
-  )
-)}
+              {/* LOOKBOOK */}
+              {job.type === "lookbook" && (
+                job.lookbookImages && job.lookbookImages.length > 0 ? (
+                  <img
+                    src={job.lookbookImages[0]}
+                    alt="Lookbook"
+                    loading="lazy"
+                    onError={(e) => {
+                      if (job.heroImageUrl) {
+                        e.currentTarget.src = job.heroImageUrl;
+                      } else {
+                        e.currentTarget.style.display = "none";
+                      }
+                    }}
+                  />
+                ) : job.heroImageUrl ? (
+                  <img
+                    src={job.heroImageUrl}
+                    alt="Fallback Hero"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="prediction-placeholder">
+                    ⏳ Generating...
+                  </div>
+                )
+              )}
 
-              </div> {/* ✅ FIX: CLOSED IMAGE DIV */}
-
-              <div className="prediction-meta">
-  <span>
-    {new Date(job.createdAt).toLocaleDateString()}
-  </span>
-
-  <span>{job.creditsUsed} credit</span>
-
-  <span
-    className={`status-badge ${
-      job.status === "completed"
-        ? "status-ready"
-        : job.status === "running"
-        ? "status-processing"
-        : "status-failed"
-    }`}
-  >
-    {job.status === "completed"
-      ? "✔ Ready"
-      : job.status === "running"
-      ? "⏳ Processing"
-      : "✖ Failed"}
-  </span>
-</div>
             </div>
-          );
-        })}
+
+            {/* META */}
+            <div className="prediction-meta">
+              <div className="meta-top">
+                <span>{new Date(job.createdAt).toLocaleDateString()}</span>
+                <span>{job.creditsUsed} credit</span>
+              </div>
+
+              <div className="meta-bottom">
+                <span
+                  className={`status-badge ${
+                    job.status === "completed"
+                      ? "status-ready"
+                      : job.status === "running"
+                      ? "status-processing"
+                      : "status-failed"
+                  }`}
+                >
+                  {job.status === "completed"
+                    ? "✔ Ready"
+                    : job.status === "running"
+                    ? "⏳ Processing"
+                    : "✖ Failed"}
+                </span>
+              </div>
+            </div>
+
+          </div>
+        ))}
       </div>
     </div>
   );
