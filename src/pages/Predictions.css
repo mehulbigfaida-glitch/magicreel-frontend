@@ -217,9 +217,20 @@
   color: #fff;
 
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  flex-wrap: nowrap; /* 🔥 prevent wrapping */
+
 }
+
+.prediction-meta span {
+  white-space: nowrap; /* 🔥 prevents breaking */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 
 /* STATUS BADGE */
 .status-badge {
@@ -227,6 +238,9 @@
   border-radius: 6px;
   font-size: 11px;
   font-weight: 500;
+
+  flex-shrink: 0;       /* 🔥 prevent shrinking */
+  white-space: nowrap;  /* 🔥 keep text in one line */
 }
 
 .status-ready {
