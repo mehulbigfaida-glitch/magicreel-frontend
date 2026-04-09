@@ -1,3 +1,5 @@
+// FILE: src/context/AuthContext.tsx (FULL REPLACEMENT)
+
 import { createContext, useContext, useEffect, useState } from "react";
 
 type User = {
@@ -33,13 +35,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       const res = await fetch(
-  `${import.meta.env.VITE_API_URL}/api/auth/me`,
-  {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }
-);
+        `${import.meta.env.VITE_API_URL}/api/auth/me`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!res.ok) {
         setUser(null);
@@ -49,12 +51,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const data = await res.json();
 
-      // 🔥 FIX: ensure credits always available
       setUser({
         ...data,
         creditsAvailable: data.creditsAvailable ?? 0,
       });
-
     } catch (err) {
       console.warn("Auth server unreachable. Running in guest mode.");
       setUser(null);
@@ -65,6 +65,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     fetchUser();
+
+    // 🔥 LISTEN FOR CREDIT UPDATE EVENTS
+    const handler = () => {
+      fetchUser();
+    };
+
+    window.addEventListener("creditsUpdated", handler);
+
+    return () => {
+      window.removeEventListener("creditsUpdated", handler);
+    };
   }, []);
 
   return (

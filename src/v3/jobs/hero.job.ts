@@ -10,8 +10,6 @@ export async function runHeroJob(payload: any) {
     throw new Error("User not authenticated");
   }
 
-  console.log("🔥 TOKEN BEING SENT:", token); // DEBUG
-
   const api = axios.create({
     baseURL: API_BASE,
     headers: {
@@ -55,6 +53,9 @@ export async function runHeroJob(payload: any) {
       (frontRunId ? frontResult : true) &&
       (backRunId ? backResult : true)
     ) {
+      // 🔥 CREDIT SYNC TRIGGER
+      window.dispatchEvent(new Event("creditsUpdated"));
+
       return { front: frontResult, back: backResult };
     }
 
