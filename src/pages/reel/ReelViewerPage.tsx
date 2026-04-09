@@ -46,56 +46,52 @@ export default function ReelViewerPage() {
   /* -----------------------------
      GENERATE REEL
   ----------------------------- */
-  useEffect(() => {
-    if (!heroPreviewUrl || !confirmed) return;
+  // FILE: src/pages/reel/ReelViewerPage.tsx (REPLACE THIS BLOCK)
 
-    const generateReel = async () => {
-      try {
-        const token = localStorage.getItem("token");
+useEffect(() => {
+  if (!heroPreviewUrl || !confirmed) return;
 
-        const res = await fetch(`${API_BASE}/api/p2m/reel/generate-v1`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            imageUrl: heroPreviewUrl,
-          }),
-        });
+  const generateReel = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-        const data = await res.json();
+      const res = await fetch(`${API_BASE}/api/p2m/reel/generate-v1`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          imageUrl: heroPreviewUrl,
+        }),
+      });
 
-        if (!res.ok) {
-  if (data?.error === "INSUFFICIENT_CREDITS") {
-    setShowPaywall(true);
-    return;
-  }
+      const data = await res.json();
 
-  if (!res.ok) {
-  if (data?.error === "INSUFFICIENT_CREDITS") {
-    setShowPaywall(true);
-    return;
-  }
+      if (!res.ok) {
+        if (data?.error === "INSUFFICIENT_CREDITS") {
+          setShowPaywall(true);
+          return;
+        }
 
-  throw new Error(data?.error || "Reel failed");
-}
-}
-
-        setVideoUrl(data.reelVideoUrl);
-
-        // success moment
-        setShowSuccess(true);
-        setTimeout(() => setShowSuccess(false), 2000);
-
-      } catch (err) {
-        console.error("Reel failed:", err);
-        ;
+        throw new Error(data?.error || "Reel failed");
       }
-    };
 
-    generateReel();
-  }, [heroPreviewUrl, confirmed, navigate]);
+      // 🔥 ADD THIS LINE HERE
+      window.dispatchEvent(new Event("creditsUpdated"));
+
+      setVideoUrl(data.reelVideoUrl);
+
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 2000);
+
+    } catch (err) {
+      console.error("Reel failed:", err);
+    }
+  };
+
+  generateReel();
+}, [heroPreviewUrl, confirmed, navigate]);
 
   /* -----------------------------
      ACTIONS

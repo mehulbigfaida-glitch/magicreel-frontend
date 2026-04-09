@@ -181,41 +181,45 @@ const handleStartGeneration = async () => {
     }
 
     const res = await fetch(`${API_BASE}/api/p2m/lookbook/generate-v2`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        heroImageUrl,
-        backHeroImageUrl,
-      }),
-    });
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  },
+  body: JSON.stringify({
+    heroImageUrl,
+    backHeroImageUrl,
+  }),
+});
 
-    if (!res.ok) {
-      setError("Lookbook generation failed");
-      setLoading(false);
-      return;
-    }
+if (!res.ok) {
+  setError("Lookbook generation failed");
+  setLoading(false);
+  return;
+}
 
-    const data = await res.json();
-    let poseData: Pose[] = data?.poses || [];
+const data = await res.json();
 
-    if (!poseData.length) {
-      setError("No poses generated");
-      setLoading(false);
-      return;
-    }
+// 🔥 ADD THIS LINE HERE
+window.dispatchEvent(new Event("creditsUpdated"));
 
-    const order = ["HERO", "BACK", "P1", "P2", "P3", "P4"];
+let poseData: Pose[] = data?.poses || [];
 
-    const sorted = order
-      .map(id => poseData.find(p => p.poseId === id))
-      .filter((p): p is Pose => Boolean(p));
+if (!poseData.length) {
+  setError("No poses generated");
+  setLoading(false);
+  return;
+}
 
-    const remaining = poseData.filter(
-      p => !order.includes(p.poseId)
-    );
+const order = ["HERO", "BACK", "P1", "P2", "P3", "P4"];
+
+const sorted = order
+  .map(id => poseData.find(p => p.poseId === id))
+  .filter((p): p is Pose => Boolean(p));
+
+const remaining = poseData.filter(
+  p => !order.includes(p.poseId)
+);
 
     poseData = [...sorted, ...remaining];
 
