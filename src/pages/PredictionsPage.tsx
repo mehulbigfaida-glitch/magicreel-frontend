@@ -120,50 +120,65 @@ export default function PredictionsPage() {
             
             <div className="prediction-image">
 
-              {/* HERO */}
-              {job.type === "hero" && job.heroImageUrl && (
-                <img src={job.heroImageUrl} alt="Hero" loading="lazy" />
-              )}
+  {/* ❌ FAILED STATE (GLOBAL OVERRIDE) */}
+  {job.status === "failed" && (
+    <div className="prediction-placeholder">
+      ❌ Generation Failed
+    </div>
+  )}
 
-              {/* REEL */}
-              {job.type === "reel" &&
-                (job.reelUrl ? (
-                  <video src={job.reelUrl} controls playsInline muted />
-                ) : (
-                  <div className="prediction-placeholder">
-                    🎬 Processing Reel...
-                  </div>
-                ))}
+  {/* HERO */}
+  {job.status !== "failed" && job.type === "hero" && job.heroImageUrl && (
+    <img
+      src={job.heroImageUrl}
+      alt="Hero"
+      loading="lazy"
+      onError={(e) => {
+        e.currentTarget.style.display = "none";
+      }}
+    />
+  )}
 
-              {/* LOOKBOOK */}
-              {job.type === "lookbook" && (
-                job.lookbookImages && job.lookbookImages.length > 0 ? (
-                  <img
-                    src={job.lookbookImages[0]}
-                    alt="Lookbook"
-                    loading="lazy"
-                    onError={(e) => {
-                      if (job.heroImageUrl) {
-                        e.currentTarget.src = job.heroImageUrl;
-                      } else {
-                        e.currentTarget.style.display = "none";
-                      }
-                    }}
-                  />
-                ) : job.heroImageUrl ? (
-                  <img
-                    src={job.heroImageUrl}
-                    alt="Fallback Hero"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="prediction-placeholder">
-                    ⏳ Generating...
-                  </div>
-                )
-              )}
+  {/* REEL */}
+  {job.status !== "failed" && job.type === "reel" && (
+    job.reelUrl ? (
+      <video src={job.reelUrl} controls playsInline muted />
+    ) : (
+      <div className="prediction-placeholder">
+        🎬 Processing Reel...
+      </div>
+    )
+  )}
 
-            </div>
+  {/* LOOKBOOK */}
+  {job.status !== "failed" && job.type === "lookbook" && (
+    job.lookbookImages && job.lookbookImages.length > 0 ? (
+      <img
+        src={job.lookbookImages[0]}
+        alt="Lookbook"
+        loading="lazy"
+        onError={(e) => {
+          if (job.heroImageUrl) {
+            e.currentTarget.src = job.heroImageUrl;
+          } else {
+            e.currentTarget.style.display = "none";
+          }
+        }}
+      />
+    ) : job.heroImageUrl ? (
+      <img
+        src={job.heroImageUrl}
+        alt="Fallback Hero"
+        loading="lazy"
+      />
+    ) : (
+      <div className="prediction-placeholder">
+        ⏳ Generating...
+      </div>
+    )
+  )}
+
+</div>
 
             {/* META */}
             <div className="prediction-meta">
