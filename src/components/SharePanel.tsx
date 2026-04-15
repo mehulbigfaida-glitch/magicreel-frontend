@@ -1,69 +1,72 @@
-import React from "react";
-
-type Props = {
-  videoUrl: string;
-  onDownload?: () => void;
-  downloadLabel?: string;
+type ShareData = {
+  runId: string;
+  type: "hero" | "lookbook" | "reel";
+  outputs: {
+    heroImage?: string | null;
+    lookbookImages?: string[];
+    reelVideo?: string | null;
+  };
 };
 
-const SharePanel: React.FC<Props> = ({
-  videoUrl,
-  onDownload,
-  downloadLabel,
-}) => {
-  const handleDownload = () => {
-    if (onDownload) {
-      onDownload();
-      return;
-    }
+export default function SharePanel({ data }: { data: ShareData }) {
+  if (!data) return null;
 
-    const link = document.createElement("a");
-    link.href = videoUrl;
-    link.download = "magicreel.mp4";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  const disabledBtn =
-    "w-full py-3 rounded-xl border text-sm opacity-50 cursor-not-allowed";
-
-  const activeBtn =
-    "w-full py-3 rounded-xl bg-black text-white text-sm hover:opacity-90";
+  const { type, outputs } = data;
 
   return (
-    <div className="mt-6 p-4 border rounded-2xl bg-white shadow-sm">
-      <h3 className="text-lg font-semibold mb-4">
-        ✨ Share Your Content
-      </h3>
+    <div style={{ padding: "20px", maxWidth: 900, margin: "0 auto" }}>
+      <h2 style={{ marginBottom: 20 }}>MagicReel</h2>
 
-      <div className="grid grid-cols-2 gap-3">
-        {/* Instagram */}
-        <button className={disabledBtn} disabled>
-          Instagram 🔜
-        </button>
+      {/* HERO */}
+      {type === "hero" && outputs.heroImage && (
+        <img
+          src={outputs.heroImage}
+          alt="Hero"
+          style={{
+            width: "100%",
+            borderRadius: 12,
+            objectFit: "cover",
+          }}
+        />
+      )}
 
-        {/* WhatsApp */}
-        <button className={disabledBtn} disabled>
-          WhatsApp 🔜
-        </button>
+      {/* LOOKBOOK */}
+      {type === "lookbook" && outputs.lookbookImages && (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 10,
+          }}
+        >
+          {outputs.lookbookImages.map((img, i) => (
+            <img
+              key={i}
+              src={img}
+              alt={`Look ${i}`}
+              style={{
+                width: "100%",
+                borderRadius: 10,
+                objectFit: "cover",
+              }}
+            />
+          ))}
+        </div>
+      )}
 
-        {/* Copy Link */}
-        <button className={disabledBtn} disabled>
-          Copy Link 🔜
-        </button>
-
-        {/* Download / Export */}
-        <button onClick={handleDownload} className={activeBtn}>
-          {downloadLabel || "Download"}
-        </button>
-      </div>
-
-      <p className="text-xs text-gray-500 mt-4 text-center">
-        More sharing options coming soon 🚀
-      </p>
+      {/* REEL */}
+      {type === "reel" && outputs.reelVideo && (
+        <video
+          src={outputs.reelVideo}
+          controls
+          autoPlay
+          loop
+          style={{
+            width: "100%",
+            borderRadius: 12,
+          }}
+        />
+      )}
     </div>
   );
-};
-
-export default SharePanel;
+}
