@@ -12,9 +12,20 @@ export default function SharePage() {
 
     const fetchData = async () => {
       try {
-        const res = await fetch(`/api/share/${runId}`);
+        const res = await fetch(`https://magicreel-backend-production.up.railway.app/api/share/${runId}`);
         const json = await res.json();
         setData(json);
+
+// 🔥 DEBUG LINE (ADD THIS)
+    console.log("SHARE DATA:", json);
+
+    // 🔥 HANDLE ERROR RESPONSE
+    if (json.error) {
+      setData(null);
+    } else {
+      setData(json);
+    }
+
       } catch (err) {
         console.error("Share fetch failed", err);
       } finally {
