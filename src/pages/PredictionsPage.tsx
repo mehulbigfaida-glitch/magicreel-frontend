@@ -152,31 +152,50 @@ export default function PredictionsPage() {
 
   {/* LOOKBOOK */}
   {job.status !== "failed" && job.type === "lookbook" && (
-    job.lookbookImages && job.lookbookImages.length > 0 ? (
-      <img
-        src={job.lookbookImages[0]}
-        alt="Lookbook"
-        loading="lazy"
-        onError={(e) => {
-          if (job.heroImageUrl) {
-            e.currentTarget.src = job.heroImageUrl;
-          } else {
-            e.currentTarget.style.display = "none";
-          }
-        }}
-      />
-    ) : job.heroImageUrl ? (
-      <img
-        src={job.heroImageUrl}
-        alt="Fallback Hero"
-        loading="lazy"
-      />
-    ) : (
-      <div className="prediction-placeholder">
-        ⏳ Generating...
+
+  // ✅ CASE 1: Lookbook ready
+  job.lookbookImages && job.lookbookImages.length > 0 ? (
+    <img
+      src={job.lookbookImages[0]}
+      alt="Lookbook"
+      loading="lazy"
+      onError={(e) => {
+        if (job.heroImageUrl) {
+          e.currentTarget.src = job.heroImageUrl;
+        } else {
+          e.currentTarget.style.display = "none";
+        }
+      }}
+    />
+
+  ) : (
+
+    // ✅ CASE 2: ALWAYS SHOW HERO (CRITICAL FIX)
+    <div className="relative w-full h-full">
+
+      {job.heroImageUrl ? (
+        <img
+          src={job.heroImageUrl}
+          alt="Hero Preview"
+          loading="lazy"
+          className="object-cover w-full h-full"
+        />
+      ) : (
+        <div className="prediction-placeholder">
+          🖼 Preparing Preview...
+        </div>
+      )}
+
+      {/* Overlay */}
+      <div className="absolute bottom-2 left-2 right-2 text-center">
+        <div className="text-xs text-white bg-black/70 px-2 py-1 rounded">
+          ⏳ Generating Lookbook...
+        </div>
       </div>
-    )
-  )}
+
+    </div>
+  )
+)}
 
 </div>
 
