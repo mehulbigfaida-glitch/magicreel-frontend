@@ -1,3 +1,4 @@
+import ShareSheet from "../../components/ShareSheet";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "./ReelViewerPage.css";
@@ -8,17 +9,20 @@ export default function ReelViewerPage() {
   const navigate = useNavigate();
 
   const params = new URLSearchParams(location.search);
+  const runId = params.get("runId");
 
   const heroPreviewUrl =
     params.get("hero") || location.state?.heroPreviewUrl || null;
 
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [confirmed, setConfirmed] = useState(false);
+  const [showShare, setShowShare] = useState(false);
   const [loadingText, setLoadingText] = useState(
     "🎬 Creating your Reel..."
   );
   const [showSuccess, setShowSuccess] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
+
   /* -----------------------------
      DYNAMIC LOADER TEXT
   ----------------------------- */
@@ -46,52 +50,49 @@ export default function ReelViewerPage() {
   /* -----------------------------
      GENERATE REEL
   ----------------------------- */
-  // FILE: src/pages/reel/ReelViewerPage.tsx (REPLACE THIS BLOCK)
+  useEffect(() => {
+    if (!heroPreviewUrl || !confirmed) return;
 
-useEffect(() => {
-  if (!heroPreviewUrl || !confirmed) return;
+    const generateReel = async () => {
+      try {
+        const token = localStorage.getItem("token");
 
-  const generateReel = async () => {
-    try {
-      const token = localStorage.getItem("token");
+        const res = await fetch(`${API_BASE}/api/p2m/reel/generate-v1`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            imageUrl: heroPreviewUrl,
+          }),
+        });
 
-      const res = await fetch(`${API_BASE}/api/p2m/reel/generate-v1`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          imageUrl: heroPreviewUrl,
-        }),
-      });
+        const data = await res.json();
 
-      const data = await res.json();
+        if (!res.ok) {
+          if (data?.error === "INSUFFICIENT_CREDITS") {
+            setShowPaywall(true);
+            return;
+          }
 
-      if (!res.ok) {
-        if (data?.error === "INSUFFICIENT_CREDITS") {
-          setShowPaywall(true);
-          return;
+          throw new Error(data?.error || "Reel failed");
         }
 
-        throw new Error(data?.error || "Reel failed");
+        window.dispatchEvent(new Event("creditsUpdated"));
+
+        setVideoUrl(data.reelVideoUrl);
+
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 2000);
+
+      } catch (err) {
+        console.error("Reel failed:", err);
       }
+    };
 
-      // 🔥 ADD THIS LINE HERE
-      window.dispatchEvent(new Event("creditsUpdated"));
-
-      setVideoUrl(data.reelVideoUrl);
-
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 2000);
-
-    } catch (err) {
-      console.error("Reel failed:", err);
-    }
-  };
-
-  generateReel();
-}, [heroPreviewUrl, confirmed, navigate]);
+    generateReel();
+  }, [heroPreviewUrl, confirmed]);
 
   /* -----------------------------
      ACTIONS
@@ -102,13 +103,14 @@ useEffect(() => {
     window.open(videoUrl, "_blank");
   };
 
-  // ✅ UPDATED: Redirect to Share Studio
+  // 🔥 UPDATED: OPEN SHARE SHEET (NOT NAVIGATION)
   const handleShare = () => {
-    if (!videoUrl) return;
+    if (!videoUrl || !runId) {
+      alert("Something went wrong. Missing share data.");
+      return;
+    }
 
-    navigate("/reel/share", {
-      state: { reelUrl: videoUrl },
-    });
+    setShowShare(true);
   };
 
   /* -----------------------------
@@ -121,7 +123,7 @@ useEffect(() => {
 
         <h2>🎬 MagicReel Studio</h2>
 
-        {/* ✅ CONFIRM SCREEN */}
+        {/* CONFIRM */}
         {!confirmed && (
           <div className="reel-confirm">
             <h3>✨ Create your cinematic Reel?</h3>
@@ -138,11 +140,10 @@ useEffect(() => {
           </div>
         )}
 
-        {/* ✅ MAIN STAGE */}
+        {/* MAIN */}
         {confirmed && (
           <div className="reel-stage">
 
-            {/* preview image */}
             {!videoUrl && heroPreviewUrl && (
               <img
                 src={heroPreviewUrl}
@@ -150,7 +151,6 @@ useEffect(() => {
               />
             )}
 
-            {/* loader */}
             {!videoUrl && (
               <div className="reel-overlay">
                 <div className="reel-loader" />
@@ -165,20 +165,20 @@ useEffect(() => {
               </div>
             )}
 
-            {/* success text */}
             {showSuccess && (
               <div className="reel-success">
                 ✨ Your Reel is Ready
               </div>
             )}
 
-            {/* video */}
             {videoUrl && (
               <video
                 src={videoUrl}
                 controls
                 autoPlay
+                muted
                 loop
+                playsInline
                 className="reel-video"
               />
             )}
@@ -186,7 +186,7 @@ useEffect(() => {
           </div>
         )}
 
-        {/* ✅ ACTIONS */}
+        {/* ACTIONS */}
         {videoUrl && (
           <div className="reel-actions">
             <button onClick={handleDownload}>
@@ -200,37 +200,48 @@ useEffect(() => {
         )}
 
       </div>
+
+      {/* 🔥 SHARE SHEET */}
+      {showShare && runId && videoUrl && (
+        <ShareSheet
+          runId={runId}
+          videoUrl={videoUrl}
+          onClose={() => setShowShare(false)}
+        />
+      )}
+
+      {/* PAYWALL */}
       {showPaywall && (
-  <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-    <div className="bg-white text-black p-6 rounded-xl w-[400px] text-center">
-      
-      <h3 className="text-xl font-semibold mb-2">
-        Not Enough Credits
-      </h3>
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+          <div className="bg-white text-black p-6 rounded-xl w-[400px] text-center">
 
-      <p className="mb-4 text-sm">
-        You need 3 credits to generate a Reel.
-      </p>
+            <h3 className="text-xl font-semibold mb-2">
+              Not Enough Credits
+            </h3>
 
-      <div className="flex gap-3 justify-center">
-        <button
-          className="bg-black text-white px-4 py-2 rounded"
-          onClick={() => navigate("/pricing")}
-        >
-          Upgrade Plan
-        </button>
+            <p className="mb-4 text-sm">
+              You need 3 credits to generate a Reel.
+            </p>
 
-        <button
-          className="border px-4 py-2 rounded"
-          onClick={() => setShowPaywall(false)}
-        >
-          Cancel
-        </button>
-      </div>
+            <div className="flex gap-3 justify-center">
+              <button
+                className="bg-black text-white px-4 py-2 rounded"
+                onClick={() => navigate("/pricing")}
+              >
+                Upgrade Plan
+              </button>
 
-    </div>
-  </div>
-)}
+              <button
+                className="border px-4 py-2 rounded"
+                onClick={() => setShowPaywall(false)}
+              >
+                Cancel
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }
