@@ -83,6 +83,12 @@ export default function ReelViewerPage() {
 
         setVideoUrl(data.reelVideoUrl);
 
+// 🔥 STORE runId IN URL
+if (data.runId) {
+  const newUrl = `/reel?runId=${data.runId}`;
+  window.history.replaceState({}, "", newUrl);
+}
+
         setShowSuccess(true);
         setTimeout(() => setShowSuccess(false), 2000);
 
