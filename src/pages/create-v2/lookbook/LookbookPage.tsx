@@ -44,11 +44,45 @@ export default function LookbookPage() {
   const [hasStarted, setHasStarted] = useState(false);
 
   // 🔥 STEP 2: DEBUG (optional but useful)
-  useEffect(() => {
-    if (runId) {
-      console.log("✅ Lookbook runId:", runId);
+  // 🔥 DEBUG
+useEffect(() => {
+  if (runId) {
+    console.log("✅ Lookbook runId:", runId);
+  }
+}, [runId]);
+
+// 🔥 FETCH EXISTING LOOKBOOK (ADD THIS BLOCK)
+useEffect(() => {
+  if (!runId) return;
+
+  const fetchLookbook = async () => {
+    try {
+      const res = await fetch(
+        `${API_BASE}/api/p2m/lookbook/${runId}`
+      );
+
+      const data = await res.json();
+
+      if (data?.poses?.length) {
+        setPoses(data.poses);
+
+        const heroPose = data.poses.find(
+          (p: any) => p.poseId === "HERO"
+        );
+
+        setSelectedImage(
+          heroPose?.imageUrl || data.poses[0].imageUrl
+        );
+
+        setHasStarted(true); // 🔥 VERY IMPORTANT
+      }
+    } catch (err) {
+      console.error("Failed to fetch lookbook:", err);
     }
-  }, [runId]);
+  };
+
+  fetchLookbook();
+}, [runId]);
 
   // 🔥 SHARE STATE
   const [showShare, setShowShare] = useState(false);
