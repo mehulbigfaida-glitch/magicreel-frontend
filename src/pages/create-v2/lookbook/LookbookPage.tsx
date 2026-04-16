@@ -17,12 +17,13 @@ const DEV_MODE = false;
 
 export default function LookbookPage() {
   const location = useLocation();
-  
 
   const params = new URLSearchParams(location.search);
 
-  // 🔥 ADD runId SUPPORT
-  const runId = params.get("runId");
+  // 🔥 STEP 1: runId STATE (SOURCE OF TRUTH)
+  const [runId, setRunId] = useState<string | null>(
+    params.get("runId") || null
+  );
 
   const heroImageUrl =
     location.state?.heroImageUrl ||
@@ -41,6 +42,13 @@ export default function LookbookPage() {
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [hasStarted, setHasStarted] = useState(false);
+
+  // 🔥 STEP 2: DEBUG (optional but useful)
+  useEffect(() => {
+    if (runId) {
+      console.log("✅ Lookbook runId:", runId);
+    }
+  }, [runId]);
 
   // 🔥 SHARE STATE
   const [showShare, setShowShare] = useState(false);
@@ -169,80 +177,89 @@ export default function LookbookPage() {
   };
 
   const handleStartGeneration = async () => {
-    try {
-      if (DEV_MODE) return;
+  try {
+    if (DEV_MODE) return;
 
-      setLoading(true);
+    setLoading(true);
 
-      const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
-      if (!token) {
-        setError("Please login again");
-        setLoading(false);
-        return;
-      }
-
-      if (!heroImageUrl) {
-        setError("Missing hero image");
-        setLoading(false);
-        return;
-      }
-
-      const res = await fetch(`${API_BASE}/api/p2m/lookbook/generate-v2`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          heroImageUrl,
-          backHeroImageUrl,
-        }),
-      });
-
-      if (!res.ok) {
-        setError("Lookbook generation failed");
-        setLoading(false);
-        return;
-      }
-
-      const data = await res.json();
-
-      window.dispatchEvent(new Event("creditsUpdated"));
-
-      let poseData: Pose[] = data?.poses || [];
-
-      if (!poseData.length) {
-        setError("No poses generated");
-        setLoading(false);
-        return;
-      }
-
-      const order = ["HERO", "BACK", "P1", "P2", "P3", "P4"];
-
-      const sorted = order
-        .map(id => poseData.find(p => p.poseId === id))
-        .filter((p): p is Pose => Boolean(p));
-
-      const remaining = poseData.filter(
-        p => !order.includes(p.poseId)
-      );
-
-      poseData = [...sorted, ...remaining];
-
-      const heroPose = poseData.find(p => p.poseId === "HERO");
-
-      setPoses(poseData);
-      setSelectedImage(heroPose?.imageUrl || poseData[0].imageUrl || null);
-
+    if (!token) {
+      setError("Please login again");
       setLoading(false);
+      return;
+    }
 
-    } catch (err) {
-      console.error("Lookbook error:", err);
+    if (!heroImageUrl) {
+      setError("Missing hero image");
+      setLoading(false);
+      return;
+    }
+
+    const res = await fetch(`${API_BASE}/api/p2m/lookbook/generate-v2`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        heroImageUrl,
+        backHeroImageUrl,
+      }),
+    });
+
+    // ✅ ONLY ONE PARSE
+    const data = await res.json();
+
+    // 🔥 STORE runId FOR SHARE
+    if (data.runId) {
+      setRunId(data.runId);
+      console.log("✅ runId stored:", data.runId);
+    }
+
+    if (!res.ok) {
       setError("Lookbook generation failed");
       setLoading(false);
+      return;
     }
-  };
+
+    window.dispatchEvent(new Event("creditsUpdated"));
+
+    let poseData: Pose[] = data?.poses || [];
+
+    if (!poseData.length) {
+      setError("No poses generated");
+      setLoading(false);
+      return;
+    }
+
+    const order = ["HERO", "BACK", "P1", "P2", "P3", "P4"];
+
+    const sorted = order
+      .map(id => poseData.find(p => p.poseId === id))
+      .filter((p): p is Pose => Boolean(p));
+
+    const remaining = poseData.filter(
+      p => !order.includes(p.poseId)
+    );
+
+    poseData = [...sorted, ...remaining];
+
+    const heroPose = poseData.find(p => p.poseId === "HERO");
+
+    setPoses(poseData);
+    setSelectedImage(
+      heroPose?.imageUrl || poseData[0].imageUrl || null
+    );
+
+    setLoading(false);
+
+  } catch (err) {
+    console.error("Lookbook error:", err);
+    setError("Lookbook generation failed");
+    setLoading(false);
+  }
+};
 
   // 🔥 NEW SHARE HANDLER
   const handleShareLookbook = () => {
