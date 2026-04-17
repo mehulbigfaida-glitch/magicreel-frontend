@@ -64,18 +64,24 @@ useEffect(() => {
       const data = await res.json();
 
       if (data?.poses?.length) {
-        setPoses(data.poses);
+  // ✅ NORMALIZE poseId (CRITICAL FIX)
+  const normalized = data.poses.map((p: any) => ({
+    ...p,
+    poseId: (p.poseId || "").toUpperCase(),
+  }));
 
-        const heroPose = data.poses.find(
-          (p: any) => p.poseId === "HERO"
-        );
+  setPoses(normalized);
 
-        setSelectedImage(
-          heroPose?.imageUrl || data.poses[0].imageUrl
-        );
+  const heroPose = normalized.find(
+    (p: any) => p.poseId === "HERO"
+  );
 
-        setHasStarted(true); // 🔥 VERY IMPORTANT
-      }
+  setSelectedImage(
+    heroPose?.imageUrl || normalized[0].imageUrl
+  );
+
+  setHasStarted(true);
+}
     } catch (err) {
       console.error("Failed to fetch lookbook:", err);
     }
@@ -267,26 +273,31 @@ useEffect(() => {
       return;
     }
 
-    const order = ["HERO", "BACK", "P1", "P2", "P3", "P4"];
+ const order = ["HERO", "BACK", "FRONT", "WALKING", "ANGLE", "DYNAMIC", "CROPPED"];
 
-    const sorted = order
-      .map(id => poseData.find(p => p.poseId === id))
-      .filter((p): p is Pose => Boolean(p));
+// ✅ SINGLE SOURCE SORT
+poseData.sort((a, b) => {
+  const indexA = order.indexOf((a.poseId || "").toUpperCase());
+  const indexB = order.indexOf((b.poseId || "").toUpperCase());
 
-    const remaining = poseData.filter(
-      p => !order.includes(p.poseId)
-    );
+  return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+});
 
-    poseData = [...sorted, ...remaining];
+// ✅ ENSURE CONSISTENT CASE
+poseData = poseData.map(p => ({
+  ...p,
+  poseId: (p.poseId || "").toUpperCase()
+}));
 
-    const heroPose = poseData.find(p => p.poseId === "HERO");
+// ✅ HERO SELECTION
+const heroPose = poseData.find(p => p.poseId === "HERO");
 
-    setPoses(poseData);
-    setSelectedImage(
-      heroPose?.imageUrl || poseData[0].imageUrl || null
-    );
+setPoses(poseData);
+setSelectedImage(
+  heroPose?.imageUrl || poseData[0]?.imageUrl || null
+);
 
-    setLoading(false);
+setLoading(false);
 
   } catch (err) {
     console.error("Lookbook error:", err);
