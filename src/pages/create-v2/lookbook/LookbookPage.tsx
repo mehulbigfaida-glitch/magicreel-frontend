@@ -267,31 +267,42 @@ useEffect(() => {
 
     let poseData: Pose[] = data?.poses || [];
 
-    if (!poseData.length) {
-      setError("No poses generated");
-      setLoading(false);
-      return;
-    }
+// ❌ No data guard
+if (!poseData.length) {
+  setError("No poses generated");
+  setLoading(false);
+  return;
+}
 
- const order = ["HERO", "BACK", "FRONT", "WALKING", "ANGLE", "DYNAMIC", "CROPPED"];
+// ✅ STEP 1: Normalize poseId (CRITICAL FIX)
+poseData = poseData.map((p) => ({
+  ...p,
+  poseId: (p.poseId || "").toLowerCase(),
+}));
 
-// ✅ SINGLE SOURCE SORT
+// ✅ STEP 2: Define correct order (lowercase)
+const order = [
+  "hero",
+  "back",
+  "front",
+  "walking",
+  "angle",
+  "dynamic",
+  "cropped",
+];
+
+// ✅ STEP 3: Sort poses
 poseData.sort((a, b) => {
-  const indexA = order.indexOf((a.poseId || "").toUpperCase());
-  const indexB = order.indexOf((b.poseId || "").toUpperCase());
+  const indexA = order.indexOf(a.poseId);
+  const indexB = order.indexOf(b.poseId);
 
   return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
 });
 
-// ✅ ENSURE CONSISTENT CASE
-poseData = poseData.map(p => ({
-  ...p,
-  poseId: (p.poseId || "").toUpperCase()
-}));
+// ✅ STEP 4: Ensure hero is selected
+const heroPose = poseData.find((p) => p.poseId === "hero");
 
-// ✅ HERO SELECTION
-const heroPose = poseData.find(p => p.poseId === "HERO");
-
+// ✅ STEP 5: Apply state
 setPoses(poseData);
 setSelectedImage(
   heroPose?.imageUrl || poseData[0]?.imageUrl || null
