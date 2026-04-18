@@ -223,7 +223,7 @@ function AppRoutes() {
   <Route path="/predictions" element={<PredictionsPage />} />
   // <Route path="/reel/share" element={<ShareStudioPage />} />
   <Route path="/reel/view" element={<ReelMobileView />} />
-  <Route path="/share/:runId" element={<SharePage />} />
+  <Route path="/s/:shareId" element={<SharePage />} />
   {/* ✅ FIX: ADD CORRECT REEL ROUTE */}
   <Route path="/reel" element={<ReelViewerPage />} />
 
