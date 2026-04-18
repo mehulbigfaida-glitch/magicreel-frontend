@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function SharePanel({ data }: { data: any }) {
   const images = data?.media || [];
@@ -16,7 +16,10 @@ Generated with MagicReel
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
 
-  // 🔥 Native Share
+  // ===============================
+  // 🔗 ACTIONS
+  // ===============================
+
   const handleNativeShare = async () => {
     if (navigator.share && hero?.url) {
       try {
@@ -25,34 +28,32 @@ Generated with MagicReel
           text: caption,
           url: shareUrl,
         });
-      } catch (err) {
-        console.log("Share cancelled");
-      }
+      } catch {}
     } else {
       alert("Sharing not supported on this device");
     }
   };
 
-  // 🔗 Copy Link
   const handleCopy = () => {
     navigator.clipboard.writeText(shareUrl);
     alert("Link copied!");
   };
 
-  // 📲 WhatsApp
   const handleWhatsApp = () => {
     const text = `${caption}\n${shareUrl}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
   };
 
-  // 📸 Instagram
   const handleInstagram = () => {
     navigator.clipboard.writeText(caption);
-    alert("Caption copied. Now download & post on Instagram 📸");
+    alert("Caption copied. Download image & post on Instagram 📸");
     window.open("https://www.instagram.com/");
   };
 
-  // 👉 Navigation
+  // ===============================
+  // 🔄 NAVIGATION
+  // ===============================
+
   const goNext = () => {
     if (currentIndex < images.length - 1) {
       const nextIndex = currentIndex + 1;
@@ -68,6 +69,44 @@ Generated with MagicReel
       setSelectedImage(images[prevIndex].url);
     }
   };
+
+  // ===============================
+  // ⌨️ KEYBOARD SUPPORT
+  // ===============================
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (!selectedImage) return;
+
+      if (e.key === "ArrowRight") goNext();
+      if (e.key === "ArrowLeft") goPrev();
+      if (e.key === "Escape") setSelectedImage(null);
+    };
+
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [selectedImage, currentIndex]);
+
+  // ===============================
+  // 📱 SWIPE SUPPORT
+  // ===============================
+
+  let touchStartX = 0;
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+
+    if (diff > 50) goNext();
+    if (diff < -50) goPrev();
+  };
+
+  // ===============================
+  // 🎨 UI
+  // ===============================
 
   return (
     <div style={{ padding: 20, maxWidth: 900, margin: "0 auto" }}>
@@ -158,9 +197,11 @@ Generated with MagicReel
         ))}
       </div>
 
-      {/* FULLSCREEN MODAL */}
+      {/* FULLSCREEN VIEWER */}
       {selectedImage && (
         <div
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
           style={{
             position: "fixed",
             inset: 0,
@@ -177,7 +218,7 @@ Generated with MagicReel
             style={{
               position: "absolute",
               left: 20,
-              fontSize: 30,
+              fontSize: 32,
               color: "#fff",
               background: "none",
               border: "none",
@@ -203,7 +244,7 @@ Generated with MagicReel
             style={{
               position: "absolute",
               right: 20,
-              fontSize: 30,
+              fontSize: 32,
               color: "#fff",
               background: "none",
               border: "none",
@@ -220,8 +261,8 @@ Generated with MagicReel
               position: "absolute",
               top: 20,
               right: 20,
+              fontSize: 22,
               color: "#fff",
-              fontSize: 20,
               cursor: "pointer",
             }}
           >
