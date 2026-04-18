@@ -38,8 +38,11 @@ import ShareStudioPage from "./pages/reel/ShareStudioPage";
 
 function GlobalHeader() {
   const location = useLocation();
+  const isSharePage = location.pathname.startsWith("/s/");
   const navigate = useNavigate();
-  const { user, loading } = useAuth();
+  const { user, loading } = isSharePage
+  ? { user: null, loading: false }
+  : useAuth();
 
   const hideHeaderRoutes = [
     "/create-v2",
