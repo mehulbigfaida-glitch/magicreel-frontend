@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 export default function SharePanel({ data }: { data: any }) {
   const images = data?.media || [];
 
@@ -6,10 +8,12 @@ export default function SharePanel({ data }: { data: any }) {
 
   const shareUrl = window.location.href;
 
-  const caption = `Serving looks ✨
+const caption = `Serving looks ✨
 Generated with MagicReel
 
 #fashion #ootd #style #magicreel`;
+
+const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   // 🔥 Native Share (Mobile Magic)
   const handleNativeShare = async () => {
@@ -102,6 +106,7 @@ Generated with MagicReel
         {others.map((item: any, index: number) => (
           <div
   key={index}
+  onClick={() => setSelectedImage(item.url)}
   style={{
     borderRadius: 14,
     overflow: "hidden",
@@ -128,6 +133,31 @@ Generated with MagicReel
 </div>
         ))}
       </div>
+   {selectedImage && (
+  <div
+    onClick={() => setSelectedImage(null)}
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,0.9)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 999,
+    }}
+  >
+    <img
+      src={selectedImage}
+      alt="fullscreen"
+      style={{
+        maxWidth: "90%",
+        maxHeight: "90%",
+        borderRadius: 12,
+      }}
+    />
+  </div>
+)}
+   
     </div>
   );
 }
