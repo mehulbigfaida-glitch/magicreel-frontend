@@ -228,6 +228,7 @@ const generateHero = async () => {
     );
 
     const data = await res.json();
+    
 
     if (!res.ok) {
       throw new Error(data.error || "Hero failed");

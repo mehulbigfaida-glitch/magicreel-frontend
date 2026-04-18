@@ -1,6 +1,4 @@
 // ✅ NEW IMPORT
-import ShareSheet from "../../../components/ShareSheet";
-
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import "./lookbook.css";
@@ -18,9 +16,11 @@ const DEV_MODE = false;
 export default function LookbookPage() {
   const location = useLocation();
 
+  const [shareId, setShareId] = useState<string | null>(null);
+
   const params = new URLSearchParams(location.search);
 
-  // 🔥 STEP 1: runId STATE (SOURCE OF TRUTH)
+    // 🔥 STEP 1: runId STATE (SOURCE OF TRUTH)
   const [runId, setRunId] = useState<string | null>(
     params.get("runId") || null
   );
@@ -63,6 +63,18 @@ useEffect(() => {
 
       const data = await res.json();
 
+// 🔥 STORE runId (existing)
+if (data.runId) {
+  setRunId(data.runId);
+  console.log("✅ runId stored:", data.runId);
+}
+
+// 🔥 STORE shareId (NEW)
+if (data.shareId) {
+  setShareId(data.shareId);
+  console.log("✅ shareId stored:", data.shareId);
+}
+
       if (data?.poses?.length) {
   // ✅ NORMALIZE poseId (CRITICAL FIX)
   const normalized = data.poses.map((p: any) => ({
@@ -91,7 +103,7 @@ useEffect(() => {
 }, [runId]);
 
   // 🔥 SHARE STATE
-  const [showShare, setShowShare] = useState(false);
+  
 
   /* Lock scroll */
   useEffect(() => {
@@ -319,12 +331,13 @@ setLoading(false);
 
   // 🔥 NEW SHARE HANDLER
   const handleShareLookbook = () => {
-    if (!runId) {
-      alert("Missing runId. Please regenerate.");
-      return;
-    }
-    setShowShare(true);
-  };
+  if (!shareId) {
+    alert("Share not ready yet. Please generate lookbook again.");
+    return;
+  }
+
+  window.open(`/s/${shareId}`, "_blank");
+};
 
   const detailCount = poses.filter(p => p.poseId === "DETAIL").length;
 
@@ -434,14 +447,6 @@ setLoading(false);
         </div>
       </div>
 
-      {/* 🔥 SHARE SHEET */}
-      {showShare && runId && (
-        <ShareSheet
-          runId={runId}
-          videoUrl="" // temporary for lookbook
-          onClose={() => setShowShare(false)}
-        />
-      )}
     </div>
   );
 }
