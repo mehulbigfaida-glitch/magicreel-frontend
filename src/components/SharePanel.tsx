@@ -54,14 +54,24 @@ Generated with MagicReel
       {/* 🔥 HERO IMAGE */}
       {hero && (
         <div style={{ marginBottom: 20 }}>
-          <img
-            src={hero.url}
-            alt="hero"
-            style={{
-              width: "100%",
-              borderRadius: 16,
-            }}
-          />
+          <div
+  style={{
+    width: "100%",
+    maxHeight: "70vh",
+    overflow: "hidden",
+    borderRadius: 16,
+  }}
+>
+  <img
+    src={hero.url}
+    alt="hero"
+    style={{
+      width: "100%",
+      height: "100%",
+      objectFit: "cover",
+    }}
+  />
+</div>
         </div>
       )}
 
