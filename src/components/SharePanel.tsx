@@ -93,22 +93,39 @@ Generated with MagicReel
 
       {/* 🖼 GRID */}
       <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
-          gap: 12,
-        }}
-      >
+  style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+    gap: 16,
+  }}
+>
         {others.map((item: any, index: number) => (
-          <img
-            key={index}
-            src={item.url}
-            alt={`look-${index}`}
-            style={{
-              width: "100%",
-              borderRadius: 12,
-            }}
-          />
+          <div
+  key={index}
+  style={{
+    borderRadius: 14,
+    overflow: "hidden",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+    cursor: "pointer",
+  }}
+>
+  <img
+    src={item.url}
+    alt={`look-${index}`}
+    style={{
+      width: "100%",
+      height: "100%",
+      objectFit: "cover",
+      transition: "transform 0.3s ease",
+    }}
+    onMouseOver={(e) =>
+      (e.currentTarget.style.transform = "scale(1.05)")
+    }
+    onMouseOut={(e) =>
+      (e.currentTarget.style.transform = "scale(1)")
+    }
+  />
+</div>
         ))}
       </div>
     </div>
