@@ -2,58 +2,61 @@ import { useState, useEffect } from "react";
 
 export default function SharePanel({ data }: { data: any }) {
   const images = data?.media || [];
-
   const hero = images[0];
   const others = images.slice(1);
 
-  const shareUrl = window.location.href;
-
-  const caption = `Serving looks ✨
-Generated with MagicReel
-
-#fashion #ootd #style #magicreel`;
+  const shareId = data?.id;
+  const backendMetaUrl = `https://magicreel-backend-production.up.railway.app/api/share/meta/${shareId}`;
+  
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
 
+  // 🔥 IG COMPOSER STATE
+  const [showComposer, setShowComposer] = useState(false);
+  const [caption, setCaption] = useState(`Serving looks ✨
+Generated with MagicReel
+
+#fashion #ootd #style #magicreel`);
+
   // ===============================
-  // 🔗 ACTIONS
+  // 📲 WHATSAPP (OG ENABLED)
   // ===============================
-
-  const handleNativeShare = async () => {
-    if (navigator.share && hero?.url) {
-      try {
-        await navigator.share({
-          title: "MagicReel Lookbook",
-          text: caption,
-          url: shareUrl,
-        });
-      } catch {}
-    } else {
-      alert("Sharing not supported on this device");
-    }
-  };
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(shareUrl);
-    alert("Link copied!");
-  };
-
   const handleWhatsApp = () => {
-    const text = `${caption}\n${shareUrl}`;
+    const text = `${caption}\n${backendMetaUrl}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
   };
 
+  // ===============================
+  // 📸 INSTAGRAM COMPOSER
+  // ===============================
   const handleInstagram = () => {
+    setShowComposer(true);
+  };
+
+  const handlePostNow = () => {
+    // ✅ download image
+    if (hero?.url) {
+      const link = document.createElement("a");
+      link.href = hero.url;
+      link.download = "magicreel-look.jpg";
+      link.click();
+    }
+
+    // ✅ copy caption
     navigator.clipboard.writeText(caption);
-    alert("Caption copied. Download image & post on Instagram 📸");
+
+    // ✅ open instagram
     window.open("https://www.instagram.com/");
+
+    setShowComposer(false);
+
+    alert("✅ Image downloaded & caption copied.\nPaste on Instagram.");
   };
 
   // ===============================
   // 🔄 NAVIGATION
   // ===============================
-
   const goNext = () => {
     if (currentIndex < images.length - 1) {
       const nextIndex = currentIndex + 1;
@@ -71,13 +74,11 @@ Generated with MagicReel
   };
 
   // ===============================
-  // ⌨️ KEYBOARD SUPPORT
+  // ⌨️ KEYBOARD
   // ===============================
-
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (!selectedImage) return;
-
       if (e.key === "ArrowRight") goNext();
       if (e.key === "ArrowLeft") goPrev();
       if (e.key === "Escape") setSelectedImage(null);
@@ -88,9 +89,8 @@ Generated with MagicReel
   }, [selectedImage, currentIndex]);
 
   // ===============================
-  // 📱 SWIPE SUPPORT
+  // 📱 SWIPE
   // ===============================
-
   let touchStartX = 0;
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -99,57 +99,29 @@ Generated with MagicReel
 
   const handleTouchEnd = (e: React.TouchEvent) => {
     const diff = touchStartX - e.changedTouches[0].clientX;
-
     if (diff > 50) goNext();
     if (diff < -50) goPrev();
   };
 
   // ===============================
-  // 🎨 UI
+  // UI
   // ===============================
-
   return (
     <div style={{ padding: 20, maxWidth: 900, margin: "0 auto" }}>
-      <h2 style={{ marginBottom: 6 }}>✨ Shared Lookbook</h2>
-      <p style={{ color: "#777", marginBottom: 20 }}>
-        Effortless style powered by MagicReel
-      </p>
+      <h2>✨ Shared Lookbook</h2>
 
       {/* HERO */}
       {hero && (
         <div style={{ marginBottom: 20 }}>
-          <div
-            style={{
-              width: "100%",
-              maxHeight: "70vh",
-              overflow: "hidden",
-              borderRadius: 16,
-            }}
-          >
-            <img
-              src={hero.url}
-              alt="hero"
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-              }}
-            />
-          </div>
+          <img
+            src={hero.url}
+            style={{ width: "100%", borderRadius: 16 }}
+          />
         </div>
       )}
 
       {/* ACTIONS */}
-      <div
-        style={{
-          display: "flex",
-          gap: 10,
-          marginBottom: 20,
-          flexWrap: "wrap",
-        }}
-      >
-        <button onClick={handleNativeShare}>🚀 Share</button>
-        <button onClick={handleCopy}>🔗 Copy Link</button>
+      <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
         <button onClick={handleWhatsApp}>📲 WhatsApp</button>
         <button onClick={handleInstagram}>📸 Instagram</button>
         <button onClick={() => window.open(hero?.url)}>⬇ Download</button>
@@ -171,33 +143,17 @@ Generated with MagicReel
               setCurrentIndex(index + 1);
             }}
             style={{
-              borderRadius: 14,
+              borderRadius: 12,
               overflow: "hidden",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
               cursor: "pointer",
             }}
           >
-            <img
-              src={item.url}
-              alt={`look-${index}`}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                transition: "transform 0.3s ease",
-              }}
-              onMouseOver={(e) =>
-                (e.currentTarget.style.transform = "scale(1.05)")
-              }
-              onMouseOut={(e) =>
-                (e.currentTarget.style.transform = "scale(1)")
-              }
-            />
+            <img src={item.url} style={{ width: "100%" }} />
           </div>
         ))}
       </div>
 
-      {/* FULLSCREEN VIEWER */}
+      {/* FULLSCREEN */}
       {selectedImage && (
         <div
           onTouchStart={handleTouchStart}
@@ -205,69 +161,70 @@ Generated with MagicReel
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0,0,0,0.95)",
+            background: "#000",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            zIndex: 999,
           }}
         >
-          {/* LEFT */}
-          <button
-            onClick={goPrev}
-            style={{
-              position: "absolute",
-              left: 20,
-              fontSize: 32,
-              color: "#fff",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
+          <button onClick={goPrev} style={{ position: "absolute", left: 20 }}>
             ←
           </button>
 
-          {/* IMAGE */}
-          <img
-            src={selectedImage}
-            style={{
-              maxWidth: "90%",
-              maxHeight: "90%",
-              borderRadius: 12,
-            }}
-          />
+          <img src={selectedImage} style={{ maxWidth: "90%" }} />
 
-          {/* RIGHT */}
-          <button
-            onClick={goNext}
-            style={{
-              position: "absolute",
-              right: 20,
-              fontSize: 32,
-              color: "#fff",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
+          <button onClick={goNext} style={{ position: "absolute", right: 20 }}>
             →
           </button>
 
-          {/* CLOSE */}
           <div
             onClick={() => setSelectedImage(null)}
-            style={{
-              position: "absolute",
-              top: 20,
-              right: 20,
-              fontSize: 22,
-              color: "#fff",
-              cursor: "pointer",
-            }}
+            style={{ position: "absolute", top: 20, right: 20 }}
           >
             ✕
           </div>
+        </div>
+      )}
+
+      {/* 🔥 INSTAGRAM COMPOSER */}
+      {showComposer && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "#fff",
+            zIndex: 1000,
+            padding: 20,
+          }}
+        >
+          <h3>📸 Prepare Instagram Post</h3>
+
+          <img
+            src={hero?.url}
+            style={{
+              width: "100%",
+              borderRadius: 12,
+              marginBottom: 12,
+            }}
+          />
+
+          <textarea
+            value={caption}
+            onChange={(e) => setCaption(e.target.value)}
+            style={{
+              width: "100%",
+              height: 120,
+              padding: 10,
+              borderRadius: 10,
+              marginBottom: 12,
+            }}
+          />
+
+          <button onClick={handlePostNow} style={{ marginRight: 10 }}>
+            🚀 Post Now
+          </button>
+
+          <button onClick={() => setShowComposer(false)}>Cancel</button>
         </div>
       )}
     </div>
