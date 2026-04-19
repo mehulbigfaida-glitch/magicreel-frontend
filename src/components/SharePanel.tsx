@@ -23,7 +23,7 @@ Generated with MagicReel
   // 📲 WHATSAPP (OG ENABLED)
   // ===============================
   const handleWhatsApp = () => {
-    const text = `${caption}\n${backendMetaUrl}`;
+    const text = `${caption}\n\n👇 View full lookbook\n${backendMetaUrl}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
   };
 
@@ -188,45 +188,49 @@ Generated with MagicReel
 
       {/* 🔥 INSTAGRAM COMPOSER */}
       {showComposer && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "#fff",
-            zIndex: 1000,
-            padding: 20,
-          }}
-        >
-          <h3>📸 Prepare Instagram Post</h3>
+  <div
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "#fff",
+      zIndex: 1000,
+      padding: 20,
+      overflowY: "auto",
+      WebkitOverflowScrolling: "touch",
+    }}
+  >
+    <div style={{ maxWidth: 600, margin: "0 auto" }}>
+      <h3>📸 Prepare Instagram Post</h3>
 
-          <img
-            src={hero?.url}
-            style={{
-              width: "100%",
-              borderRadius: 12,
-              marginBottom: 12,
-            }}
-          />
+      <img
+        src={hero?.url}
+        style={{
+          width: "100%",
+          borderRadius: 12,
+          marginBottom: 12,
+        }}
+      />
 
-          <textarea
-            value={caption}
-            onChange={(e) => setCaption(e.target.value)}
-            style={{
-              width: "100%",
-              height: 120,
-              padding: 10,
-              borderRadius: 10,
-              marginBottom: 12,
-            }}
-          />
+      <textarea
+        value={caption}
+        onChange={(e) => setCaption(e.target.value)}
+        style={{
+          width: "100%",
+          height: 120,
+          padding: 10,
+          borderRadius: 10,
+          marginBottom: 12,
+        }}
+      />
 
-          <button onClick={handlePostNow} style={{ marginRight: 10 }}>
-            🚀 Post Now
-          </button>
+      <button onClick={handlePostNow} style={{ marginRight: 10 }}>
+        🚀 Post Now
+      </button>
 
-          <button onClick={() => setShowComposer(false)}>Cancel</button>
-        </div>
-      )}
+      <button onClick={() => setShowComposer(false)}>Cancel</button>
+    </div>
+  </div>
+)}
     </div>
   );
 }
