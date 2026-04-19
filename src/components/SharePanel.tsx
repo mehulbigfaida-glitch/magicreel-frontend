@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function SharePanel({ data }: { data: any }) {
   const images = data?.media || [];
@@ -6,42 +6,7 @@ export default function SharePanel({ data }: { data: any }) {
   const hero = images[0];
   const others = images.slice(1);
 
-  const shareUrl = window.location.href;
-
-  const [isMobile, setIsMobile] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-
-  // ✅ Detect mobile
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
-
-  const caption = `Serving looks ✨
-Generated with MagicReel
-
-#fashion #ootd #style #magicreel`;
-
-  // 🔗 Copy Link
-  const handleCopy = () => {
-    navigator.clipboard.writeText(shareUrl);
-    alert("Link copied!");
-  };
-
-  // 📲 WhatsApp (ONLY mobile useful)
-  const handleWhatsApp = () => {
-    const text = `${caption}\n${shareUrl}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
-  };
-
-  // 📸 Instagram
-  const handleInstagram = () => {
-    navigator.clipboard.writeText(caption);
-    alert("Caption copied. Now paste on Instagram 📸");
-    window.open("https://www.instagram.com/");
-  };
 
   return (
     <div style={{ padding: 20, maxWidth: 900, margin: "0 auto" }}>
@@ -49,7 +14,7 @@ Generated with MagicReel
       {/* 🔥 TITLE */}
       <h2 style={{ marginBottom: 16 }}>✨ Shared Lookbook</h2>
 
-      {/* 🔥 HERO */}
+      {/* 🔥 HERO IMAGE */}
       {hero && (
         <div style={{ marginBottom: 24 }}>
           <div
@@ -73,48 +38,7 @@ Generated with MagicReel
         </div>
       )}
 
-{!isMobile && (
-  <div
-    style={{
-      textAlign: "center",
-      marginBottom: 30,
-    }}
-  >
-    <h3 style={{ marginBottom: 10 }}>📱 Continue on your phone</h3>
-
-    <img
-      src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${shareUrl}`}
-      alt="QR Code"
-      style={{
-        borderRadius: 12,
-        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-      }}
-    />
-
-    <p style={{ marginTop: 10, fontSize: 14, color: "#666" }}>
-      Scan to share on WhatsApp / Instagram
-    </p>
-  </div>
-)}
-
-      {/* 🔥 MOBILE ACTIONS ONLY */}
-      {isMobile && (
-        <div
-          style={{
-            display: "flex",
-            gap: 10,
-            marginBottom: 20,
-            flexWrap: "wrap",
-            justifyContent: "center",
-          }}
-        >
-          <button onClick={handleWhatsApp}>📲 WhatsApp</button>
-          <button onClick={handleInstagram}>📸 Instagram</button>
-          <button onClick={handleCopy}>🔗 Copy Link</button>
-        </div>
-      )}
-
-      {/* 🖼 GRID */}
+      {/* 🖼 LOOKBOOK GRID */}
       <div
         style={{
           display: "grid",
