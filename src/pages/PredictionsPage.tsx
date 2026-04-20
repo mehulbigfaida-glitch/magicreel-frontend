@@ -117,87 +117,129 @@ export default function PredictionsPage() {
       <div className="predictions-grid">
         {jobs.map((job) => (
           <div className="prediction-card" key={job.runId}>
-            
+
+            {/* IMAGE BLOCK */}
             <div className="prediction-image">
 
-  {/* ❌ FAILED STATE (GLOBAL OVERRIDE) */}
-  {job.status === "failed" && (
-    <div className="prediction-placeholder">
-      ❌ Generation Failed
-    </div>
-  )}
+              {/* FAILED */}
+              {job.status === "failed" && (
+                <div className="prediction-placeholder">
+                  ❌ Generation Failed
+                </div>
+              )}
 
-  {/* HERO */}
-  {job.status !== "failed" && job.type === "hero" && job.heroImageUrl && (
-    <img
-      src={job.heroImageUrl}
-      alt="Hero"
-      loading="lazy"
-      onError={(e) => {
-        e.currentTarget.style.display = "none";
-      }}
-    />
-  )}
+              {/* HERO */}
+              {job.status !== "failed" && job.type === "hero" && job.heroImageUrl && (
+                <img
+                  src={job.heroImageUrl}
+                  alt="Hero"
+                  loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                  }}
+                />
+              )}
 
-  {/* REEL */}
-  {job.status !== "failed" && job.type === "reel" && (
-    job.reelUrl ? (
-      <video src={job.reelUrl} controls playsInline muted />
-    ) : (
-      <div className="prediction-placeholder">
-        🎬 Processing Reel...
-      </div>
-    )
-  )}
+              {/* REEL */}
+              {job.status !== "failed" && job.type === "reel" && (
+                job.reelUrl ? (
+                  <video src={job.reelUrl} controls playsInline muted />
+                ) : (
+                  <div className="prediction-placeholder">
+                    🎬 Processing Reel...
+                  </div>
+                )
+              )}
 
-  {/* LOOKBOOK */}
-  {job.status !== "failed" && job.type === "lookbook" && (
+              {/* LOOKBOOK */}
+              {job.status !== "failed" && job.type === "lookbook" && (
+                job.lookbookImages && job.lookbookImages.length > 0 ? (
+                  <img
+                    src={job.lookbookImages[0]}
+                    alt="Lookbook"
+                    loading="lazy"
+                    onError={(e) => {
+                      if (job.heroImageUrl) {
+                        e.currentTarget.src = job.heroImageUrl;
+                      } else {
+                        e.currentTarget.style.display = "none";
+                      }
+                    }}
+                  />
+                ) : (
+                  <div className="relative w-full h-full">
 
-  // ✅ CASE 1: Lookbook ready
-  job.lookbookImages && job.lookbookImages.length > 0 ? (
-    <img
-      src={job.lookbookImages[0]}
-      alt="Lookbook"
-      loading="lazy"
-      onError={(e) => {
-        if (job.heroImageUrl) {
-          e.currentTarget.src = job.heroImageUrl;
-        } else {
-          e.currentTarget.style.display = "none";
-        }
-      }}
-    />
+                    {job.heroImageUrl ? (
+                      <img
+                        src={job.heroImageUrl}
+                        alt="Hero Preview"
+                        loading="lazy"
+                        className="object-cover w-full h-full"
+                      />
+                    ) : (
+                      <div className="prediction-placeholder">
+                        🖼 Preparing Preview...
+                      </div>
+                    )}
 
-  ) : (
+                    <div className="absolute bottom-2 left-2 right-2 text-center">
+                      <div className="text-xs text-white bg-black/70 px-2 py-1 rounded">
+                        ⏳ Generating Lookbook...
+                      </div>
+                    </div>
 
-    // ✅ CASE 2: ALWAYS SHOW HERO (CRITICAL FIX)
-    <div className="relative w-full h-full">
+                  </div>
+                )
+              )}
 
-      {job.heroImageUrl ? (
-        <img
-          src={job.heroImageUrl}
-          alt="Hero Preview"
-          loading="lazy"
-          className="object-cover w-full h-full"
-        />
-      ) : (
-        <div className="prediction-placeholder">
-          🖼 Preparing Preview...
-        </div>
-      )}
+            </div>
 
-      {/* Overlay */}
-      <div className="absolute bottom-2 left-2 right-2 text-center">
-        <div className="text-xs text-white bg-black/70 px-2 py-1 rounded">
-          ⏳ Generating Lookbook...
-        </div>
-      </div>
+            {/* 🔥 ACTION BAR (NEW — COMMAND CENTER CORE) */}
+            <div className="prediction-actions">
 
-    </div>
-  )
-)}
+              {/* HERO */}
+              {job.type === "hero" && job.status === "completed" && (
+                <>
+                  <button onClick={() => console.log("Create Lookbook", job.runId)}>
+                    ➕ Lookbook
+                  </button>
+                  <button onClick={() => console.log("Generate Reel", job.runId)}>
+                    🎬 Reel
+                  </button>
+                  <button onClick={() => console.log("Share", job.runId)}>
+                    📤 Share
+                  </button>
+                </>
+              )}
 
-</div>
+              {/* LOOKBOOK */}
+              {job.type === "lookbook" && job.status === "completed" && (
+                <>
+                  <button onClick={() => console.log("Generate Reel", job.runId)}>
+                    🎬 Reel
+                  </button>
+                  <button onClick={() => console.log("Share", job.runId)}>
+                    📤 Share
+                  </button>
+                  <button onClick={() => console.log("View Lookbook", job.runId)}>
+                    🔍 View
+                  </button>
+                </>
+              )}
+
+              {/* REEL */}
+              {job.type === "reel" && job.status === "completed" && (
+                <>
+                  <button onClick={() => console.log("Share", job.runId)}>
+                    📤 Share
+                  </button>
+                  <button onClick={() => console.log("View Reel", job.runId)}>
+                    🔍 View
+                  </button>
+                </>
+              )}
+
+            </div>
 
             {/* META */}
             <div className="prediction-meta">

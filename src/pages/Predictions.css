@@ -254,3 +254,26 @@
   flex-shrink: 0;
   white-space: nowrap;
 }
+
+.prediction-actions {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  justify-content: center;
+}
+
+.prediction-actions button {
+  flex: 1;
+  font-size: 12px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #111;
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.prediction-actions button:hover {
+  background: #333;
+}
