@@ -21,6 +21,7 @@ export default function PredictionsPage() {
   const [loading, setLoading] = useState(true);
   const [shareData, setShareData] = useState<any>(null);
 
+  // ✅ FINAL SHARE LOGIC (HERO + POSES)
   const handleShare = (job: Prediction) => {
     let media: { url: string }[] = [];
 
@@ -28,8 +29,18 @@ export default function PredictionsPage() {
       media = [{ url: job.heroImageUrl }];
     }
 
-    if (job.type === "lookbook" && job.lookbookImages) {
-      media = job.lookbookImages.map((url) => ({ url }));
+    if (job.type === "lookbook") {
+      const hero = job.heroImageUrl;
+
+      const poses =
+        job.lookbookImages?.filter(
+          (url) => url && url !== hero
+        ) || [];
+
+      media = [
+        ...(hero ? [{ url: hero }] : []),
+        ...poses.map((url) => ({ url })),
+      ];
     }
 
     if (job.type === "reel" && job.reelUrl) {
@@ -47,39 +58,20 @@ export default function PredictionsPage() {
       const jobsData: Prediction[] = (data || []).map((job: any) => {
         const mediaUrl = job.mediaUrl ?? null;
 
+        // ✅ LOOKBOOK (CLEAN — NO mediaUrls)
         if (job.type === "lookbook") {
-  const images: string[] = Array.isArray(job.mediaUrls)
-    ? job.mediaUrls
-    : [];
+          return {
+            runId: job.id,
+            type: "lookbook",
+            heroImageUrl: job.heroImageUrl || null,
+            lookbookImages: job.lookbookImages || [],
+            status: job.status ?? "completed",
+            createdAt: job.createdAt,
+            creditsUsed: 2,
+          };
+        }
 
-  const hero = job.heroImageUrl || "";
-
-  // ✅ FILTER CORRECT IMAGES
-  const filteredImages = images.filter((url) => {
-    if (!url) return false;
-
-    // remove replicate junk
-    if (url.includes("replicate.delivery")) return false;
-
-    // ensure same hero group (Cloudinary version match)
-    const heroVersion = hero.split("/upload/")[1]?.split("/")[0];
-    const urlVersion = url.split("/upload/")[1]?.split("/")[0];
-
-    return heroVersion && urlVersion && heroVersion === urlVersion;
-  });
-
-  return {
-    runId: job.id,
-    type: "lookbook",
-    heroImageUrl: hero || filteredImages[0] || null,
-    lookbookImages:
-      filteredImages.length > 0 ? filteredImages : images,
-    status: job.status ?? "completed",
-    createdAt: job.createdAt,
-    creditsUsed: 2,
-  };
-}
-
+        // REEL
         if (job.type === "reel") {
           return {
             runId: job.id,
@@ -92,6 +84,7 @@ export default function PredictionsPage() {
           };
         }
 
+        // HERO
         return {
           runId: job.id,
           type: "hero",
@@ -104,7 +97,7 @@ export default function PredictionsPage() {
 
       setJobs(jobsData);
 
-      // ✅ FINAL POLLING FIX
+      // ✅ POLLING FIX
       return jobsData.some((job) => {
         const status = (job.status || "").toLowerCase().trim();
 
@@ -115,10 +108,7 @@ export default function PredictionsPage() {
 
         return (
           isRecent &&
-          (status === "running" ||
-            status === "processing" ||
-            status === "pending" ||
-            status === "queued")
+          ["running", "processing", "pending", "queued"].includes(status)
         );
       });
 
@@ -240,13 +230,38 @@ export default function PredictionsPage() {
         })}
       </div>
 
+      {/* ✅ IMPROVED MODAL */}
       {shareData && (
-        <div style={{ position: "fixed", inset: 0, background: "#0009", zIndex: 9999 }}>
-          <button onClick={() => setShareData(null)}>Close</button>
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.9)",
+            zIndex: 9999,
+            overflowY: "auto",
+          }}
+        >
+          <button
+            onClick={() => setShareData(null)}
+            style={{
+              position: "fixed",
+              top: 20,
+              right: 20,
+              zIndex: 10000,
+              background: "#000",
+              color: "#fff",
+              border: "none",
+              padding: "10px 14px",
+              borderRadius: 6,
+              cursor: "pointer",
+            }}
+          >
+            ✕ Close
+          </button>
+
           <SharePanel data={shareData} />
         </div>
       )}
-
     </div>
   );
 }
