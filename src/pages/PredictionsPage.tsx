@@ -21,7 +21,19 @@ export default function PredictionsPage() {
   const [loading, setLoading] = useState(true);
   const [shareData, setShareData] = useState<any>(null);
 
-  // ✅ FINAL SHARE LOGIC (HERO + POSES)
+  // ✅ DOWNLOAD FUNCTION
+  const handleDownload = (url: string | null) => {
+    if (!url) return;
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "magicreel";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // ✅ SHARE LOGIC
   const handleShare = (job: Prediction) => {
     let media: { url: string }[] = [];
 
@@ -33,9 +45,7 @@ export default function PredictionsPage() {
       const hero = job.heroImageUrl;
 
       const poses =
-        job.lookbookImages?.filter(
-          (url) => url && url !== hero
-        ) || [];
+        job.lookbookImages?.filter((url) => url && url !== hero) || [];
 
       media = [
         ...(hero ? [{ url: hero }] : []),
@@ -58,7 +68,6 @@ export default function PredictionsPage() {
       const jobsData: Prediction[] = (data || []).map((job: any) => {
         const mediaUrl = job.mediaUrl ?? null;
 
-        // ✅ LOOKBOOK (CLEAN — NO mediaUrls)
         if (job.type === "lookbook") {
           return {
             runId: job.id,
@@ -71,7 +80,6 @@ export default function PredictionsPage() {
           };
         }
 
-        // REEL
         if (job.type === "reel") {
           return {
             runId: job.id,
@@ -84,7 +92,6 @@ export default function PredictionsPage() {
           };
         }
 
-        // HERO
         return {
           runId: job.id,
           type: "hero",
@@ -97,7 +104,6 @@ export default function PredictionsPage() {
 
       setJobs(jobsData);
 
-      // ✅ POLLING FIX
       return jobsData.some((job) => {
         const status = (job.status || "").toLowerCase().trim();
 
@@ -157,6 +163,13 @@ export default function PredictionsPage() {
         {jobs.map((job) => {
           const status = (job.status || "").toLowerCase().trim();
 
+          const mainUrl =
+            job.type === "hero"
+              ? job.heroImageUrl
+              : job.type === "lookbook"
+              ? job.lookbookImages?.[0]
+              : job.reelUrl;
+
           return (
             <div className="prediction-card" key={job.runId}>
 
@@ -187,28 +200,15 @@ export default function PredictionsPage() {
               </div>
 
               <div className="prediction-actions">
-                {job.type === "hero" && status === "completed" && (
-                  <>
-                    <button>➕ Lookbook</button>
-                    <button>🎬 Reel</button>
-                    <button onClick={() => handleShare(job)}>📤 Share</button>
-                  </>
-                )}
 
-                {job.type === "lookbook" && status === "completed" && (
-                  <>
-                    <button>🎬 Reel</button>
-                    <button onClick={() => handleShare(job)}>📤 Share</button>
-                    <button>🔍 View</button>
-                  </>
-                )}
+                <button onClick={() => handleShare(job)}>📤 Share</button>
 
-                {job.type === "reel" && status === "completed" && (
-                  <>
-                    <button onClick={() => handleShare(job)}>📤 Share</button>
-                    <button>🔍 View</button>
-                  </>
-                )}
+                <button onClick={() => handleDownload(mainUrl || null)}>
+                  ⬇️ Download
+                </button>
+
+                <button>🔍 View</button>
+
               </div>
 
               <div className="prediction-meta">
@@ -230,7 +230,6 @@ export default function PredictionsPage() {
         })}
       </div>
 
-      {/* ✅ IMPROVED MODAL */}
       {shareData && (
         <div
           style={{
