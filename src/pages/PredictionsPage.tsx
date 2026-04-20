@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "./Predictions.css";
 import { API_BASE } from "../config/api";
+import SharePanel from "../components/SharePanel";
 
 type PredictionType = "hero" | "reel" | "lookbook";
 
@@ -20,6 +21,26 @@ type Prediction = {
 export default function PredictionsPage() {
   const [jobs, setJobs] = useState<Prediction[]>([]);
   const [loading, setLoading] = useState(true);
+  const [shareData, setShareData] = useState<any>(null); // ✅ FIXED
+
+  // ✅ SHARE HANDLER (CORRECT PLACE)
+  const handleShare = (job: Prediction) => {
+    let media: { url: string }[] = [];
+
+    if (job.type === "hero" && job.heroImageUrl) {
+      media = [{ url: job.heroImageUrl }];
+    }
+
+    if (job.type === "lookbook" && job.lookbookImages) {
+      media = job.lookbookImages.map((url) => ({ url }));
+    }
+
+    if (job.type === "reel" && job.reelUrl) {
+      media = [{ url: job.reelUrl }];
+    }
+
+    setShareData({ media });
+  };
 
   const loadPredictions = async () => {
     try {
@@ -118,124 +139,58 @@ export default function PredictionsPage() {
         {jobs.map((job) => (
           <div className="prediction-card" key={job.runId}>
 
-            {/* IMAGE BLOCK */}
+            {/* IMAGE */}
             <div className="prediction-image">
 
-              {/* FAILED */}
               {job.status === "failed" && (
-                <div className="prediction-placeholder">
-                  ❌ Generation Failed
-                </div>
+                <div className="prediction-placeholder">❌ Generation Failed</div>
               )}
 
-              {/* HERO */}
               {job.status !== "failed" && job.type === "hero" && job.heroImageUrl && (
-                <img
-                  src={job.heroImageUrl}
-                  alt="Hero"
-                  loading="lazy"
-                  onError={(e) => {
-                    e.currentTarget.style.display = "none";
-                  }}
-                />
+                <img src={job.heroImageUrl} alt="Hero" loading="lazy" />
               )}
 
-              {/* REEL */}
               {job.status !== "failed" && job.type === "reel" && (
                 job.reelUrl ? (
                   <video src={job.reelUrl} controls playsInline muted />
                 ) : (
-                  <div className="prediction-placeholder">
-                    🎬 Processing Reel...
-                  </div>
+                  <div className="prediction-placeholder">🎬 Processing Reel...</div>
                 )
               )}
 
-              {/* LOOKBOOK */}
               {job.status !== "failed" && job.type === "lookbook" && (
                 job.lookbookImages && job.lookbookImages.length > 0 ? (
-                  <img
-                    src={job.lookbookImages[0]}
-                    alt="Lookbook"
-                    loading="lazy"
-                    onError={(e) => {
-                      if (job.heroImageUrl) {
-                        e.currentTarget.src = job.heroImageUrl;
-                      } else {
-                        e.currentTarget.style.display = "none";
-                      }
-                    }}
-                  />
+                  <img src={job.lookbookImages[0]} alt="Lookbook" loading="lazy" />
                 ) : (
-                  <div className="relative w-full h-full">
-
-                    {job.heroImageUrl ? (
-                      <img
-                        src={job.heroImageUrl}
-                        alt="Hero Preview"
-                        loading="lazy"
-                        className="object-cover w-full h-full"
-                      />
-                    ) : (
-                      <div className="prediction-placeholder">
-                        🖼 Preparing Preview...
-                      </div>
-                    )}
-
-                    <div className="absolute bottom-2 left-2 right-2 text-center">
-                      <div className="text-xs text-white bg-black/70 px-2 py-1 rounded">
-                        ⏳ Generating Lookbook...
-                      </div>
-                    </div>
-
-                  </div>
+                  <div className="prediction-placeholder">🖼 Preparing Preview...</div>
                 )
               )}
 
             </div>
 
-            {/* 🔥 ACTION BAR (NEW — COMMAND CENTER CORE) */}
+            {/* ACTIONS */}
             <div className="prediction-actions">
 
-              {/* HERO */}
               {job.type === "hero" && job.status === "completed" && (
                 <>
-                  <button onClick={() => console.log("Create Lookbook", job.runId)}>
-                    ➕ Lookbook
-                  </button>
-                  <button onClick={() => console.log("Generate Reel", job.runId)}>
-                    🎬 Reel
-                  </button>
-                  <button onClick={() => console.log("Share", job.runId)}>
-                    📤 Share
-                  </button>
+                  <button>➕ Lookbook</button>
+                  <button>🎬 Reel</button>
+                  <button onClick={() => handleShare(job)}>📤 Share</button>
                 </>
               )}
 
-              {/* LOOKBOOK */}
               {job.type === "lookbook" && job.status === "completed" && (
                 <>
-                  <button onClick={() => console.log("Generate Reel", job.runId)}>
-                    🎬 Reel
-                  </button>
-                  <button onClick={() => console.log("Share", job.runId)}>
-                    📤 Share
-                  </button>
-                  <button onClick={() => console.log("View Lookbook", job.runId)}>
-                    🔍 View
-                  </button>
+                  <button>🎬 Reel</button>
+                  <button onClick={() => handleShare(job)}>📤 Share</button>
+                  <button>🔍 View</button>
                 </>
               )}
 
-              {/* REEL */}
               {job.type === "reel" && job.status === "completed" && (
                 <>
-                  <button onClick={() => console.log("Share", job.runId)}>
-                    📤 Share
-                  </button>
-                  <button onClick={() => console.log("View Reel", job.runId)}>
-                    🔍 View
-                  </button>
+                  <button onClick={() => handleShare(job)}>📤 Share</button>
+                  <button>🔍 View</button>
                 </>
               )}
 
@@ -247,15 +202,7 @@ export default function PredictionsPage() {
                 {new Date(job.createdAt).toLocaleDateString()} • {job.creditsUsed} credit
               </span>
 
-              <span
-                className={`status ${
-                  job.status === "completed"
-                    ? "completed"
-                    : job.status === "running"
-                    ? "running"
-                    : "failed"
-                }`}
-              >
+              <span className={`status ${job.status}`}>
                 {job.status === "completed"
                   ? "✅ Ready"
                   : job.status === "running"
@@ -267,6 +214,31 @@ export default function PredictionsPage() {
           </div>
         ))}
       </div>
+
+      {/* ✅ SHARE MODAL */}
+      {shareData && (
+        <div style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(0,0,0,0.9)",
+          zIndex: 9999
+        }}>
+          <button
+            onClick={() => setShareData(null)}
+            style={{
+              position: "absolute",
+              top: 20,
+              right: 20,
+              zIndex: 10000
+            }}
+          >
+            ✕ Close
+          </button>
+
+          <SharePanel data={shareData} />
+        </div>
+      )}
+
     </div>
   );
 }
