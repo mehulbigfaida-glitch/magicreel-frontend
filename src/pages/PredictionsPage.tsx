@@ -21,9 +21,8 @@ type Prediction = {
 export default function PredictionsPage() {
   const [jobs, setJobs] = useState<Prediction[]>([]);
   const [loading, setLoading] = useState(true);
-  const [shareData, setShareData] = useState<any>(null); // ✅ FIXED
+  const [shareData, setShareData] = useState<any>(null);
 
-  // ✅ SHARE HANDLER (CORRECT PLACE)
   const handleShare = (job: Prediction) => {
     let media: { url: string }[] = [];
 
@@ -51,22 +50,21 @@ export default function PredictionsPage() {
         const mediaUrl = job.mediaUrl ?? null;
 
         // LOOKBOOK
-        console.log("LOOKBOOK JOB:", job);
         if (job.type === "lookbook") {
-  const images: string[] = Array.isArray(job.mediaUrls)
-    ? job.mediaUrls
-    : [];
+          const images: string[] = Array.isArray(job.mediaUrls)
+            ? job.mediaUrls
+            : [];
 
-  return {
-    runId: job.id,
-    type: "lookbook",
-    heroImageUrl: job.heroImageUrl || images[0] || null,
-    lookbookImages: images, // ✅ STRICT — no fallback
-    status: job.status ?? "completed",
-    createdAt: job.createdAt,
-    creditsUsed: 2,
-  };
-}
+          return {
+            runId: job.id,
+            type: "lookbook",
+            heroImageUrl: job.heroImageUrl || images[0] || null,
+            lookbookImages: images,
+            status: job.status ?? "completed",
+            createdAt: job.createdAt,
+            creditsUsed: 2,
+          };
+        }
 
         // REEL
         if (job.type === "reel") {
@@ -93,7 +91,17 @@ export default function PredictionsPage() {
       });
 
       setJobs(jobsData);
-      return jobsData.some((job) => job.status === "running");
+
+      // ✅ FIXED POLLING LOGIC
+      return jobsData.some((job) => {
+        const status = (job.status || "").toLowerCase().trim();
+        return (
+          status === "running" ||
+          status === "processing" ||
+          status === "pending"
+        );
+      });
+
     } catch (err) {
       console.error("Predictions fetch error:", err);
       return false;
@@ -102,31 +110,31 @@ export default function PredictionsPage() {
     }
   };
 
+  // ✅ FIXED POLLING SYSTEM
   useEffect(() => {
-  let interval: ReturnType<typeof setInterval> | null = null;
+    let interval: ReturnType<typeof setInterval> | null = null;
 
-  const startPolling = async () => {
-    const hasRunningJobs = await loadPredictions();
+    const startPolling = async () => {
+      const hasRunningJobs = await loadPredictions();
 
-    if (hasRunningJobs) {
-      interval = setInterval(async () => {
-        const stillRunning = await loadPredictions();
+      if (hasRunningJobs) {
+        interval = setInterval(async () => {
+          const stillRunning = await loadPredictions();
 
-        // ✅ STOP polling when done
-        if (!stillRunning && interval) {
-          clearInterval(interval);
-          interval = null;
-        }
-      }, 4000);
-    }
-  };
+          if (!stillRunning && interval) {
+            clearInterval(interval);
+            interval = null;
+          }
+        }, 4000);
+      }
+    };
 
-  startPolling();
+    startPolling();
 
-  return () => {
-    if (interval) clearInterval(interval);
-  };
-}, []);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, []);
 
   if (loading) {
     return <div className="predictions-loading">Loading predictions...</div>;
@@ -137,127 +145,126 @@ export default function PredictionsPage() {
       <h1 className="predictions-title">Predictions</h1>
 
       <div className="predictions-grid">
-        {jobs.map((job) => (
-          <div className="prediction-card" key={job.runId}>
+        {jobs.map((job) => {
+          const normalizedStatus = (job.status || "").toLowerCase().trim();
 
-            {/* IMAGE */}
-            <div className="prediction-image">
+          return (
+            <div className="prediction-card" key={job.runId}>
 
-              {job.status === "failed" && (
-                <div className="prediction-placeholder">❌ Generation Failed</div>
-              )}
+              {/* IMAGE */}
+              <div className="prediction-image">
 
-              {job.status !== "failed" && job.type === "hero" && job.heroImageUrl && (
-                <img src={job.heroImageUrl} alt="Hero" loading="lazy" />
-              )}
+                {normalizedStatus === "failed" && (
+                  <div className="prediction-placeholder">❌ Generation Failed</div>
+                )}
 
-              {job.status !== "failed" && job.type === "reel" && (
-                job.reelUrl ? (
-                  <video src={job.reelUrl} controls playsInline muted />
-                ) : (
-                  <div className="prediction-placeholder">🎬 Processing Reel...</div>
-                )
-              )}
+                {normalizedStatus !== "failed" && job.type === "hero" && job.heroImageUrl && (
+                  <img src={job.heroImageUrl} alt="Hero" loading="lazy" />
+                )}
 
-              {job.status !== "failed" && job.type === "lookbook" && (
-                job.lookbookImages && job.lookbookImages.length > 0 ? (
-                  <img src={job.lookbookImages[0]} alt="Lookbook" loading="lazy" />
-                ) : (
-                  <div className="prediction-placeholder">🖼 Preparing Preview...</div>
-                )
-              )}
+                {normalizedStatus !== "failed" && job.type === "reel" && (
+                  job.reelUrl ? (
+                    <video src={job.reelUrl} controls playsInline muted />
+                  ) : (
+                    <div className="prediction-placeholder">🎬 Processing Reel...</div>
+                  )
+                )}
+
+                {normalizedStatus !== "failed" && job.type === "lookbook" && (
+                  job.lookbookImages && job.lookbookImages.length > 0 ? (
+                    <img src={job.lookbookImages[0]} alt="Lookbook" loading="lazy" />
+                  ) : (
+                    <div className="prediction-placeholder">🖼 Preparing Preview...</div>
+                  )
+                )}
+
+              </div>
+
+              {/* ACTIONS */}
+              <div className="prediction-actions">
+
+                {job.type === "hero" && normalizedStatus === "completed" && (
+                  <>
+                    <button>➕ Lookbook</button>
+                    <button>🎬 Reel</button>
+                    <button onClick={() => handleShare(job)}>📤 Share</button>
+                  </>
+                )}
+
+                {job.type === "lookbook" && normalizedStatus === "completed" && (
+                  <>
+                    <button>🎬 Reel</button>
+                    <button onClick={() => handleShare(job)}>📤 Share</button>
+                    <button>🔍 View</button>
+                  </>
+                )}
+
+                {job.type === "reel" && normalizedStatus === "completed" && (
+                  <>
+                    <button onClick={() => handleShare(job)}>📤 Share</button>
+                    <button>🔍 View</button>
+                  </>
+                )}
+
+              </div>
+
+              {/* META */}
+              <div className="prediction-meta">
+                <span>
+                  {new Date(job.createdAt).toLocaleDateString()} • {job.creditsUsed} credit
+                </span>
+
+                <span className={`status ${normalizedStatus}`}>
+                  {normalizedStatus === "completed"
+                    ? "✅ Ready"
+                    : normalizedStatus === "running" ||
+                      normalizedStatus === "processing" ||
+                      normalizedStatus === "pending"
+                    ? "⏳ Processing"
+                    : "❌ Failed"}
+                </span>
+              </div>
 
             </div>
-
-            {/* ACTIONS */}
-            <div className="prediction-actions">
-
-              {job.type === "hero" && job.status === "completed" && (
-                <>
-                  <button>➕ Lookbook</button>
-                  <button>🎬 Reel</button>
-                  <button onClick={() => handleShare(job)}>📤 Share</button>
-                </>
-              )}
-
-              {job.type === "lookbook" && job.status === "completed" && (
-                <>
-                  <button>🎬 Reel</button>
-                  <button onClick={() => handleShare(job)}>📤 Share</button>
-                  <button>🔍 View</button>
-                </>
-              )}
-
-              {job.type === "reel" && job.status === "completed" && (
-                <>
-                  <button onClick={() => handleShare(job)}>📤 Share</button>
-                  <button>🔍 View</button>
-                </>
-              )}
-
-            </div>
-
-            {/* META */}
-            <div className="prediction-meta">
-              <span>
-                {new Date(job.createdAt).toLocaleDateString()} • {job.creditsUsed} credit
-              </span>
-
-              <span className={`status ${job.status}`}>
-                {job.status === "completed"
-                  ? "✅ Ready"
-                  : job.status === "running"
-                  ? "⏳ Processing"
-                  : "❌ Failed"}
-              </span>
-            </div>
-
-          </div>
-        ))}
+          );
+        })}
       </div>
 
-      {/* ✅ SHARE MODAL */}
+      {/* SHARE MODAL */}
       {shareData && (
-  <div
-    style={{
-      position: "fixed",
-      inset: 0,
-      background: "rgba(0,0,0,0.9)",
-      zIndex: 9999,
-      overflowY: "auto",   // ✅ enable scroll
-      padding: "40px 0"
-    }}
-  >
-    <div
-      style={{
-        maxWidth: 1000,
-        margin: "0 auto",
-        position: "relative"
-      }}
-    >
-      {/* CLOSE BUTTON */}
-      <button
-        onClick={() => setShareData(null)}
-        style={{
-          position: "sticky",
-          top: 10,
-          float: "right",
-          zIndex: 10000,
-          background: "#000",
-          color: "#fff",
-          border: "none",
-          padding: "8px 12px",
-          borderRadius: 6,
-          cursor: "pointer",
-        }}
-      >
-        ✕ Close
-      </button>
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.9)",
+            zIndex: 9999,
+            overflowY: "auto",
+            padding: "40px 0"
+          }}
+        >
+          <div style={{ maxWidth: 1000, margin: "0 auto", position: "relative" }}>
+            <button
+              onClick={() => setShareData(null)}
+              style={{
+                position: "sticky",
+                top: 10,
+                float: "right",
+                zIndex: 10000,
+                background: "#000",
+                color: "#fff",
+                border: "none",
+                padding: "8px 12px",
+                borderRadius: 6,
+                cursor: "pointer",
+              }}
+            >
+              ✕ Close
+            </button>
 
-      <SharePanel data={shareData} />
-    </div>
-  </div>
-)}
+            <SharePanel data={shareData} />
+          </div>
+        </div>
+      )}
 
     </div>
   );
