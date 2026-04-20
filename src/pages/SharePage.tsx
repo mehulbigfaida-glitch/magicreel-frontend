@@ -3,30 +3,29 @@ import { useEffect, useState } from "react";
 import SharePanel from "../components/SharePanel";
 
 export default function SharePage() {
-  const { shareId } = useParams<{ shareId: string }>();
+  const { id } = useParams<{ id: string }>();
 
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!shareId) return;
+    if (!id) return;
 
     const fetchData = async () => {
       try {
         const res = await fetch(
-          `https://magicreel-backend-production.up.railway.app/api/share/${shareId}`
+          `https://magicreel-backend-production.up.railway.app/api/share/${id}`
         );
 
         const json = await res.json();
 
         console.log("✅ SHARE DATA:", json);
 
-        // handle error response safely
         if (!res.ok || json.error) {
           console.error("❌ Share API error:", json);
           setData(null);
         } else {
-          setData(json);
+          setData(json.asset); // ✅ important (matches backend)
         }
       } catch (err) {
         console.error("❌ Share fetch failed:", err);
@@ -37,7 +36,7 @@ export default function SharePage() {
     };
 
     fetchData();
-  }, [shareId]);
+  }, [id]);
 
   /* ---------------- LOADING ---------------- */
   if (loading) {
