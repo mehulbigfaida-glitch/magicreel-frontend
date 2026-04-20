@@ -8,11 +8,9 @@ type PredictionType = "hero" | "reel" | "lookbook";
 type Prediction = {
   runId: string;
   type: PredictionType;
-
   heroImageUrl: string | null;
   reelUrl?: string | null;
   lookbookImages?: string[];
-
   status: string;
   createdAt: string;
   creditsUsed: number;
@@ -49,7 +47,6 @@ export default function PredictionsPage() {
       const jobsData: Prediction[] = (data || []).map((job: any) => {
         const mediaUrl = job.mediaUrl ?? null;
 
-        // LOOKBOOK
         if (job.type === "lookbook") {
           const images: string[] = Array.isArray(job.mediaUrls)
             ? job.mediaUrls
@@ -66,7 +63,6 @@ export default function PredictionsPage() {
           };
         }
 
-        // REEL
         if (job.type === "reel") {
           return {
             runId: job.id,
@@ -79,7 +75,6 @@ export default function PredictionsPage() {
           };
         }
 
-        // HERO
         return {
           runId: job.id,
           type: "hero",
@@ -92,13 +87,21 @@ export default function PredictionsPage() {
 
       setJobs(jobsData);
 
-      // ✅ FIXED POLLING LOGIC
+      // ✅ FINAL POLLING FIX
       return jobsData.some((job) => {
         const status = (job.status || "").toLowerCase().trim();
+
+        const createdTime = new Date(job.createdAt).getTime();
+        const now = Date.now();
+
+        const isRecent = now - createdTime < 5 * 60 * 1000;
+
         return (
-          status === "running" ||
-          status === "processing" ||
-          status === "pending"
+          isRecent &&
+          (status === "running" ||
+            status === "processing" ||
+            status === "pending" ||
+            status === "queued")
         );
       });
 
@@ -110,7 +113,6 @@ export default function PredictionsPage() {
     }
   };
 
-  // ✅ FIXED POLLING SYSTEM
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | null = null;
 
@@ -146,44 +148,39 @@ export default function PredictionsPage() {
 
       <div className="predictions-grid">
         {jobs.map((job) => {
-          const normalizedStatus = (job.status || "").toLowerCase().trim();
+          const status = (job.status || "").toLowerCase().trim();
 
           return (
             <div className="prediction-card" key={job.runId}>
 
-              {/* IMAGE */}
               <div className="prediction-image">
-
-                {normalizedStatus === "failed" && (
-                  <div className="prediction-placeholder">❌ Generation Failed</div>
+                {status === "failed" && (
+                  <div className="prediction-placeholder">❌ Failed</div>
                 )}
 
-                {normalizedStatus !== "failed" && job.type === "hero" && job.heroImageUrl && (
-                  <img src={job.heroImageUrl} alt="Hero" loading="lazy" />
+                {status !== "failed" && job.type === "hero" && job.heroImageUrl && (
+                  <img src={job.heroImageUrl} alt="Hero" />
                 )}
 
-                {normalizedStatus !== "failed" && job.type === "reel" && (
+                {status !== "failed" && job.type === "reel" && (
                   job.reelUrl ? (
-                    <video src={job.reelUrl} controls playsInline muted />
+                    <video src={job.reelUrl} controls />
                   ) : (
-                    <div className="prediction-placeholder">🎬 Processing Reel...</div>
+                    <div className="prediction-placeholder">Processing...</div>
                   )
                 )}
 
-                {normalizedStatus !== "failed" && job.type === "lookbook" && (
-                  job.lookbookImages && job.lookbookImages.length > 0 ? (
-                    <img src={job.lookbookImages[0]} alt="Lookbook" loading="lazy" />
+                {status !== "failed" && job.type === "lookbook" && (
+                  job.lookbookImages?.length ? (
+                    <img src={job.lookbookImages[0]} alt="Lookbook" />
                   ) : (
-                    <div className="prediction-placeholder">🖼 Preparing Preview...</div>
+                    <div className="prediction-placeholder">Preparing...</div>
                   )
                 )}
-
               </div>
 
-              {/* ACTIONS */}
               <div className="prediction-actions">
-
-                {job.type === "hero" && normalizedStatus === "completed" && (
+                {job.type === "hero" && status === "completed" && (
                   <>
                     <button>➕ Lookbook</button>
                     <button>🎬 Reel</button>
@@ -191,7 +188,7 @@ export default function PredictionsPage() {
                   </>
                 )}
 
-                {job.type === "lookbook" && normalizedStatus === "completed" && (
+                {job.type === "lookbook" && status === "completed" && (
                   <>
                     <button>🎬 Reel</button>
                     <button onClick={() => handleShare(job)}>📤 Share</button>
@@ -199,27 +196,23 @@ export default function PredictionsPage() {
                   </>
                 )}
 
-                {job.type === "reel" && normalizedStatus === "completed" && (
+                {job.type === "reel" && status === "completed" && (
                   <>
                     <button onClick={() => handleShare(job)}>📤 Share</button>
                     <button>🔍 View</button>
                   </>
                 )}
-
               </div>
 
-              {/* META */}
               <div className="prediction-meta">
                 <span>
                   {new Date(job.createdAt).toLocaleDateString()} • {job.creditsUsed} credit
                 </span>
 
-                <span className={`status ${normalizedStatus}`}>
-                  {normalizedStatus === "completed"
+                <span className={`status ${status}`}>
+                  {status === "completed"
                     ? "✅ Ready"
-                    : normalizedStatus === "running" ||
-                      normalizedStatus === "processing" ||
-                      normalizedStatus === "pending"
+                    : ["running", "processing", "pending", "queued"].includes(status)
                     ? "⏳ Processing"
                     : "❌ Failed"}
                 </span>
@@ -230,39 +223,10 @@ export default function PredictionsPage() {
         })}
       </div>
 
-      {/* SHARE MODAL */}
       {shareData && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.9)",
-            zIndex: 9999,
-            overflowY: "auto",
-            padding: "40px 0"
-          }}
-        >
-          <div style={{ maxWidth: 1000, margin: "0 auto", position: "relative" }}>
-            <button
-              onClick={() => setShareData(null)}
-              style={{
-                position: "sticky",
-                top: 10,
-                float: "right",
-                zIndex: 10000,
-                background: "#000",
-                color: "#fff",
-                border: "none",
-                padding: "8px 12px",
-                borderRadius: 6,
-                cursor: "pointer",
-              }}
-            >
-              ✕ Close
-            </button>
-
-            <SharePanel data={shareData} />
-          </div>
+        <div style={{ position: "fixed", inset: 0, background: "#0009", zIndex: 9999 }}>
+          <button onClick={() => setShareData(null)}>Close</button>
+          <SharePanel data={shareData} />
         </div>
       )}
 
