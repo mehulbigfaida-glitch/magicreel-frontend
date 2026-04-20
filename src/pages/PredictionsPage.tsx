@@ -48,20 +48,37 @@ export default function PredictionsPage() {
         const mediaUrl = job.mediaUrl ?? null;
 
         if (job.type === "lookbook") {
-          const images: string[] = Array.isArray(job.mediaUrls)
-            ? job.mediaUrls
-            : [];
+  const images: string[] = Array.isArray(job.mediaUrls)
+    ? job.mediaUrls
+    : [];
 
-          return {
-            runId: job.id,
-            type: "lookbook",
-            heroImageUrl: job.heroImageUrl || images[0] || null,
-            lookbookImages: images,
-            status: job.status ?? "completed",
-            createdAt: job.createdAt,
-            creditsUsed: 2,
-          };
-        }
+  const hero = job.heroImageUrl || "";
+
+  // ✅ FILTER CORRECT IMAGES
+  const filteredImages = images.filter((url) => {
+    if (!url) return false;
+
+    // remove replicate junk
+    if (url.includes("replicate.delivery")) return false;
+
+    // ensure same hero group (Cloudinary version match)
+    const heroVersion = hero.split("/upload/")[1]?.split("/")[0];
+    const urlVersion = url.split("/upload/")[1]?.split("/")[0];
+
+    return heroVersion && urlVersion && heroVersion === urlVersion;
+  });
+
+  return {
+    runId: job.id,
+    type: "lookbook",
+    heroImageUrl: hero || filteredImages[0] || null,
+    lookbookImages:
+      filteredImages.length > 0 ? filteredImages : images,
+    status: job.status ?? "completed",
+    createdAt: job.createdAt,
+    creditsUsed: 2,
+  };
+}
 
         if (job.type === "reel") {
           return {
