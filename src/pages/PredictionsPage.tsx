@@ -51,28 +51,17 @@ export default function PredictionsPage() {
         const mediaUrl = job.mediaUrl ?? null;
 
         // LOOKBOOK
+        console.log("LOOKBOOK JOB:", job);
         if (job.type === "lookbook") {
-  let images: string[] = [];
-
-  if (Array.isArray(job.mediaUrls)) {
-    images = job.mediaUrls;
-  } else if (typeof job.mediaUrl === "string") {
-    images = [job.mediaUrl];
-  }
-
-  // ✅ FILTER: remove invalid / mismatched URLs
-  const cleanImages = images.filter(
-    (url) =>
-      typeof url === "string" &&
-      url.length > 0 &&
-      url.includes("cloudinary") // basic sanity check
-  );
+  const images: string[] = Array.isArray(job.mediaUrls)
+    ? job.mediaUrls
+    : [];
 
   return {
     runId: job.id,
     type: "lookbook",
-    heroImageUrl: job.heroImageUrl || null,
-    lookbookImages: cleanImages,
+    heroImageUrl: job.heroImageUrl || images[0] || null,
+    lookbookImages: images, // ✅ STRICT — no fallback
     status: job.status ?? "completed",
     createdAt: job.createdAt,
     creditsUsed: 2,
@@ -114,22 +103,30 @@ export default function PredictionsPage() {
   };
 
   useEffect(() => {
-    let interval: ReturnType<typeof setInterval>;
+  let interval: ReturnType<typeof setInterval> | null = null;
 
-    const init = async () => {
-      const hasRunningJobs = await loadPredictions();
+  const startPolling = async () => {
+    const hasRunningJobs = await loadPredictions();
 
-      if (hasRunningJobs) {
-        interval = setInterval(loadPredictions, 4000);
-      }
-    };
+    if (hasRunningJobs) {
+      interval = setInterval(async () => {
+        const stillRunning = await loadPredictions();
 
-    init();
+        // ✅ STOP polling when done
+        if (!stillRunning && interval) {
+          clearInterval(interval);
+          interval = null;
+        }
+      }, 4000);
+    }
+  };
 
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, []);
+  startPolling();
+
+  return () => {
+    if (interval) clearInterval(interval);
+  };
+}, []);
 
   if (loading) {
     return <div className="predictions-loading">Loading predictions...</div>;
