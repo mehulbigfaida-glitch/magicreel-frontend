@@ -52,28 +52,32 @@ export default function PredictionsPage() {
 
         // LOOKBOOK
         if (job.type === "lookbook") {
-          let images: string[] = [];
+  let images: string[] = [];
 
-          if (Array.isArray(job.mediaUrls)) {
-            images = job.mediaUrls;
-          } else if (typeof job.mediaUrl === "string") {
-            images = [job.mediaUrl];
-          }
+  if (Array.isArray(job.mediaUrls)) {
+    images = job.mediaUrls;
+  } else if (typeof job.mediaUrl === "string") {
+    images = [job.mediaUrl];
+  }
 
-          const cleanImages = images.filter(
-            (url) => typeof url === "string" && url.length > 0
-          );
+  // ✅ FILTER: remove invalid / mismatched URLs
+  const cleanImages = images.filter(
+    (url) =>
+      typeof url === "string" &&
+      url.length > 0 &&
+      url.includes("cloudinary") // basic sanity check
+  );
 
-          return {
-            runId: job.id,
-            type: "lookbook",
-            heroImageUrl: job.heroImageUrl || null,
-            lookbookImages: cleanImages,
-            status: job.status ?? "completed",
-            createdAt: job.createdAt,
-            creditsUsed: 2,
-          };
-        }
+  return {
+    runId: job.id,
+    type: "lookbook",
+    heroImageUrl: job.heroImageUrl || null,
+    lookbookImages: cleanImages,
+    status: job.status ?? "completed",
+    createdAt: job.createdAt,
+    creditsUsed: 2,
+  };
+}
 
         // REEL
         if (job.type === "reel") {
@@ -217,27 +221,46 @@ export default function PredictionsPage() {
 
       {/* ✅ SHARE MODAL */}
       {shareData && (
-        <div style={{
-          position: "fixed",
-          inset: 0,
-          background: "rgba(0,0,0,0.9)",
-          zIndex: 9999
-        }}>
-          <button
-            onClick={() => setShareData(null)}
-            style={{
-              position: "absolute",
-              top: 20,
-              right: 20,
-              zIndex: 10000
-            }}
-          >
-            ✕ Close
-          </button>
+  <div
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,0.9)",
+      zIndex: 9999,
+      overflowY: "auto",   // ✅ enable scroll
+      padding: "40px 0"
+    }}
+  >
+    <div
+      style={{
+        maxWidth: 1000,
+        margin: "0 auto",
+        position: "relative"
+      }}
+    >
+      {/* CLOSE BUTTON */}
+      <button
+        onClick={() => setShareData(null)}
+        style={{
+          position: "sticky",
+          top: 10,
+          float: "right",
+          zIndex: 10000,
+          background: "#000",
+          color: "#fff",
+          border: "none",
+          padding: "8px 12px",
+          borderRadius: 6,
+          cursor: "pointer",
+        }}
+      >
+        ✕ Close
+      </button>
 
-          <SharePanel data={shareData} />
-        </div>
-      )}
+      <SharePanel data={shareData} />
+    </div>
+  </div>
+)}
 
     </div>
   );
