@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./Predictions.css";
 import { API_BASE } from "../config/api";
 import SharePanel from "../components/SharePanel";
+import { QRCodeCanvas } from "qrcode.react";
 
 type PredictionType = "hero" | "reel" | "lookbook";
 
@@ -20,7 +21,7 @@ export default function PredictionsPage() {
   const [jobs, setJobs] = useState<Prediction[]>([]);
   const [loading, setLoading] = useState(true);
   const [shareData, setShareData] = useState<any>(null);
-
+  
   // ✅ DOWNLOAD FUNCTION
   const handleDownload = (url: string | null) => {
     if (!url) return;
@@ -33,8 +34,8 @@ export default function PredictionsPage() {
     document.body.removeChild(link);
   };
 
-  // ✅ SHARE LOGIC
-  const handleShare = (job: Prediction) => {
+  const handleShare = async (job: Prediction) => {
+  try {
     let media: { url: string }[] = [];
 
     if (job.type === "hero" && job.heroImageUrl) {
@@ -57,8 +58,35 @@ export default function PredictionsPage() {
       media = [{ url: job.reelUrl }];
     }
 
-    setShareData({ media });
-  };
+    // 🔥 CREATE SHARE ASSET (BACKEND)
+    const res = await fetch(`${API_BASE}/api/share`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        type: job.type,
+        media,
+      }),
+    });
+
+    const data = await res.json();
+
+    const shareId = data?.asset?.id || data?.id;
+
+    // 🔥 GENERATE SHARE URL
+    const shareUrl = `${window.location.origin}/share/${shareId}`;
+
+    // 🔥 SET DATA FOR MODAL
+    setShareData({
+      media,
+      shareUrl,
+    });
+
+  } catch (err) {
+    console.error("Share error:", err);
+  }
+};
 
   const loadPredictions = async () => {
     try {
@@ -231,36 +259,54 @@ export default function PredictionsPage() {
       </div>
 
       {shareData && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.9)",
-            zIndex: 9999,
-            overflowY: "auto",
-          }}
-        >
-          <button
-            onClick={() => setShareData(null)}
-            style={{
-              position: "fixed",
-              top: 20,
-              right: 20,
-              zIndex: 10000,
-              background: "#000",
-              color: "#fff",
-              border: "none",
-              padding: "10px 14px",
-              borderRadius: 6,
-              cursor: "pointer",
-            }}
-          >
-            ✕ Close
-          </button>
+  <div
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,0.9)",
+      zIndex: 9999,
+      overflowY: "auto",
+      padding: "40px 20px",
+    }}
+  >
+    {/* CLOSE BUTTON */}
+    <button
+      onClick={() => setShareData(null)}
+      style={{
+        position: "fixed",
+        top: 20,
+        right: 20,
+        zIndex: 10000,
+        background: "#000",
+        color: "#fff",
+        border: "none",
+        padding: "10px 14px",
+        borderRadius: 6,
+        cursor: "pointer",
+      }}
+    >
+      ✕ Close
+    </button>
 
-          <SharePanel data={shareData} />
-        </div>
-      )}
+    {/* 🔥 QR SECTION */}
+    {shareData?.shareUrl && (
+      <div style={{ textAlign: "center", marginBottom: 30 }}>
+        <p style={{ color: "#fff", marginBottom: 10 }}>
+          Scan to open on mobile
+        </p>
+
+        <QRCodeCanvas value={shareData.shareUrl} size={180} />
+
+        <p style={{ color: "#aaa", marginTop: 10, fontSize: 12 }}>
+          {shareData.shareUrl}
+        </p>
+      </div>
+    )}
+
+    {/* SHARE CONTENT */}
+    <SharePanel data={shareData} />
+  </div>
+)}
     </div>
   );
 }
