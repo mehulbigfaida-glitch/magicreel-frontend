@@ -104,14 +104,26 @@ export default function PredictionsPage() {
 
       // ✅ FIXED MAPPING
       const jobsData: Prediction[] = (data || []).map((job: any) => ({
-        id: job.id,
-        type: job.type,
-        status: job.status ?? "completed",
-        createdAt: job.createdAt,
-        mediaUrl: job.mediaUrl ?? null,
-        mediaUrls: job.mediaUrls ?? [],
-        creditsUsed: job.creditsUsed ?? 1,
-      }));
+  id: job.id,
+  type: job.type,
+  status: job.status ?? "completed",
+  createdAt: job.createdAt,
+
+  // ✅ BACK TO WORKING STRUCTURE
+  mediaUrl:
+    job.type === "hero"
+      ? job.heroImageUrl
+      : job.type === "reel"
+      ? job.reelUrl
+      : null,
+
+  mediaUrls:
+    job.type === "lookbook"
+      ? job.lookbookImages || []
+      : [],
+
+  creditsUsed: job.creditsUsed ?? 1,
+}));
 
       setJobs(jobsData);
 
