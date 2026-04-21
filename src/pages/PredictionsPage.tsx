@@ -20,9 +20,8 @@ export default function PredictionsPage() {
   const [jobs, setJobs] = useState<Prediction[]>([]);
   const [loading, setLoading] = useState(true);
   const [shareData, setShareData] = useState<any>(null);
-  
 
-  // DOWNLOAD
+  // ================= DOWNLOAD =================
   const handleDownload = (url: string | null) => {
     if (!url) return;
     const link = document.createElement("a");
@@ -33,7 +32,7 @@ export default function PredictionsPage() {
     document.body.removeChild(link);
   };
 
-  // SHARE
+  // ================= SHARE =================
   const handleShare = async (job: Prediction) => {
     try {
       let media: { url: string }[] = [];
@@ -53,10 +52,8 @@ export default function PredictionsPage() {
         media = [{ url: job.mediaUrl }];
       }
 
-      console.log("🚀 FINAL SHARE MEDIA:", media);
-
       if (!media.length) {
-        alert("No images found for sharing");
+        alert("No media found");
         return;
       }
 
@@ -64,147 +61,126 @@ export default function PredictionsPage() {
         "https://magicreel-backend-production.up.railway.app/api/share",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            type: job.type,
-            media,
-          }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: job.type, media }),
         }
       );
 
       const json = await res.json();
 
       if (!json?.asset?.id) {
-        throw new Error("Share creation failed");
+        throw new Error("Share failed");
       }
 
       const shareUrl = `https://magicreel-frontend.vercel.app/s/${json.asset.id}`;
 
-      // ✅ FIXED
-      setShareData({
-        media,
-        shareUrl,
-      });
+      setShareData({ media, shareUrl });
 
     } catch (err) {
-      console.error("❌ SHARE ERROR:", err);
-      alert("Failed to create share");
+      console.error("Share error:", err);
+      alert("Share failed");
     }
   };
 
-  // FETCH
+  // ================= FETCH =================
   const loadPredictions = async () => {
     try {
       const res = await fetch(`${API_BASE}/api/predictions`, {
-  cache: "no-store",
-}).catch((err) => {
-  console.warn("⚠️ Ignoring fetch error:", err);
-  return null;
-});
+        cache: "no-store",
+      });
 
-if (!res) return false;
       const data = await res.json();
 
-      // ✅ FIXED MAPPING
-      const jobsData: Prediction[] = (data || []).map((job: any) => ({
-  id: job.id,
-  type: job.type,
-  status: job.status ?? "completed",
-  createdAt: job.createdAt,
+      // ✅ SAFE MAPPING (FINAL)
+      const jobsData: Prediction[] = (data || []).map((job: any) => {
+        const type = (job.type || "").toLowerCase();
 
-  // ✅ BACK TO WORKING STRUCTURE
-  mediaUrl:
-    job.type === "hero"
-      ? job.heroImageUrl
-      : job.type === "reel"
-      ? job.reelUrl
-      : null,
+        return {
+          id: job.id,
+          type,
+          status: job.status ?? "completed",
+          createdAt: job.createdAt,
 
-  mediaUrls:
-    job.type === "lookbook"
-      ? job.lookbookImages || []
-      : [],
+          mediaUrl:
+            type === "hero"
+              ? job.heroImageUrl || null
+              : type === "reel"
+              ? job.reelUrl || null
+              : null,
 
-  creditsUsed: job.creditsUsed ?? 1,
-}));
+          mediaUrls:
+            type === "lookbook" && Array.isArray(job.lookbookImages)
+              ? job.lookbookImages.filter((u: any) => typeof u === "string" && u)
+              : [],
+
+          creditsUsed: job.creditsUsed ?? 1,
+        };
+      });
 
       setJobs(jobsData);
 
+      // ✅ POLLING CHECK
       const hasRunningJobs = jobsData.some((job) => {
-  const status = (job.status || "").toLowerCase().trim();
+        const status = (job.status || "").toLowerCase().trim();
 
-  return (
-    status === "running" ||
-    status === "processing" ||
-    status === "pending" ||
-    status === "queued"
-  );
-});
+        return (
+          status === "running" ||
+          status === "processing" ||
+          status === "pending" ||
+          status === "queued"
+        );
+      });
 
-console.log("🧠 POLLING CHECK:", jobsData.map(j => j.status));
-
-return hasRunningJobs;
+      return hasRunningJobs;
 
     } catch (err) {
-      console.error("Predictions fetch error:", err);
+      console.error("Fetch error:", err);
       return false;
     } finally {
       setLoading(false);
     }
   };
 
+  // ================= POLLING =================
   useEffect(() => {
-  let interval: ReturnType<typeof setInterval> | null = null;
+    let interval: any = null;
+    const startTime = Date.now();
+    const MAX_TIME = 30000;
 
-  const MAX_POLL_TIME = 30000; // 30 seconds
-  const startTime = Date.now();
+    const startPolling = async () => {
+      const hasRunning = await loadPredictions();
 
-  const startPolling = async () => {
-    const hasRunningJobs = await loadPredictions();
+      if (hasRunning) {
+        interval = setInterval(async () => {
+          const stillRunning = await loadPredictions();
+          const elapsed = Date.now() - startTime;
 
-    if (hasRunningJobs) {
-      interval = setInterval(async () => {
-        const stillRunning = await loadPredictions();
-
-        const elapsed = Date.now() - startTime;
-
-        console.log("⏱️ Polling time:", elapsed);
-
-        // ✅ STOP CONDITIONS
-        if (!stillRunning || elapsed > MAX_POLL_TIME) {
-          console.log("🛑 STOP POLLING (done or timeout)");
-
-          if (interval) {
+          if (!stillRunning || elapsed > MAX_TIME) {
             clearInterval(interval);
-            interval = null;
           }
-        }
-      }, 4000);
-    }
-  };
+        }, 4000);
+      }
+    };
 
-  startPolling();
+    startPolling();
 
-  return () => {
-    if (interval) {
-      clearInterval(interval);
-    }
-  };
-}, []);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, []);
 
   if (loading) {
     return <div className="predictions-loading">Loading predictions...</div>;
   }
 
+  // ================= UI =================
   return (
     <div className="predictions-page">
       <h1 className="predictions-title">Predictions</h1>
 
       <div className="predictions-grid">
         {jobs.map((job) => {
-          const status = (job.status || "").toLowerCase().trim();
+          const status = (job.status || "").toLowerCase();
 
           const mainUrl =
             job.type === "hero"
@@ -222,12 +198,12 @@ return hasRunningJobs;
                 )}
 
                 {status !== "failed" && job.type === "hero" && (
-  job.mediaUrl ? (
-    <img src={job.mediaUrl} alt="Hero" />
-  ) : (
-    <div className="prediction-placeholder">⚠️ No Image</div>
-  )
-)}
+                  job.mediaUrl ? (
+                    <img src={job.mediaUrl} />
+                  ) : (
+                    <div className="prediction-placeholder">No Image</div>
+                  )
+                )}
 
                 {status !== "failed" && job.type === "reel" && (
                   job.mediaUrl ? (
@@ -238,25 +214,19 @@ return hasRunningJobs;
                 )}
 
                 {status !== "failed" && job.type === "lookbook" && (
-  job.mediaUrls?.length ? (
-    job.mediaUrls[0] ? (
-      <img src={job.mediaUrls[0]} alt="Lookbook" />
-    ) : (
-      <div className="prediction-placeholder">⚠️ Missing Images</div>
-    )
-  ) : (
-    <div className="prediction-placeholder">Preparing...</div>
-  )
-)}
+                  job.mediaUrls?.length ? (
+                    <img src={job.mediaUrls[0]} />
+                  ) : (
+                    <div className="prediction-placeholder">Preparing...</div>
+                  )
+                )}
               </div>
 
               <div className="prediction-actions">
                 <button onClick={() => handleShare(job)}>📤 Share</button>
-
                 <button onClick={() => handleDownload(mainUrl || null)}>
                   ⬇️ Download
                 </button>
-
                 <button>🔍 View</button>
               </div>
 
@@ -280,40 +250,24 @@ return hasRunningJobs;
 
       {/* SHARE MODAL */}
       {shareData && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.9)",
-            zIndex: 9999,
-            overflowY: "auto",
-            padding: "40px 20px",
-          }}
-        >
+        <div style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(0,0,0,0.9)",
+          zIndex: 9999,
+          overflowY: "auto",
+          padding: 20,
+        }}>
           <button
-            onClick={() => {
-  setShareData(null);
-}}
-            style={{
-              position: "fixed",
-              top: 20,
-              right: 20,
-              zIndex: 10000,
-              background: "#000",
-              color: "#fff",
-              padding: "10px 14px",
-              borderRadius: 6,
-            }}
+            onClick={() => setShareData(null)}
+            style={{ position: "fixed", top: 20, right: 20 }}
           >
-            ✕ Close
+            ✕
           </button>
 
-          <div style={{ textAlign: "center", marginBottom: 30 }}>
-            <p style={{ color: "#fff" }}>Scan to open on mobile</p>
-            <QRCodeCanvas value={shareData.shareUrl} size={180} />
-            <p style={{ color: "#aaa", fontSize: 12 }}>
-              {shareData.shareUrl}
-            </p>
+          <div style={{ textAlign: "center", marginBottom: 20 }}>
+            <QRCodeCanvas value={shareData.shareUrl} size={160} />
+            <p style={{ color: "#aaa" }}>{shareData.shareUrl}</p>
           </div>
 
           <SharePanel data={shareData} />
