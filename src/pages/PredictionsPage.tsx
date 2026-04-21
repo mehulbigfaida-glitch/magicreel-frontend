@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react";
 import "./Predictions.css";
+import { API_BASE } from "../config/api";
 import SharePanel from "../components/SharePanel";
+import { QRCodeCanvas } from "qrcode.react";
 
 type Prediction = {
   id: string;
   type: "hero" | "lookbook" | "reel";
   status: string;
   createdAt: string;
+
   mediaUrl?: string | null;
   mediaUrls?: string[];
+
   creditsUsed?: number;
 };
 
@@ -16,97 +20,135 @@ export default function PredictionsPage() {
   const [jobs, setJobs] = useState<Prediction[]>([]);
   const [loading, setLoading] = useState(true);
   const [shareData, setShareData] = useState<any>(null);
+  
 
-  const API_BASE = "https://magicreel-backend-production.up.railway.app";
+  // DOWNLOAD
+  const handleDownload = (url: string | null) => {
+    if (!url) return;
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "magicreel";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
-  // ================= FETCH =================
-const loadPredictions = async () => {
-  try {
-    const res = await fetch(`${API_BASE}/api/predictions`, {
-      credentials: "include",
-    });
-
-    const data = await res.json();
-
-    const mapped: Prediction[] = (data || []).map((job: any) => ({
-      id: job.id,
-      type: job.type,
-      status: job.status ?? "completed",
-      createdAt: job.createdAt,
-      mediaUrl: job.mediaUrl ?? null,
-      mediaUrls: job.mediaUrls ?? [],
-      creditsUsed: job.creditsUsed ?? 1,
-    }));
-
-    setJobs(mapped);
-  } catch (err) {
-    console.error("Fetch error:", err);
-  } finally {
-    setLoading(false);
-  }
-};
-
-useEffect(() => {
-  loadPredictions();
-}, []);
-
-  // ================= SHARE =================
+  // SHARE
   const handleShare = async (job: Prediction) => {
     try {
       let media: { url: string }[] = [];
 
-      if ((job.type === "hero" || job.type === "reel") && job.mediaUrl) {
+      if (job.type === "hero" && job.mediaUrl) {
         media = [{ url: job.mediaUrl }];
       }
 
       if (job.type === "lookbook") {
-        media = (job.mediaUrls || [])
-          .filter((u) => u)
-          .map((u) => ({ url: u }));
+        const images = job.mediaUrls || [];
+        media = images
+          .filter((url) => typeof url === "string" && url)
+          .map((url) => ({ url }));
       }
 
-      if (!media.length) {
-        alert("No images to share");
-        return;
+      if (job.type === "reel" && job.mediaUrl) {
+        media = [{ url: job.mediaUrl }];
       }
 
       console.log("🚀 FINAL SHARE MEDIA:", media);
 
-      const res = await fetch(`${API_BASE}/api/share`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          type: job.type,
-          media,
-        }),
-      });
+      if (!media.length) {
+        alert("No images found for sharing");
+        return;
+      }
+
+      const res = await fetch(
+        "https://magicreel-backend-production.up.railway.app/api/share",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            type: job.type,
+            media,
+          }),
+        }
+      );
 
       const json = await res.json();
-      const shareId = json?.asset?.id;
 
-      if (!shareId) throw new Error("Share failed");
+      if (!json?.asset?.id) {
+        throw new Error("Share creation failed");
+      }
 
+      const shareUrl = `https://magicreel-frontend.vercel.app/s/${json.asset.id}`;
+
+      // ✅ FIXED
       setShareData({
         media,
-        shareUrl: `${window.location.origin}/s/${shareId}`,
+        shareUrl,
       });
 
     } catch (err) {
-      console.error("Share error:", err);
-      alert("Share failed");
+      console.error("❌ SHARE ERROR:", err);
+      alert("Failed to create share");
     }
   };
 
-  // ================= DOWNLOAD =================
-  const handleDownload = (url: string | null) => {
-    if (!url) return;
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "magicreel";
-    a.click();
+  // FETCH
+  const loadPredictions = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/predictions`);
+      const data = await res.json();
+
+      // ✅ FIXED MAPPING
+      const jobsData: Prediction[] = (data || []).map((job: any) => ({
+        id: job.id,
+        type: job.type,
+        status: job.status ?? "completed",
+        createdAt: job.createdAt,
+        mediaUrl: job.mediaUrl ?? null,
+        mediaUrls: job.mediaUrls ?? [],
+        creditsUsed: job.creditsUsed ?? 1,
+      }));
+
+      setJobs(jobsData);
+
+      return jobsData.some((job) => {
+        const status = (job.status || "").toLowerCase().trim();
+        return ["running", "processing", "pending", "queued"].includes(status);
+      });
+
+    } catch (err) {
+      console.error("Predictions fetch error:", err);
+      return false;
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval> | null = null;
+
+    const startPolling = async () => {
+      const hasRunningJobs = await loadPredictions();
+
+      if (hasRunningJobs) {
+        interval = setInterval(async () => {
+          const stillRunning = await loadPredictions();
+          if (!stillRunning && interval) {
+            clearInterval(interval);
+            interval = null;
+          }
+        }, 4000);
+      }
+    };
+
+    startPolling();
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, []);
 
   if (loading) {
     return <div className="predictions-loading">Loading predictions...</div>;
@@ -118,53 +160,63 @@ useEffect(() => {
 
       <div className="predictions-grid">
         {jobs.map((job) => {
-          const preview =
-            job.type === "lookbook"
-              ? job.mediaUrls?.[0] || job.mediaUrl
-              : job.mediaUrl;
+          const status = (job.status || "").toLowerCase().trim();
 
-          const status = job.status?.toLowerCase();
+          const mainUrl =
+            job.type === "hero"
+              ? job.mediaUrl
+              : job.type === "lookbook"
+              ? job.mediaUrls?.[0]
+              : job.mediaUrl;
 
           return (
             <div className="prediction-card" key={job.id}>
-              
-              {/* IMAGE */}
               <div className="prediction-image">
-                {status === "failed" ? (
+
+                {status === "failed" && (
                   <div className="prediction-placeholder">❌ Failed</div>
-                ) : preview ? (
-                  job.type === "reel" ? (
-                    <video src={preview} controls />
+                )}
+
+                {status !== "failed" && job.type === "hero" && job.mediaUrl && (
+                  <img src={job.mediaUrl} alt="Hero" />
+                )}
+
+                {status !== "failed" && job.type === "reel" && (
+                  job.mediaUrl ? (
+                    <video src={job.mediaUrl} controls />
                   ) : (
-                    <img src={preview} alt="preview" />
+                    <div className="prediction-placeholder">Processing...</div>
                   )
-                ) : (
-                  <div className="prediction-placeholder">⏳ Processing...</div>
+                )}
+
+                {status !== "failed" && job.type === "lookbook" && (
+                  job.mediaUrls?.length ? (
+                    <img src={job.mediaUrls[0]} alt="Lookbook" />
+                  ) : (
+                    <div className="prediction-placeholder">Preparing...</div>
+                  )
                 )}
               </div>
 
-              {/* ACTIONS */}
               <div className="prediction-actions">
                 <button onClick={() => handleShare(job)}>📤 Share</button>
 
-                <button onClick={() => handleDownload(preview || null)}>
+                <button onClick={() => handleDownload(mainUrl || null)}>
                   ⬇️ Download
                 </button>
 
                 <button>🔍 View</button>
               </div>
 
-              {/* META */}
               <div className="prediction-meta">
                 <span>
-                  {new Date(job.createdAt).toLocaleDateString()} •{" "}
-                  {job.creditsUsed} credit
+                  {new Date(job.createdAt).toLocaleDateString()} • {job.creditsUsed} credit
                 </span>
 
                 <span className={`status ${status}`}>
                   {status === "completed"
                     ? "✅ Ready"
-                    : ["running", "processing", "pending"].includes(status)
+                    : ["running", "processing", "pending", "queued"].includes(status)
                     ? "⏳ Processing"
                     : "❌ Failed"}
                 </span>
@@ -174,7 +226,7 @@ useEffect(() => {
         })}
       </div>
 
-      {/* ================= SHARE MODAL ================= */}
+      {/* SHARE MODAL */}
       {shareData && (
         <div
           style={{
@@ -183,28 +235,36 @@ useEffect(() => {
             background: "rgba(0,0,0,0.9)",
             zIndex: 9999,
             overflowY: "auto",
-            padding: 20,
+            padding: "40px 20px",
           }}
         >
           <button
-            onClick={() => setShareData(null)}
+            onClick={() => {
+  setShareData(null);
+}}
             style={{
               position: "fixed",
               top: 20,
               right: 20,
+              zIndex: 10000,
               background: "#000",
               color: "#fff",
-              padding: 10,
+              padding: "10px 14px",
               borderRadius: 6,
             }}
           >
             ✕ Close
           </button>
 
-          {/* PREVIEW */}
-          <div style={{ maxWidth: 600, margin: "40px auto" }}>
-            <SharePanel data={{ asset: { media: shareData.media } }} />
+          <div style={{ textAlign: "center", marginBottom: 30 }}>
+            <p style={{ color: "#fff" }}>Scan to open on mobile</p>
+            <QRCodeCanvas value={shareData.shareUrl} size={180} />
+            <p style={{ color: "#aaa", fontSize: 12 }}>
+              {shareData.shareUrl}
+            </p>
           </div>
+
+          <SharePanel data={shareData} />
         </div>
       )}
     </div>
