@@ -127,10 +127,20 @@ export default function PredictionsPage() {
 
       setJobs(jobsData);
 
-      return jobsData.some((job) => {
-        const status = (job.status || "").toLowerCase().trim();
-        return ["running", "processing", "pending", "queued"].includes(status);
-      });
+      const hasRunningJobs = jobsData.some((job) => {
+  const status = (job.status || "").toLowerCase().trim();
+
+  return (
+    status === "running" ||
+    status === "processing" ||
+    status === "pending" ||
+    status === "queued"
+  );
+});
+
+console.log("🧠 POLLING CHECK:", jobsData.map(j => j.status));
+
+return hasRunningJobs;
 
     } catch (err) {
       console.error("Predictions fetch error:", err);
@@ -150,9 +160,10 @@ export default function PredictionsPage() {
         interval = setInterval(async () => {
           const stillRunning = await loadPredictions();
           if (!stillRunning && interval) {
-            clearInterval(interval);
-            interval = null;
-          }
+  console.log("🛑 STOP POLLING");
+  clearInterval(interval);
+  interval = null;
+}
         }, 4000);
       }
     };
