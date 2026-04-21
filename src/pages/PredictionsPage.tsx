@@ -85,7 +85,12 @@ export default function PredictionsPage() {
   // ================= FETCH =================
   const loadPredictions = async () => {
   try {
-    const res = await fetch(`${API_BASE}/api/predictions`, {
+    const token = localStorage.getItem("token");
+
+const res = await fetch(`${API_BASE}/api/predictions`, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
   cache: "no-store",
 });
 
