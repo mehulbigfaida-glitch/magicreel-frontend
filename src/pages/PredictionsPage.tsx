@@ -118,21 +118,30 @@ const res = await fetch(`${API_BASE}/api/predictions`, {
   if (type === "reel") {
     mediaUrl = job.reelUrl || null;
   }
+if (type === "lookbook") {
+  let raw = job.lookbook;
 
-  if (type === "lookbook") {
-    if (job.lookbook) {
   try {
-    const parsed =
-      typeof job.lookbook === "string"
-        ? JSON.parse(job.lookbook)
-        : job.lookbook;
+    // 1. Parse string safely
+    if (typeof raw === "string") {
+      raw = JSON.parse(raw);
+    }
 
-    mediaUrls = Array.isArray(parsed) ? parsed : [];
-  } catch {
+    // 2. Handle object → convert to array
+    if (raw && typeof raw === "object" && !Array.isArray(raw)) {
+      raw = Object.values(raw);
+    }
+
+    // 3. Final sanitize (CRITICAL)
+    mediaUrls = (Array.isArray(raw) ? raw : []).filter(
+      (url) => typeof url === "string" && url.startsWith("http")
+    );
+
+  } catch (err) {
+    console.error("LOOKBOOK PARSE FAILED:", job.lookbook);
     mediaUrls = [];
   }
 }
-  }
 
   return {
     id: job.id,
