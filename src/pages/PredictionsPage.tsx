@@ -85,7 +85,7 @@ export default function PredictionsPage() {
   // ================= FETCH =================
   const loadPredictions = async () => {
   try {
-    const res = await fetch(`${API_BASE}/api/predictions`, {
+    const res = await fetch(`${API_BASE}/api/predictions/me`, {
       cache: "no-store",
     });
 
