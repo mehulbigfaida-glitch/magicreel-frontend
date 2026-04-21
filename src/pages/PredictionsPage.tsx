@@ -99,7 +99,12 @@ export default function PredictionsPage() {
     try {
       const res = await fetch(`${API_BASE}/api/predictions`, {
   cache: "no-store",
+}).catch((err) => {
+  console.warn("⚠️ Ignoring fetch error:", err);
+  return null;
 });
+
+if (!res) return false;
       const data = await res.json();
 
       // ✅ FIXED MAPPING
@@ -151,29 +156,43 @@ return hasRunningJobs;
   };
 
   useEffect(() => {
-    let interval: ReturnType<typeof setInterval> | null = null;
+  let interval: ReturnType<typeof setInterval> | null = null;
 
-    const startPolling = async () => {
-      const hasRunningJobs = await loadPredictions();
+  const MAX_POLL_TIME = 30000; // 30 seconds
+  const startTime = Date.now();
 
-      if (hasRunningJobs) {
-        interval = setInterval(async () => {
-          const stillRunning = await loadPredictions();
-          if (!stillRunning && interval) {
-  console.log("🛑 STOP POLLING");
-  clearInterval(interval);
-  interval = null;
-}
-        }, 4000);
-      }
-    };
+  const startPolling = async () => {
+    const hasRunningJobs = await loadPredictions();
 
-    startPolling();
+    if (hasRunningJobs) {
+      interval = setInterval(async () => {
+        const stillRunning = await loadPredictions();
 
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, []);
+        const elapsed = Date.now() - startTime;
+
+        console.log("⏱️ Polling time:", elapsed);
+
+        // ✅ STOP CONDITIONS
+        if (!stillRunning || elapsed > MAX_POLL_TIME) {
+          console.log("🛑 STOP POLLING (done or timeout)");
+
+          if (interval) {
+            clearInterval(interval);
+            interval = null;
+          }
+        }
+      }, 4000);
+    }
+  };
+
+  startPolling();
+
+  return () => {
+    if (interval) {
+      clearInterval(interval);
+    }
+  };
+}, []);
 
   if (loading) {
     return <div className="predictions-loading">Loading predictions...</div>;
