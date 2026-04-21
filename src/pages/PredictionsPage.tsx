@@ -115,9 +115,18 @@ export default function PredictionsPage() {
   }
 
   if (type === "lookbook") {
-    mediaUrls = Array.isArray(job.lookbook)
-      ? job.lookbook
-      : [];
+    if (job.lookbook) {
+  try {
+    const parsed =
+      typeof job.lookbook === "string"
+        ? JSON.parse(job.lookbook)
+        : job.lookbook;
+
+    mediaUrls = Array.isArray(parsed) ? parsed : [];
+  } catch {
+    mediaUrls = [];
+  }
+}
   }
 
   return {
