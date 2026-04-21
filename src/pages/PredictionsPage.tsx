@@ -73,7 +73,6 @@ export default function PredictionsPage() {
       }
 
       const shareUrl = `https://magicreel-frontend.vercel.app/s/${json.asset.id}`;
-
       setShareData({ media, shareUrl });
 
     } catch (err) {
@@ -84,117 +83,107 @@ export default function PredictionsPage() {
 
   // ================= FETCH =================
   const loadPredictions = async () => {
-  try {
-    const token = localStorage.getItem("token");
+    try {
+      const token = localStorage.getItem("token");
 
-const res = await fetch(`${API_BASE}/api/predictions`, {
-  headers: {
-    Authorization: `Bearer ${token}`,
-  },
-  cache: "no-store",
-});
+      const res = await fetch(`${API_BASE}/api/predictions`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: "no-store",
+      });
 
-    const data = await res.json();
+      if (!res.ok) {
+        console.error("❌ API FAILED:", res.status);
+        return false;
+      }
 
-    const jobsData: Prediction[] = (data || []).map((job: any) => {
-  let type: "hero" | "lookbook" | "reel" = "hero";
-  let mediaUrl: string | null = null;
-  let mediaUrls: string[] = [];
+      const data = await res.json();
 
-  // ✅ DETECT TYPE CORRECTLY
-  if (job.lookbook && job.lookbook.length > 0) {
-    type = "lookbook";
-  } else if (job.reelUrl) {
-    type = "reel";
-  } else {
-    type = "hero";
-  }
+      const jobsData: Prediction[] = (data || []).map((job: any) => {
+        let type: "hero" | "lookbook" | "reel" = "hero";
+        let mediaUrl: string | null = null;
+        let mediaUrls: string[] = [];
 
-  // ✅ MAP MEDIA CORRECTLY
-  if (type === "hero") {
-    mediaUrl = job.outputImageUrl || job.heroImageUrl || null;
-  }
+        // DETECT TYPE
+        if (job.lookbook) {
+          type = "lookbook";
+        } else if (job.reelUrl) {
+          type = "reel";
+        } else {
+          type = "hero";
+        }
 
-  if (type === "reel") {
-    mediaUrl = job.reelUrl || null;
-  }
-if (type === "lookbook") {
-  let raw = job.lookbook;
+        // HERO
+        if (type === "hero") {
+          mediaUrl = job.outputImageUrl || job.heroImageUrl || null;
+        }
 
-  try {
-    // 1. Parse string safely
-    if (typeof raw === "string") {
-      raw = JSON.parse(raw);
+        // REEL
+        if (type === "reel") {
+          mediaUrl = job.reelUrl || null;
+        }
+
+        // LOOKBOOK (FINAL FIX)
+        if (type === "lookbook") {
+          let raw = job.lookbook;
+
+          try {
+            if (typeof raw === "string") {
+              raw = JSON.parse(raw);
+            }
+
+            if (raw && typeof raw === "object" && !Array.isArray(raw)) {
+              raw = Object.values(raw);
+            }
+
+            mediaUrls = (Array.isArray(raw) ? raw : []).filter(
+              (url) => typeof url === "string" && url.startsWith("http")
+            );
+          } catch {
+            mediaUrls = [];
+          }
+        }
+
+        return {
+          id: job.id,
+          type,
+          status: job.status ?? "completed",
+          createdAt: job.createdAt,
+          mediaUrl,
+          mediaUrls,
+          creditsUsed:
+            type === "lookbook" ? 2 :
+            type === "reel" ? 3 : 1,
+        };
+      });
+
+      setJobs(jobsData);
+
+      return jobsData.some((job) => {
+        const s = (job.status || "").toLowerCase();
+        return ["running", "processing", "pending", "queued"].includes(s);
+      });
+
+    } catch (err) {
+      console.error("Fetch error:", err);
+      return false;
+    } finally {
+      setLoading(false);
     }
-
-    // 2. Handle object → convert to array
-    if (raw && typeof raw === "object" && !Array.isArray(raw)) {
-      raw = Object.values(raw);
-    }
-
-    // 3. Final sanitize (CRITICAL)
-    mediaUrls = (Array.isArray(raw) ? raw : []).filter(
-      (url) => typeof url === "string" && url.startsWith("http")
-    );
-
-  } catch (err) {
-    console.error("LOOKBOOK PARSE FAILED:", job.lookbook);
-    mediaUrls = [];
-  }
-}
-
-  return {
-    id: job.id,
-    type,
-    status: job.status ?? "completed",
-    createdAt: job.createdAt,
-
-    mediaUrl,
-    mediaUrls,
-
-    creditsUsed:
-      type === "lookbook" ? 2 :
-      type === "reel" ? 3 : 1,
   };
-});
-
-    setJobs(jobsData);
-
-    const hasRunningJobs = jobsData.some((job) => {
-      const status = (job.status || "").toLowerCase().trim();
-
-      return (
-        status === "running" ||
-        status === "processing" ||
-        status === "pending" ||
-        status === "queued"
-      );
-    });
-
-    return hasRunningJobs;
-  } catch (err) {
-    console.error("Fetch error:", err);
-    return false;
-  } finally {
-    setLoading(false);
-  }
-};
 
   // ================= POLLING =================
   useEffect(() => {
     let interval: any = null;
-    const startTime = Date.now();
-    const MAX_TIME = 30000;
 
     const startPolling = async () => {
-      const hasRunning = await loadPredictions();
+      const running = await loadPredictions();
 
-      if (hasRunning) {
+      if (running) {
         interval = setInterval(async () => {
           const stillRunning = await loadPredictions();
-          const elapsed = Date.now() - startTime;
-
-          if (!stillRunning || elapsed > MAX_TIME) {
+          if (!stillRunning && interval) {
             clearInterval(interval);
           }
         }, 4000);
@@ -212,7 +201,6 @@ if (type === "lookbook") {
     return <div className="predictions-loading">Loading predictions...</div>;
   }
 
-  // ================= UI =================
   return (
     <div className="predictions-page">
       <h1 className="predictions-title">Predictions</h1>
@@ -237,35 +225,24 @@ if (type === "lookbook") {
                 )}
 
                 {status !== "failed" && job.type === "hero" && (
-                  job.mediaUrl ? (
-                    <img src={job.mediaUrl} />
-                  ) : (
-                    <div className="prediction-placeholder">No Image</div>
-                  )
+                  job.mediaUrl ? <img src={job.mediaUrl} /> :
+                  <div className="prediction-placeholder">No Image</div>
                 )}
 
                 {status !== "failed" && job.type === "reel" && (
-                  job.mediaUrl ? (
-                    <video src={job.mediaUrl} controls />
-                  ) : (
-                    <div className="prediction-placeholder">Processing...</div>
-                  )
+                  job.mediaUrl ? <video src={job.mediaUrl} controls /> :
+                  <div className="prediction-placeholder">Processing...</div>
                 )}
 
                 {status !== "failed" && job.type === "lookbook" && (
-                  job.mediaUrls?.length ? (
-                    <img src={job.mediaUrls[0]} />
-                  ) : (
-                    <div className="prediction-placeholder">Preparing...</div>
-                  )
+                  job.mediaUrls?.length ? <img src={job.mediaUrls[0]} /> :
+                  <div className="prediction-placeholder">No Image</div>
                 )}
               </div>
 
               <div className="prediction-actions">
                 <button onClick={() => handleShare(job)}>📤 Share</button>
-                <button onClick={() => handleDownload(mainUrl || null)}>
-                  ⬇️ Download
-                </button>
+                <button onClick={() => handleDownload(mainUrl || null)}>⬇️ Download</button>
                 <button>🔍 View</button>
               </div>
 
@@ -287,7 +264,6 @@ if (type === "lookbook") {
         })}
       </div>
 
-      {/* SHARE MODAL */}
       {shareData && (
         <div style={{
           position: "fixed",
@@ -297,10 +273,7 @@ if (type === "lookbook") {
           overflowY: "auto",
           padding: 20,
         }}>
-          <button
-            onClick={() => setShareData(null)}
-            style={{ position: "fixed", top: 20, right: 20 }}
-          >
+          <button onClick={() => setShareData(null)} style={{ position: "fixed", top: 20, right: 20 }}>
             ✕
           </button>
 
