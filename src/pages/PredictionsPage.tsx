@@ -1,85 +1,20 @@
 import { useEffect, useState } from "react";
-import "./Predictions.css";
-import { API_BASE } from "../config/api";
-import SharePanel from "../components/SharePanel";
-import { QRCodeCanvas } from "qrcode.react";
+
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 type Prediction = {
   id: string;
   type: "hero" | "lookbook" | "reel";
   status: string;
   createdAt: string;
-
-  mediaUrl?: string | null;
-  mediaUrls?: string[];
-
-  creditsUsed?: number;
+  mediaUrl: string | null;
+  mediaUrls: string[];
+  creditsUsed: number;
 };
 
 export default function PredictionsPage() {
   const [jobs, setJobs] = useState<Prediction[]>([]);
   const [loading, setLoading] = useState(true);
-  const [shareData, setShareData] = useState<any>(null);
-
-  // ================= DOWNLOAD =================
-  const handleDownload = (url: string | null) => {
-    if (!url) return;
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "magicreel";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  // ================= SHARE =================
-  const handleShare = async (job: Prediction) => {
-    try {
-      let media: { url: string }[] = [];
-
-      if (job.type === "hero" && job.mediaUrl) {
-        media = [{ url: job.mediaUrl }];
-      }
-
-      if (job.type === "lookbook") {
-        const images = job.mediaUrls || [];
-        media = images
-          .filter((url) => typeof url === "string" && url)
-          .map((url) => ({ url }));
-      }
-
-      if (job.type === "reel" && job.mediaUrl) {
-        media = [{ url: job.mediaUrl }];
-      }
-
-      if (!media.length) {
-        alert("No media found");
-        return;
-      }
-
-      const res = await fetch(
-        "https://magicreel-backend-production.up.railway.app/api/share",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type: job.type, media }),
-        }
-      );
-
-      const json = await res.json();
-
-      if (!json?.asset?.id) {
-        throw new Error("Share failed");
-      }
-
-      const shareUrl = `https://magicreel-frontend.vercel.app/s/${json.asset.id}`;
-      setShareData({ media, shareUrl });
-
-    } catch (err) {
-      console.error("Share error:", err);
-      alert("Share failed");
-    }
-  };
 
   // ================= FETCH =================
   const loadPredictions = async () => {
@@ -95,114 +30,95 @@ export default function PredictionsPage() {
 
       if (!res.ok) {
         console.error("❌ API FAILED:", res.status);
+        setLoading(false);
         return false;
       }
 
       const data = await res.json();
 
-      const jobsData: Prediction[] = (data || []).map((job: any) => {
-        let type: "hero" | "lookbook" | "reel" = "hero";
-        let mediaUrl: string | null = null;
-        let mediaUrls: string[] = [];
+      // ✅ CLEAN + FILTERED MAPPING
+      const jobsData: Prediction[] = (data || [])
+        .map((job: any) => {
+          let type: "hero" | "lookbook" | "reel" = "hero";
+          let mediaUrl: string | null = null;
+          let mediaUrls: string[] = [];
 
-        // DETECT TYPE
-        if (job.lookbook) {
-          type = "lookbook";
-        } else if (job.reelUrl) {
-          type = "reel";
-        } else {
-          type = "hero";
-        }
-
-        // HERO
-        if (type === "hero") {
-          mediaUrl = job.outputImageUrl || job.heroImageUrl || null;
-        }
-
-        // REEL
-        if (type === "reel") {
-          mediaUrl = job.reelUrl || null;
-        }
-
-        // LOOKBOOK (FINAL FIX)
-        if (type === "lookbook") {
-          let raw = job.lookbook;
-
-          try {
-            if (typeof raw === "string") {
-              raw = JSON.parse(raw);
-            }
-
-            if (raw && typeof raw === "object" && !Array.isArray(raw)) {
-              raw = Object.values(raw);
-            }
-
-            mediaUrls = (Array.isArray(raw) ? raw : []).filter(
-              (url) => typeof url === "string" && url.startsWith("http")
-            );
-          } catch {
-            mediaUrls = [];
+          // ✅ TYPE DETECTION
+          if (Array.isArray(job.lookbook) && job.lookbook.length > 0) {
+            type = "lookbook";
+            mediaUrls = job.lookbook;
+          } else if (job.reelUrl) {
+            type = "reel";
+            mediaUrl = job.reelUrl;
+          } else if (job.heroImageUrl) {
+            type = "hero";
+            mediaUrl = job.heroImageUrl;
           }
-        }
 
-        return {
-          id: job.id,
-          type,
-          status: job.status ?? "completed",
-          createdAt: job.createdAt,
-          mediaUrl,
-          mediaUrls,
-          creditsUsed:
-            type === "lookbook" ? 2 :
-            type === "reel" ? 3 : 1,
-        };
-      });
+          return {
+            id: job.id,
+            type,
+            status: job.status || "completed",
+            createdAt: job.createdAt,
+            mediaUrl,
+            mediaUrls,
+            creditsUsed: job.creditsUsed ?? 1,
+          };
+        })
+
+        // ❗ REMOVE BROKEN JOBS (MAIN FIX)
+        .filter((job: Prediction) => {
+          if (job.type === "lookbook") return job.mediaUrls.length > 0;
+          return !!job.mediaUrl;
+        });
 
       setJobs(jobsData);
+      setLoading(false);
 
-      return jobsData.some((job) => {
-        const s = (job.status || "").toLowerCase();
-        return !["completed", "failed"].includes(s);
+      // ✅ CHECK RUNNING JOBS
+      const hasRunningJobs = jobsData.some((job) => {
+        const status = (job.status || "").toLowerCase().trim();
+        return (
+          status === "running" ||
+          status === "processing" ||
+          status === "pending" ||
+          status === "queued"
+        );
       });
 
+      return hasRunningJobs;
     } catch (err) {
-      console.error("Fetch error:", err);
-      return false;
-    } finally {
+      console.error("❌ Fetch error:", err);
       setLoading(false);
+      return false;
     }
   };
 
   // ================= POLLING =================
   useEffect(() => {
-  let interval: any = null;
-  let attempts = 0;
+    let interval: any = null;
 
-  const startPolling = async () => {
-    const running = await loadPredictions();
+    const startPolling = async () => {
+      const running = await loadPredictions();
 
-    if (running) {
-      interval = setInterval(async () => {
-        attempts++;
+      if (running) {
+        interval = setInterval(async () => {
+          const stillRunning = await loadPredictions();
+          if (!stillRunning && interval) {
+            clearInterval(interval);
+          }
+        }, 4000);
+      }
+    };
 
-        const stillRunning = await loadPredictions();
+    startPolling();
 
-        // ✅ STOP CONDITIONS (VERY IMPORTANT)
-        if (!stillRunning || attempts > 10) {
-          console.log("🛑 STOP POLLING");
-          clearInterval(interval);
-        }
-      }, 4000);
-    }
-  };
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, []);
 
-  startPolling();
-
-  return () => {
-    if (interval) clearInterval(interval);
-  };
-}, []);
-
+  // ================= UI =================
   if (loading) {
     return <div className="predictions-loading">Loading predictions...</div>;
   }
@@ -212,7 +128,7 @@ export default function PredictionsPage() {
       <h1 className="predictions-title">Predictions</h1>
 
       <div className="predictions-grid">
-        {jobs.map((job) => {
+        {jobs.map((job: Prediction) => {
           const status = (job.status || "").toLowerCase();
 
           const mainUrl =
@@ -225,42 +141,65 @@ export default function PredictionsPage() {
           return (
             <div className="prediction-card" key={job.id}>
               <div className="prediction-image">
-
                 {status === "failed" && (
                   <div className="prediction-placeholder">❌ Failed</div>
                 )}
 
                 {status !== "failed" && job.type === "hero" && (
-                  job.mediaUrl ? <img src={job.mediaUrl} /> :
-                  <div className="prediction-placeholder">No Image</div>
+                  job.mediaUrl ? (
+                    <img src={job.mediaUrl} />
+                  ) : (
+                    <div className="prediction-placeholder">Processing...</div>
+                  )
                 )}
 
                 {status !== "failed" && job.type === "reel" && (
-                  job.mediaUrl ? <video src={job.mediaUrl} controls /> :
-                  <div className="prediction-placeholder">Processing...</div>
+                  job.mediaUrl ? (
+                    <video src={job.mediaUrl} controls />
+                  ) : (
+                    <div className="prediction-placeholder">Processing...</div>
+                  )
                 )}
 
                 {status !== "failed" && job.type === "lookbook" && (
-                  job.mediaUrls?.length ? <img src={job.mediaUrls[0]} /> :
-                  <div className="prediction-placeholder">No Image</div>
+                  job.mediaUrls?.length ? (
+                    <img src={job.mediaUrls[0]} />
+                  ) : (
+                    <div className="prediction-placeholder">Processing...</div>
+                  )
                 )}
               </div>
 
               <div className="prediction-actions">
-                <button onClick={() => handleShare(job)}>📤 Share</button>
-                <button onClick={() => handleDownload(mainUrl || null)}>⬇️ Download</button>
-                <button>🔍 View</button>
+                <button onClick={() => mainUrl && window.open(mainUrl)}>
+                  🔍 View
+                </button>
+
+                <button
+                  onClick={() => {
+                    if (!mainUrl) return;
+                    const link = document.createElement("a");
+                    link.href = mainUrl;
+                    link.download = "magicreel";
+                    link.click();
+                  }}
+                >
+                  ⬇️ Download
+                </button>
               </div>
 
               <div className="prediction-meta">
                 <span>
-                  {new Date(job.createdAt).toLocaleDateString()} • {job.creditsUsed} credit
+                  {new Date(job.createdAt).toLocaleDateString()} •{" "}
+                  {job.creditsUsed} credit
                 </span>
 
                 <span className={`status ${status}`}>
                   {status === "completed"
                     ? "✅ Ready"
-                    : ["running", "processing", "pending", "queued"].includes(status)
+                    : ["running", "processing", "pending", "queued"].includes(
+                        status
+                      )
                     ? "⏳ Processing"
                     : "❌ Failed"}
                 </span>
@@ -269,28 +208,6 @@ export default function PredictionsPage() {
           );
         })}
       </div>
-
-      {shareData && (
-        <div style={{
-          position: "fixed",
-          inset: 0,
-          background: "rgba(0,0,0,0.9)",
-          zIndex: 9999,
-          overflowY: "auto",
-          padding: 20,
-        }}>
-          <button onClick={() => setShareData(null)} style={{ position: "fixed", top: 20, right: 20 }}>
-            ✕
-          </button>
-
-          <div style={{ textAlign: "center", marginBottom: 20 }}>
-            <QRCodeCanvas value={shareData.shareUrl} size={160} />
-            <p style={{ color: "#aaa" }}>{shareData.shareUrl}</p>
-          </div>
-
-          <SharePanel data={shareData} />
-        </div>
-      )}
     </div>
   );
 }
