@@ -97,7 +97,9 @@ export default function PredictionsPage() {
   // FETCH
   const loadPredictions = async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/predictions`);
+      const res = await fetch(`${API_BASE}/api/predictions`, {
+  cache: "no-store",
+});
       const data = await res.json();
 
       // ✅ FIXED MAPPING
