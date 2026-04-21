@@ -1,10 +1,20 @@
 import { useState } from "react";
 
 export default function SharePanel({ data }: { data: any }) {
-  const images = data?.asset?.media || [];
+  // ✅ SAFE DATA EXTRACTION
+  const media = data?.asset?.media ?? [];
 
-  const hero = images[0];
-  const others = images.slice(1);
+  // 🚨 HARD GUARD (IMPORTANT)
+  if (!media || media.length === 0) {
+    return (
+      <div style={{ padding: 40, textAlign: "center" }}>
+        <h3>Loading images...</h3>
+      </div>
+    );
+  }
+
+  const hero = media[0];
+  const others = media.slice(1);
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -19,24 +29,14 @@ export default function SharePanel({ data }: { data: any }) {
   const pageUrl = window.location.href;
 
   return (
-    <div
-      style={{
-        maxWidth: 600,
-        margin: "0 auto",
-        padding: 16,
-      }}
-    >
+    <div style={{ maxWidth: 600, margin: "0 auto", padding: 16 }}>
       {/* HERO */}
-      {hero && (
+      {hero?.url && (
         <div style={{ marginBottom: 16 }}>
           <img
             src={hero.url}
             alt="hero"
-            style={{
-              width: "100%",
-              borderRadius: 16,
-              objectFit: "cover",
-            }}
+            style={{ width: "100%", borderRadius: 16 }}
           />
         </div>
       )}
@@ -49,21 +49,23 @@ export default function SharePanel({ data }: { data: any }) {
           gap: 10,
         }}
       >
-        {others.map((item: any, i: number) => (
-          <img
-            key={i}
-            src={item.url}
-            onClick={() => setSelectedImage(item.url)}
-            style={{
-              width: "100%",
-              borderRadius: 12,
-              cursor: "pointer",
-            }}
-          />
-        ))}
+        {others.map((item: any, i: number) =>
+          item?.url ? (
+            <img
+              key={i}
+              src={item.url}
+              onClick={() => setSelectedImage(item.url)}
+              style={{
+                width: "100%",
+                borderRadius: 12,
+                cursor: "pointer",
+              }}
+            />
+          ) : null
+        )}
       </div>
 
-      {/* SHARE ACTIONS */}
+      {/* SHARE BUTTONS */}
       <div
         style={{
           display: "flex",
@@ -90,10 +92,10 @@ export default function SharePanel({ data }: { data: any }) {
         </button>
       </div>
 
-      {/* WHATSAPP PANEL */}
+      {/* WHATSAPP */}
       {activePlatform === "whatsapp" && (
         <div style={panelStyle}>
-          <h3>📲 Share on WhatsApp</h3>
+          <h3>📲 WhatsApp Share</h3>
 
           <textarea
             value={caption}
@@ -104,6 +106,7 @@ export default function SharePanel({ data }: { data: any }) {
 
           <button
             onClick={() => {
+              // ✅ IMPORTANT FIX
               const url = `https://wa.me/?text=${encodeURIComponent(
                 caption + "\n\n" + pageUrl
               )}`;
@@ -117,10 +120,10 @@ export default function SharePanel({ data }: { data: any }) {
         </div>
       )}
 
-      {/* INSTAGRAM PANEL */}
+      {/* INSTAGRAM */}
       {activePlatform === "instagram" && (
         <div style={panelStyle}>
-          <h3>📸 Instagram Post Assistant</h3>
+          <h3>📸 Instagram Assistant</h3>
 
           <textarea
             value={caption}
@@ -129,20 +132,13 @@ export default function SharePanel({ data }: { data: any }) {
             style={textareaStyle}
           />
 
-          <div style={{ marginTop: 10 }}>
-            <strong>Steps to Post:</strong>
-            <ol>
-              <li>Click "Download Images"</li>
-              <li>Open Instagram</li>
-              <li>Create Post → Select multiple images</li>
-              <li>Paste caption</li>
-              <li>Publish 🚀</li>
-            </ol>
-          </div>
+          <p style={{ fontSize: 12 }}>
+            Download images → Open Instagram → Upload → Paste caption
+          </p>
 
           <button
             onClick={() => {
-              images.forEach((m: any) => {
+              media.forEach((m: any) => {
                 if (m?.url) window.open(m.url, "_blank");
               });
             }}
@@ -154,7 +150,7 @@ export default function SharePanel({ data }: { data: any }) {
         </div>
       )}
 
-      {/* FULLSCREEN VIEW */}
+      {/* FULLSCREEN */}
       {selectedImage && (
         <div
           onClick={() => setSelectedImage(null)}
@@ -163,8 +159,8 @@ export default function SharePanel({ data }: { data: any }) {
             inset: 0,
             background: "rgba(0,0,0,0.9)",
             display: "flex",
-            alignItems: "center",
             justifyContent: "center",
+            alignItems: "center",
             zIndex: 9999,
           }}
         >
@@ -181,8 +177,6 @@ export default function SharePanel({ data }: { data: any }) {
     </div>
   );
 }
-
-/* ---------- STYLES ---------- */
 
 const panelStyle: React.CSSProperties = {
   position: "fixed",
