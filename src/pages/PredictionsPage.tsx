@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const API_BASE = import.meta.env.VITE_API_BASE;
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 type Prediction = {
   id: string;
@@ -36,60 +36,52 @@ export default function PredictionsPage() {
 
       const data = await res.json();
 
-      // ✅ FINAL CORRECT MAPPING (ALIGNED WITH DB)
-const jobsData: Prediction[] = (data || []).map((job: any) => {
-  let type: "hero" | "lookbook" | "reel" = "hero";
-  let mediaUrl: string | null = null;
-  let mediaUrls: string[] = [];
+      // ✅ CLEAN + STABLE MAPPING (FINAL)
+      const jobsData: Prediction[] = (data || []).map((job: any) => {
+        let type: "hero" | "lookbook" | "reel" = "hero";
+        let mediaUrl: string | null = null;
+        let mediaUrls: string[] = [];
 
-  // ✅ TYPE FROM DB
-  if (job.type === "LOOKBOOK") {
-    type = "lookbook";
+        // 🔥 BACKEND-ALIGNED MAPPING (CRITICAL)
+        if (job.type === "LOOKBOOK" && job.outputImageUrl) {
+          type = "lookbook";
+          mediaUrls = [job.outputImageUrl];
+        } else if (job.reelUrl) {
+          type = "reel";
+          mediaUrl = job.reelUrl;
+        } else if (job.outputImageUrl) {
+          type = "hero";
+          mediaUrl = job.outputImageUrl;
+        }
 
-    // lookbook is stored as JSON string
-    try {
-      mediaUrls = job.lookbook ? JSON.parse(job.lookbook) : [];
-    } catch {
-      mediaUrls = [];
-    }
-  } else if (job.type === "REEL") {
-    type = "reel";
-    mediaUrl = job.outputVideoUrl || null;
-  } else {
-    type = "hero";
+        return {
+          id: job.id,
+          type,
+          status: job.status || "completed",
+          createdAt: job.createdAt,
+          mediaUrl,
+          mediaUrls,
+          creditsUsed: job.creditsUsed ?? (type === "lookbook" ? 2 : 1),
+        };
+      });
 
-    // ✅ MAIN OUTPUT IMAGE
-    mediaUrl = job.outputImageUrl || null;
-  }
+      setJobs(jobsData);
+      setLoading(false);
 
-  return {
-    id: job.id,
-    type,
-    status: job.status || "completed",
-    createdAt: job.createdAt,
-    mediaUrl,
-    mediaUrls,
-    creditsUsed: job.creditsUsed ?? 1,
-  };
-});
-
-setJobs(jobsData);
-setLoading(false);
-
-      // ✅ CHECK RUNNING JOBS
-      const hasRunningJobs = jobsData.some((job) => {
-        const status = (job.status || "").toLowerCase().trim();
+      // polling control
+      const hasRunningJobs = jobsData.some((job: Prediction) => {
+        const s = (job.status || "").toLowerCase();
         return (
-          status === "running" ||
-          status === "processing" ||
-          status === "pending" ||
-          status === "queued"
+          s === "running" ||
+          s === "processing" ||
+          s === "pending" ||
+          s === "queued"
         );
       });
 
       return hasRunningJobs;
     } catch (err) {
-      console.error("❌ Fetch error:", err);
+      console.error("❌ FETCH ERROR:", err);
       setLoading(false);
       return false;
     }
@@ -97,22 +89,20 @@ setLoading(false);
 
   // ================= POLLING =================
   useEffect(() => {
-    let interval: any = null;
+    let interval: any;
 
-    const startPolling = async () => {
+    const start = async () => {
       const running = await loadPredictions();
 
       if (running) {
         interval = setInterval(async () => {
           const stillRunning = await loadPredictions();
-          if (!stillRunning && interval) {
-            clearInterval(interval);
-          }
+          if (!stillRunning && interval) clearInterval(interval);
         }, 4000);
       }
     };
 
-    startPolling();
+    start();
 
     return () => {
       if (interval) clearInterval(interval);
@@ -121,7 +111,7 @@ setLoading(false);
 
   // ================= UI =================
   if (loading) {
-    return <div className="predictions-loading">Loading predictions...</div>;
+    return <div className="predictions-loading">Loading...</div>;
   }
 
   return (
@@ -133,9 +123,7 @@ setLoading(false);
           const status = (job.status || "").toLowerCase();
 
           const mainUrl =
-            job.type === "hero"
-              ? job.mediaUrl
-              : job.type === "lookbook"
+            job.type === "lookbook"
               ? job.mediaUrls?.[0]
               : job.mediaUrl;
 
@@ -146,43 +134,49 @@ setLoading(false);
                   <div className="prediction-placeholder">❌ Failed</div>
                 )}
 
-                {status !== "failed" && job.type === "hero" && (
+                {job.type === "hero" && (
                   job.mediaUrl ? (
                     <img src={job.mediaUrl} />
                   ) : (
-                    <div className="prediction-placeholder">Processing...</div>
+                    <div className="prediction-placeholder">
+                      ⚠️ Missing Image
+                    </div>
                   )
                 )}
 
-                {status !== "failed" && job.type === "reel" && (
+                {job.type === "reel" && (
                   job.mediaUrl ? (
                     <video src={job.mediaUrl} controls />
                   ) : (
-                    <div className="prediction-placeholder">Processing...</div>
+                    <div className="prediction-placeholder">
+                      ⚠️ Missing Video
+                    </div>
                   )
                 )}
 
-                {status !== "failed" && job.type === "lookbook" && (
-                  job.mediaUrls?.length ? (
+                {job.type === "lookbook" && (
+                  job.mediaUrls && job.mediaUrls.length > 0 ? (
                     <img src={job.mediaUrls[0]} />
                   ) : (
-                    <div className="prediction-placeholder">Processing...</div>
+                    <div className="prediction-placeholder">
+                      ⚠️ Missing Lookbook
+                    </div>
                   )
                 )}
               </div>
 
               <div className="prediction-actions">
-                <button onClick={() => mainUrl && window.open(mainUrl)}>
+                <button onClick={() => window.open(mainUrl || "", "_blank")}>
                   🔍 View
                 </button>
 
                 <button
                   onClick={() => {
                     if (!mainUrl) return;
-                    const link = document.createElement("a");
-                    link.href = mainUrl;
-                    link.download = "magicreel";
-                    link.click();
+                    const a = document.createElement("a");
+                    a.href = mainUrl;
+                    a.download = "magicreel";
+                    a.click();
                   }}
                 >
                   ⬇️ Download
@@ -196,13 +190,7 @@ setLoading(false);
                 </span>
 
                 <span className={`status ${status}`}>
-                  {status === "completed"
-                    ? "✅ Ready"
-                    : ["running", "processing", "pending", "queued"].includes(
-                        status
-                      )
-                    ? "⏳ Processing"
-                    : "❌ Failed"}
+                  {status === "completed" ? "✅ Ready" : "⏳"}
                 </span>
               </div>
             </div>
