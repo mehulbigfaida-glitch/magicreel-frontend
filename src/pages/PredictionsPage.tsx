@@ -45,15 +45,27 @@ export default function PredictionsPage() {
       }
 
       if (job.type === "lookbook") {
-        const hero = job.heroImageUrl;
+        
 
-        const poses =
-          job.lookbookImages?.filter((url) => url && url !== hero) || [];
+        // 🔥 STRICT ORDER + CLEAN
+// 🔥 CLEAN + TYPE SAFE
+const uniqueImages = Array.from(
+  new Set(
+    [job.heroImageUrl, ...(job.lookbookImages || [])]
+      .filter((img): img is string => typeof img === "string" && img.length > 0)
+  )
+);
 
-        media = [
-          ...(hero ? [{ url: hero }] : []),
-          ...poses.map((url) => ({ url })),
-        ];
+// Ensure hero first
+const orderedImages = job.heroImageUrl
+  ? [
+      job.heroImageUrl,
+      ...uniqueImages.filter((img) => img !== job.heroImageUrl),
+    ]
+  : uniqueImages;
+
+// FINAL MEDIA
+media = orderedImages.map((url) => ({ url }));
       }
 
       if (job.type === "reel" && job.reelUrl) {
