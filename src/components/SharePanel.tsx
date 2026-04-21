@@ -1,20 +1,25 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function SharePanel({ data }: { data: any }) {
-  const images = data?.media || [];
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  // ✅ ALWAYS USE FRESH DATA
+  const images = Array.isArray(data?.media) ? data.media : [];
 
   const hero = images[0];
   const others = images.slice(1);
 
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  // ✅ RESET WHEN DATA CHANGES
+  useEffect(() => {
+    setSelectedImage(null);
+  }, [data]);
 
   return (
     <div style={{ padding: 20, maxWidth: 900, margin: "0 auto" }}>
-      
-      {/* 🔥 TITLE */}
+
       <h2 style={{ marginBottom: 16 }}>✨ Shared Lookbook</h2>
 
-      {/* 🔥 HERO IMAGE */}
+      {/* HERO */}
       {hero && (
         <div style={{ marginBottom: 24 }}>
           <div
@@ -38,7 +43,7 @@ export default function SharePanel({ data }: { data: any }) {
         </div>
       )}
 
-      {/* 🖼 LOOKBOOK GRID */}
+      {/* POSES */}
       <div
         style={{
           display: "grid",
@@ -64,20 +69,13 @@ export default function SharePanel({ data }: { data: any }) {
                 width: "100%",
                 height: "100%",
                 objectFit: "cover",
-                transition: "transform 0.3s ease",
               }}
-              onMouseOver={(e) =>
-                (e.currentTarget.style.transform = "scale(1.05)")
-              }
-              onMouseOut={(e) =>
-                (e.currentTarget.style.transform = "scale(1)")
-              }
             />
           </div>
         ))}
       </div>
 
-      {/* 🔥 FULLSCREEN VIEW */}
+      {/* FULLSCREEN */}
       {selectedImage && (
         <div
           onClick={() => setSelectedImage(null)}
