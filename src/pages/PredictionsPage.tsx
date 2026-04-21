@@ -85,45 +85,55 @@ export default function PredictionsPage() {
   // ================= FETCH =================
   const loadPredictions = async () => {
   try {
-    const res = await fetch(`${API_BASE}/api/predictions/me`, {
-      cache: "no-store",
-    });
+    const res = await fetch(`${API_BASE}/api/predictions`, {
+  cache: "no-store",
+});
 
     const data = await res.json();
 
     const jobsData: Prediction[] = (data || []).map((job: any) => {
-      const rawType = job.type || "";
+  let type: "hero" | "lookbook" | "reel" = "hero";
+  let mediaUrl: string | null = null;
+  let mediaUrls: string[] = [];
 
-      const type =
-        rawType.toLowerCase().includes("look")
-          ? "lookbook"
-          : rawType.toLowerCase().includes("reel")
-          ? "reel"
-          : "hero";
+  // ✅ DETECT TYPE CORRECTLY
+  if (job.lookbook && job.lookbook.length > 0) {
+    type = "lookbook";
+  } else if (job.reelUrl) {
+    type = "reel";
+  } else {
+    type = "hero";
+  }
 
-      return {
-        id: job.id,
-        type,
-        status: job.status ?? "completed",
-        createdAt: job.createdAt,
+  // ✅ MAP MEDIA CORRECTLY
+  if (type === "hero") {
+    mediaUrl = job.outputImageUrl || job.heroImageUrl || null;
+  }
 
-        mediaUrl:
-          type === "hero"
-            ? job.heroImageUrl || null
-            : type === "reel"
-            ? job.reelUrl || null
-            : null,
+  if (type === "reel") {
+    mediaUrl = job.reelUrl || null;
+  }
 
-        mediaUrls:
-          type === "lookbook"
-            ? (job.lookbookImages || []).filter(
-                (u: any) => typeof u === "string" && u
-              )
-            : [],
+  if (type === "lookbook") {
+    mediaUrls = Array.isArray(job.lookbook)
+      ? job.lookbook
+      : [];
+  }
 
-        creditsUsed: job.creditsUsed ?? 1,
-      };
-    });
+  return {
+    id: job.id,
+    type,
+    status: job.status ?? "completed",
+    createdAt: job.createdAt,
+
+    mediaUrl,
+    mediaUrls,
+
+    creditsUsed:
+      type === "lookbook" ? 2 :
+      type === "reel" ? 3 : 1,
+  };
+});
 
     setJobs(jobsData);
 
