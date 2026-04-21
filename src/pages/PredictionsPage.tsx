@@ -162,7 +162,7 @@ export default function PredictionsPage() {
 
       return jobsData.some((job) => {
         const s = (job.status || "").toLowerCase();
-        return ["running", "processing", "pending", "queued"].includes(s);
+        return !["completed", "failed"].includes(s);
       });
 
     } catch (err) {
@@ -175,27 +175,33 @@ export default function PredictionsPage() {
 
   // ================= POLLING =================
   useEffect(() => {
-    let interval: any = null;
+  let interval: any = null;
+  let attempts = 0;
 
-    const startPolling = async () => {
-      const running = await loadPredictions();
+  const startPolling = async () => {
+    const running = await loadPredictions();
 
-      if (running) {
-        interval = setInterval(async () => {
-          const stillRunning = await loadPredictions();
-          if (!stillRunning && interval) {
-            clearInterval(interval);
-          }
-        }, 4000);
-      }
-    };
+    if (running) {
+      interval = setInterval(async () => {
+        attempts++;
 
-    startPolling();
+        const stillRunning = await loadPredictions();
 
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, []);
+        // ✅ STOP CONDITIONS (VERY IMPORTANT)
+        if (!stillRunning || attempts > 10) {
+          console.log("🛑 STOP POLLING");
+          clearInterval(interval);
+        }
+      }, 4000);
+    }
+  };
+
+  startPolling();
+
+  return () => {
+    if (interval) clearInterval(interval);
+  };
+}, []);
 
   if (loading) {
     return <div className="predictions-loading">Loading predictions...</div>;
