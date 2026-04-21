@@ -221,9 +221,13 @@ return hasRunningJobs;
                   <div className="prediction-placeholder">❌ Failed</div>
                 )}
 
-                {status !== "failed" && job.type === "hero" && job.mediaUrl && (
-                  <img src={job.mediaUrl} alt="Hero" />
-                )}
+                {status !== "failed" && job.type === "hero" && (
+  job.mediaUrl ? (
+    <img src={job.mediaUrl} alt="Hero" />
+  ) : (
+    <div className="prediction-placeholder">⚠️ No Image</div>
+  )
+)}
 
                 {status !== "failed" && job.type === "reel" && (
                   job.mediaUrl ? (
@@ -234,12 +238,16 @@ return hasRunningJobs;
                 )}
 
                 {status !== "failed" && job.type === "lookbook" && (
-                  job.mediaUrls?.length ? (
-                    <img src={job.mediaUrls[0]} alt="Lookbook" />
-                  ) : (
-                    <div className="prediction-placeholder">Preparing...</div>
-                  )
-                )}
+  job.mediaUrls?.length ? (
+    job.mediaUrls[0] ? (
+      <img src={job.mediaUrls[0]} alt="Lookbook" />
+    ) : (
+      <div className="prediction-placeholder">⚠️ Missing Images</div>
+    )
+  ) : (
+    <div className="prediction-placeholder">Preparing...</div>
+  )
+)}
               </div>
 
               <div className="prediction-actions">
