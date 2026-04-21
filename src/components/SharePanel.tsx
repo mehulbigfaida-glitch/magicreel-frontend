@@ -1,81 +1,59 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function SharePanel({ data }: { data: any }) {
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-
-  // ✅ ALWAYS USE FRESH DATA
-  const images = Array.isArray(data?.media) ? data.media : [];
+  const images = data?.media || [];
 
   const hero = images[0];
   const others = images.slice(1);
 
-  // ✅ RESET WHEN DATA CHANGES
-  useEffect(() => {
-    setSelectedImage(null);
-  }, [data]);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   return (
-    <div style={{ padding: 20, maxWidth: 900, margin: "0 auto" }}>
-
-      <h2 style={{ marginBottom: 16 }}>✨ Shared Lookbook</h2>
-
+    <div
+      style={{
+        maxWidth: 600,
+        margin: "0 auto",
+        padding: 16,
+      }}
+    >
       {/* HERO */}
       {hero && (
-        <div style={{ marginBottom: 24 }}>
-          <div
+        <div style={{ marginBottom: 16 }}>
+          <img
+            src={hero.url}
+            alt="hero"
             style={{
               width: "100%",
-              maxHeight: "75vh",
-              overflow: "hidden",
               borderRadius: 16,
+              objectFit: "cover",
             }}
-          >
-            <img
-              src={hero.url}
-              alt="hero"
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-              }}
-            />
-          </div>
+          />
         </div>
       )}
 
-      {/* POSES */}
+      {/* GRID */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-          gap: 16,
+          gridTemplateColumns: "repeat(2, 1fr)",
+          gap: 10,
         }}
       >
-        {others.map((item: any, index: number) => (
-          <div
-            key={index}
+        {others.map((item: any, i: number) => (
+          <img
+            key={i}
+            src={item.url}
             onClick={() => setSelectedImage(item.url)}
             style={{
-              borderRadius: 14,
-              overflow: "hidden",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+              width: "100%",
+              borderRadius: 12,
               cursor: "pointer",
             }}
-          >
-            <img
-              src={item.url}
-              alt={`look-${index}`}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-              }}
-            />
-          </div>
+          />
         ))}
       </div>
 
-      {/* FULLSCREEN */}
+      {/* FULLSCREEN VIEW */}
       {selectedImage && (
         <div
           onClick={() => setSelectedImage(null)}
@@ -86,12 +64,11 @@ export default function SharePanel({ data }: { data: any }) {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            zIndex: 999,
+            zIndex: 9999,
           }}
         >
           <img
             src={selectedImage}
-            alt="fullscreen"
             style={{
               maxWidth: "90%",
               maxHeight: "90%",
