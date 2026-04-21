@@ -9,6 +9,7 @@ type Prediction = {
   createdAt: string;
   mediaUrl?: string | null;
   mediaUrls?: string[];
+  creditsUsed?: number;
 };
 
 export default function PredictionsPage() {
@@ -18,7 +19,7 @@ export default function PredictionsPage() {
 
   const API_BASE = "https://magicreel-backend-production.up.railway.app";
 
-  // 🔥 FETCH
+  // ================= FETCH =================
   const loadPredictions = async () => {
     try {
       const res = await fetch(`${API_BASE}/api/predictions`);
@@ -31,6 +32,7 @@ export default function PredictionsPage() {
         createdAt: job.createdAt,
         mediaUrl: job.mediaUrl ?? null,
         mediaUrls: job.mediaUrls ?? [],
+        creditsUsed: job.creditsUsed ?? 1,
       }));
 
       setJobs(mapped);
@@ -45,7 +47,7 @@ export default function PredictionsPage() {
     loadPredictions();
   }, []);
 
-  // 🔥 SHARE
+  // ================= SHARE =================
   const handleShare = async (job: Prediction) => {
     try {
       let media: { url: string }[] = [];
@@ -60,12 +62,12 @@ export default function PredictionsPage() {
           .map((u) => ({ url: u }));
       }
 
-      console.log("🚀 FINAL SHARE MEDIA:", media);
-
       if (!media.length) {
         alert("No images to share");
         return;
       }
+
+      console.log("🚀 FINAL SHARE MEDIA:", media);
 
       const res = await fetch(`${API_BASE}/api/share`, {
         method: "POST",
@@ -90,50 +92,116 @@ export default function PredictionsPage() {
 
     } catch (err) {
       console.error("Share error:", err);
+      alert("Share failed");
     }
   };
 
+  // ================= DOWNLOAD =================
+  const handleDownload = (url: string | null) => {
+    if (!url) return;
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "magicreel";
+    a.click();
+  };
+
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="predictions-loading">Loading predictions...</div>;
   }
 
   return (
     <div className="predictions-page">
-      <h2>Predictions</h2>
+      <h1 className="predictions-title">Predictions</h1>
 
       <div className="predictions-grid">
         {jobs.map((job) => {
           const preview =
             job.type === "lookbook"
-              ? job.mediaUrls?.[0]
+              ? job.mediaUrls?.[0] || job.mediaUrl
               : job.mediaUrl;
 
-          return (
-            <div key={job.id} className="prediction-card">
-              {job.type === "reel" && preview ? (
-                <video src={preview} controls />
-              ) : preview ? (
-                <img src={preview} />
-              ) : (
-                <div>Processing...</div>
-              )}
+          const status = job.status?.toLowerCase();
 
-              <div className="actions">
-                <button onClick={() => handleShare(job)}>
-                  Share
+          return (
+            <div className="prediction-card" key={job.id}>
+              
+              {/* IMAGE */}
+              <div className="prediction-image">
+                {status === "failed" ? (
+                  <div className="prediction-placeholder">❌ Failed</div>
+                ) : preview ? (
+                  job.type === "reel" ? (
+                    <video src={preview} controls />
+                  ) : (
+                    <img src={preview} alt="preview" />
+                  )
+                ) : (
+                  <div className="prediction-placeholder">⏳ Processing...</div>
+                )}
+              </div>
+
+              {/* ACTIONS */}
+              <div className="prediction-actions">
+                <button onClick={() => handleShare(job)}>📤 Share</button>
+
+                <button onClick={() => handleDownload(preview || null)}>
+                  ⬇️ Download
                 </button>
+
+                <button>🔍 View</button>
+              </div>
+
+              {/* META */}
+              <div className="prediction-meta">
+                <span>
+                  {new Date(job.createdAt).toLocaleDateString()} •{" "}
+                  {job.creditsUsed} credit
+                </span>
+
+                <span className={`status ${status}`}>
+                  {status === "completed"
+                    ? "✅ Ready"
+                    : ["running", "processing", "pending"].includes(status)
+                    ? "⏳ Processing"
+                    : "❌ Failed"}
+                </span>
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* SHARE MODAL */}
+      {/* ================= SHARE MODAL ================= */}
       {shareData && (
-        <div className="share-modal">
-          <button onClick={() => setShareData(null)}>Close</button>
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.9)",
+            zIndex: 9999,
+            overflowY: "auto",
+            padding: 20,
+          }}
+        >
+          <button
+            onClick={() => setShareData(null)}
+            style={{
+              position: "fixed",
+              top: 20,
+              right: 20,
+              background: "#000",
+              color: "#fff",
+              padding: 10,
+              borderRadius: 6,
+            }}
+          >
+            ✕ Close
+          </button>
 
-          <SharePanel data={{ asset: { media: shareData.media } }} />
+          {/* PREVIEW */}
+          <div style={{ maxWidth: 600, margin: "40px auto" }}>
+            <SharePanel data={{ asset: { media: shareData.media } }} />
+          </div>
         </div>
       )}
     </div>
