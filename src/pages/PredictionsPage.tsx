@@ -20,32 +20,35 @@ export default function PredictionsPage() {
   const API_BASE = "https://magicreel-backend-production.up.railway.app";
 
   // ================= FETCH =================
-  const loadPredictions = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/api/predictions`);
-      const data = await res.json();
+const loadPredictions = async () => {
+  try {
+    const res = await fetch(`${API_BASE}/api/predictions`, {
+      credentials: "include",
+    });
 
-      const mapped: Prediction[] = (data || []).map((job: any) => ({
-        id: job.id,
-        type: job.type,
-        status: job.status ?? "completed",
-        createdAt: job.createdAt,
-        mediaUrl: job.mediaUrl ?? null,
-        mediaUrls: job.mediaUrls ?? [],
-        creditsUsed: job.creditsUsed ?? 1,
-      }));
+    const data = await res.json();
 
-      setJobs(mapped);
-    } catch (err) {
-      console.error("Fetch error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const mapped: Prediction[] = (data || []).map((job: any) => ({
+      id: job.id,
+      type: job.type,
+      status: job.status ?? "completed",
+      createdAt: job.createdAt,
+      mediaUrl: job.mediaUrl ?? null,
+      mediaUrls: job.mediaUrls ?? [],
+      creditsUsed: job.creditsUsed ?? 1,
+    }));
 
-  useEffect(() => {
-    loadPredictions();
-  }, []);
+    setJobs(mapped);
+  } catch (err) {
+    console.error("Fetch error:", err);
+  } finally {
+    setLoading(false);
+  }
+};
+
+useEffect(() => {
+  loadPredictions();
+}, []);
 
   // ================= SHARE =================
   const handleShare = async (job: Prediction) => {
