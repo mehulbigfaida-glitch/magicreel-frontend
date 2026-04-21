@@ -36,44 +36,45 @@ export default function PredictionsPage() {
 
       const data = await res.json();
 
-      // ✅ CLEAN + FILTERED MAPPING
-      const jobsData: Prediction[] = (data || [])
-        .map((job: any) => {
-          let type: "hero" | "lookbook" | "reel" = "hero";
-          let mediaUrl: string | null = null;
-          let mediaUrls: string[] = [];
+      // ✅ FINAL CORRECT MAPPING (ALIGNED WITH DB)
+const jobsData: Prediction[] = (data || []).map((job: any) => {
+  let type: "hero" | "lookbook" | "reel" = "hero";
+  let mediaUrl: string | null = null;
+  let mediaUrls: string[] = [];
 
-          // ✅ TYPE DETECTION
-          if (Array.isArray(job.lookbook) && job.lookbook.length > 0) {
-            type = "lookbook";
-            mediaUrls = job.lookbook;
-          } else if (job.reelUrl) {
-            type = "reel";
-            mediaUrl = job.reelUrl;
-          } else if (job.heroImageUrl) {
-            type = "hero";
-            mediaUrl = job.heroImageUrl;
-          }
+  // ✅ TYPE FROM DB
+  if (job.type === "LOOKBOOK") {
+    type = "lookbook";
 
-          return {
-            id: job.id,
-            type,
-            status: job.status || "completed",
-            createdAt: job.createdAt,
-            mediaUrl,
-            mediaUrls,
-            creditsUsed: job.creditsUsed ?? 1,
-          };
-        })
+    // lookbook is stored as JSON string
+    try {
+      mediaUrls = job.lookbook ? JSON.parse(job.lookbook) : [];
+    } catch {
+      mediaUrls = [];
+    }
+  } else if (job.type === "REEL") {
+    type = "reel";
+    mediaUrl = job.outputVideoUrl || null;
+  } else {
+    type = "hero";
 
-        // ❗ REMOVE BROKEN JOBS (MAIN FIX)
-        .filter((job: Prediction) => {
-          if (job.type === "lookbook") return job.mediaUrls.length > 0;
-          return !!job.mediaUrl;
-        });
+    // ✅ MAIN OUTPUT IMAGE
+    mediaUrl = job.outputImageUrl || null;
+  }
 
-      setJobs(jobsData);
-      setLoading(false);
+  return {
+    id: job.id,
+    type,
+    status: job.status || "completed",
+    createdAt: job.createdAt,
+    mediaUrl,
+    mediaUrls,
+    creditsUsed: job.creditsUsed ?? 1,
+  };
+});
+
+setJobs(jobsData);
+setLoading(false);
 
       // ✅ CHECK RUNNING JOBS
       const hasRunningJobs = jobsData.some((job) => {
