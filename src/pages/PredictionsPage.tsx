@@ -84,62 +84,68 @@ export default function PredictionsPage() {
 
   // ================= FETCH =================
   const loadPredictions = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/api/predictions`, {
-        cache: "no-store",
-      });
+  try {
+    const res = await fetch(`${API_BASE}/api/predictions`, {
+      cache: "no-store",
+    });
 
-      const data = await res.json();
+    const data = await res.json();
 
-      // ✅ SAFE MAPPING (FINAL)
-      const jobsData: Prediction[] = (data || []).map((job: any) => {
-        const type = (job.type || "").toLowerCase();
+    const jobsData: Prediction[] = (data || []).map((job: any) => {
+      const rawType = job.type || "";
 
-        return {
-          id: job.id,
-          type,
-          status: job.status ?? "completed",
-          createdAt: job.createdAt,
+      const type =
+        rawType.toLowerCase().includes("look")
+          ? "lookbook"
+          : rawType.toLowerCase().includes("reel")
+          ? "reel"
+          : "hero";
 
-          mediaUrl:
-            type === "hero"
-              ? job.heroImageUrl || null
-              : type === "reel"
-              ? job.reelUrl || null
-              : null,
+      return {
+        id: job.id,
+        type,
+        status: job.status ?? "completed",
+        createdAt: job.createdAt,
 
-          mediaUrls:
-            type === "lookbook" && Array.isArray(job.lookbookImages)
-              ? job.lookbookImages.filter((u: any) => typeof u === "string" && u)
-              : [],
+        mediaUrl:
+          type === "hero"
+            ? job.heroImageUrl || null
+            : type === "reel"
+            ? job.reelUrl || null
+            : null,
 
-          creditsUsed: job.creditsUsed ?? 1,
-        };
-      });
+        mediaUrls:
+          type === "lookbook"
+            ? (job.lookbookImages || []).filter(
+                (u: any) => typeof u === "string" && u
+              )
+            : [],
 
-      setJobs(jobsData);
+        creditsUsed: job.creditsUsed ?? 1,
+      };
+    });
 
-      // ✅ POLLING CHECK
-      const hasRunningJobs = jobsData.some((job) => {
-        const status = (job.status || "").toLowerCase().trim();
+    setJobs(jobsData);
 
-        return (
-          status === "running" ||
-          status === "processing" ||
-          status === "pending" ||
-          status === "queued"
-        );
-      });
+    const hasRunningJobs = jobsData.some((job) => {
+      const status = (job.status || "").toLowerCase().trim();
 
-      return hasRunningJobs;
+      return (
+        status === "running" ||
+        status === "processing" ||
+        status === "pending" ||
+        status === "queued"
+      );
+    });
 
-    } catch (err) {
-      console.error("Fetch error:", err);
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
+    return hasRunningJobs;
+  } catch (err) {
+    console.error("Fetch error:", err);
+    return false;
+  } finally {
+    setLoading(false);
+  }
+};
 
   // ================= POLLING =================
   useEffect(() => {
