@@ -40,11 +40,19 @@ export default function PredictionsPage() {
   }, []);
 
   return (
-    <div className="p-6 w-full max-w-[1600px] mx-auto">
-      <h1 className="text-2xl font-semibold mb-6">Predictions</h1>
+    <div style={{ padding: "24px", maxWidth: "1600px", margin: "0 auto" }}>
+      <h1 style={{ fontSize: "24px", fontWeight: 600, marginBottom: "20px" }}>
+        Predictions
+      </h1>
 
-      {/* ✅ TIGHT GRID */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
+      {/* ✅ FORCE GRID (WORKS 100%) */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
+          gap: "20px",
+        }}
+      >
         {data.map((item) => {
           const mediaUrl =
             item.mediaUrl ||
@@ -57,41 +65,79 @@ export default function PredictionsPage() {
           return (
             <div
               key={item.id}
-              className="relative rounded-xl overflow-hidden shadow-md group"
+              style={{
+                position: "relative",
+                borderRadius: "12px",
+                overflow: "hidden",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+              }}
             >
               {/* IMAGE */}
-              <div className="aspect-[3/4] bg-gray-200">
+              <div style={{ aspectRatio: "3 / 4", background: "#eee" }}>
                 {mediaUrl ? (
                   isVideo ? (
                     <video
                       src={mediaUrl}
-                      className="w-full h-full object-cover"
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
                     />
                   ) : (
                     <img
                       src={mediaUrl}
-                      className="w-full h-full object-cover"
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
                     />
                   )
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400">
+                  <div
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "#999",
+                    }}
+                  >
                     No media
                   </div>
                 )}
               </div>
 
-              {/* ✅ OVERLAY (LIKE YOUR REFERENCE) */}
-              <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white p-2 text-xs">
-                <div className="flex justify-between items-center">
+              {/* OVERLAY */}
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  background: "rgba(0,0,0,0.7)",
+                  color: "#fff",
+                  padding: "8px",
+                  fontSize: "12px",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                  }}
+                >
                   <span>
                     {new Date(item.createdAt).toLocaleDateString()}
                   </span>
-                  <span className="text-green-400">● Ready</span>
+                  <span style={{ color: "#4ade80" }}>● Ready</span>
                 </div>
 
-                <div className="flex justify-between items-center mt-1">
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    marginTop: "4px",
+                  }}
+                >
                   <span>{item.creditsUsed ?? 0} credit</span>
-                  <span className="uppercase">{item.type}</span>
+                  <span style={{ textTransform: "uppercase" }}>
+                    {item.type}
+                  </span>
                 </div>
               </div>
             </div>
