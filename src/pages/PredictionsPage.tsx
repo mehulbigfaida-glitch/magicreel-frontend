@@ -60,7 +60,8 @@ export default function PredictionsPage() {
             (item.lookbookImages && item.lookbookImages[0]);
 
           const isVideo =
-            item.type === "reel" && mediaUrl?.includes(".mp4");
+  item.type === "reel" ||
+  mediaUrl?.toLowerCase().includes(".mp4");
 
           return (
             <div
@@ -134,7 +135,9 @@ export default function PredictionsPage() {
                     marginTop: "4px",
                   }}
                 >
-                  <span>{item.creditsUsed ?? 0} credit</span>
+                  {item.creditsUsed !== undefined && (
+  <span>{item.creditsUsed} {item.creditsUsed === 1 ? "credit" : "credits"}</span>
+)}
                   <span style={{ textTransform: "uppercase" }}>
                     {item.type}
                   </span>
