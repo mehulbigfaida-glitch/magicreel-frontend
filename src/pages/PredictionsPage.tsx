@@ -4,8 +4,9 @@ interface Prediction {
   id: string;
   type: string;
   status: string;
-  outputImageUrl?: string;
-  reelUrl?: string;
+  mediaUrl?: string;
+  heroImageUrl?: string;
+  lookbookImages?: string[];
   createdAt: string;
   creditsUsed?: number;
 }
@@ -20,9 +21,12 @@ export default function PredictionsPage() {
       try {
         setLoading(true);
 
-        const res = await fetch("https://magicreel-backend-production.up.railway.app/api/predictions", {
-          credentials: "include",
-        });
+        const res = await fetch(
+          "https://magicreel-backend-production.up.railway.app/api/predictions",
+          {
+            credentials: "include",
+          }
+        );
 
         if (!res.ok) {
           throw new Error("Failed to fetch predictions");
@@ -30,7 +34,6 @@ export default function PredictionsPage() {
 
         const json = await res.json();
 
-        // SAFE mapping (handles array or nested response)
         const predictions: Prediction[] = Array.isArray(json)
           ? json
           : json?.data || [];
@@ -77,7 +80,14 @@ export default function PredictionsPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {data.map((item) => {
-          const mediaUrl = item.outputImageUrl || item.reelUrl;
+          // ✅ FINAL MEDIA LOGIC (fixed)
+          const mediaUrl =
+            item.mediaUrl || // hero + reel
+            item.heroImageUrl || // lookbook hero
+            (item.lookbookImages && item.lookbookImages[0]); // fallback
+
+          const isVideo =
+            item.type === "reel" && mediaUrl?.includes(".mp4");
 
           return (
             <div
@@ -85,18 +95,20 @@ export default function PredictionsPage() {
               className="bg-white rounded-2xl shadow-md overflow-hidden"
             >
               <div className="aspect-[3/4] bg-gray-100 flex items-center justify-center">
-                {item.type === "reel" && mediaUrl ? (
-                  <video
-                    src={mediaUrl}
-                    controls
-                    className="w-full h-full object-cover"
-                  />
-                ) : mediaUrl ? (
-                  <img
-                    src={mediaUrl}
-                    alt="prediction"
-                    className="w-full h-full object-cover"
-                  />
+                {mediaUrl ? (
+                  isVideo ? (
+                    <video
+                      src={mediaUrl}
+                      controls
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <img
+                      src={mediaUrl}
+                      alt="prediction"
+                      className="w-full h-full object-cover"
+                    />
+                  )
                 ) : (
                   <p className="text-sm text-gray-400">No media</p>
                 )}
