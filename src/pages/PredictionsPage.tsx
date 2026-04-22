@@ -40,7 +40,7 @@ export default function PredictionsPage() {
   }, []);
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-6 w-full max-w-[1600px] mx-auto">
       <h1 className="text-2xl font-semibold mb-6">Predictions</h1>
 
       {/* ✅ TIGHT GRID */}
