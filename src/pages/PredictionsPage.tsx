@@ -20,7 +20,7 @@ export default function PredictionsPage() {
       try {
         setLoading(true);
 
-        const res = await fetch("/api/predictions", {
+        const res = await fetch("https://magicreel-backend-production.up.railway.app/api/predictions", {
           credentials: "include",
         });
 
