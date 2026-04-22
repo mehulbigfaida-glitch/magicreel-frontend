@@ -136,7 +136,10 @@ export default function PredictionsPage() {
                   }}
                 >
                   <span>
-  {item.creditsUsed ?? 0} {((item.creditsUsed ?? 0) === 1 ? "credit" : "credits")}
+  {(item.creditsUsed ?? (item as any).credits ?? 0)}{" "}
+  {((item.creditsUsed ?? (item as any).credits ?? 0) === 1
+    ? "credit"
+    : "credits")}
 </span>
                   <span style={{ textTransform: "uppercase" }}>
                     {item.type}
