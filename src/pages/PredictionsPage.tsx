@@ -29,7 +29,7 @@ export default function PredictionsPage() {
           ? json
           : json?.data || [];
 
-        // ✅ sort latest first
+        // latest first
         predictions.sort(
           (a, b) =>
             new Date(b.createdAt).getTime() -
@@ -59,7 +59,8 @@ export default function PredictionsPage() {
     <div className="p-6 max-w-7xl mx-auto">
       <h1 className="text-2xl font-semibold mb-6">Predictions</h1>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      {/* ✅ FIXED GRID */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
         {data.map((item) => {
           const mediaUrl =
             item.mediaUrl ||
@@ -74,7 +75,7 @@ export default function PredictionsPage() {
           return (
             <div
               key={item.id}
-              className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition"
+              className="bg-white rounded-xl shadow-sm overflow-hidden flex flex-col"
             >
               {/* MEDIA */}
               <div className="aspect-[3/4] bg-gray-100">
@@ -99,25 +100,25 @@ export default function PredictionsPage() {
               </div>
 
               {/* META */}
-              <div className="p-2 space-y-1">
+              <div className="p-3 flex flex-col gap-1">
                 {/* TYPE */}
-                <div className="text-[10px] font-semibold text-blue-600">
+                <span className="text-xs font-semibold text-blue-600">
                   {typeLabel}
-                </div>
+                </span>
 
                 {/* TIME */}
-                <div className="text-[10px] text-gray-500">
+                <span className="text-xs text-gray-500">
                   {new Date(item.createdAt).toLocaleDateString()}{" "}
                   {new Date(item.createdAt).toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
                   })}
-                </div>
+                </span>
 
-                {/* CREDITS */}
-                <div className="text-[11px] text-gray-700">
-                  Credits: {item.creditsUsed || 0}
-                </div>
+                {/* ✅ FIXED CREDITS */}
+                <span className="text-sm text-gray-800 font-medium">
+                  Credits: {item.creditsUsed ?? 0}
+                </span>
               </div>
             </div>
           );
