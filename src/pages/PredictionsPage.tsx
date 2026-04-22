@@ -78,12 +78,12 @@ export default function PredictionsPage() {
                   isVideo ? (
                     <video
                       src={mediaUrl}
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      style={{ width: "100%", height: "100%", objectFit: "contain", background: "#f5f5f5"}}
                     />
                   ) : (
                     <img
                       src={mediaUrl}
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      style={{ width: "100%", height: "100%", objectFit: "contain", background: "#f5f5f5"}}
                     />
                   )
                 ) : (
