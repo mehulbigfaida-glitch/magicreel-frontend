@@ -14,23 +14,14 @@ interface Prediction {
 export default function PredictionsPage() {
   const [data, setData] = useState<Prediction[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPredictions = async () => {
       try {
-        setLoading(true);
-
         const res = await fetch(
           "https://magicreel-backend-production.up.railway.app/api/predictions",
-          {
-            credentials: "include",
-          }
+          { credentials: "include" }
         );
-
-        if (!res.ok) {
-          throw new Error("Failed to fetch predictions");
-        }
 
         const json = await res.json();
 
@@ -38,10 +29,16 @@ export default function PredictionsPage() {
           ? json
           : json?.data || [];
 
+        // ✅ sort latest first
+        predictions.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() -
+            new Date(a.createdAt).getTime()
+        );
+
         setData(predictions);
-      } catch (err: any) {
+      } catch (err) {
         console.error(err);
-        setError(err.message || "Something went wrong");
       } finally {
         setLoading(false);
       }
@@ -53,23 +50,7 @@ export default function PredictionsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p className="text-lg">Loading predictions...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-red-500">{error}</p>
-      </div>
-    );
-  }
-
-  if (!data.length) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p>No predictions found.</p>
+        Loading...
       </div>
     );
   }
@@ -78,72 +59,64 @@ export default function PredictionsPage() {
     <div className="p-6 max-w-7xl mx-auto">
       <h1 className="text-2xl font-semibold mb-6">Predictions</h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {data.map((item) => {
-          // ✅ FINAL MEDIA LOGIC (fixed)
           const mediaUrl =
-            item.mediaUrl || // hero + reel
-            item.heroImageUrl || // lookbook hero
-            (item.lookbookImages && item.lookbookImages[0]); // fallback
+            item.mediaUrl ||
+            item.heroImageUrl ||
+            (item.lookbookImages && item.lookbookImages[0]);
 
           const isVideo =
             item.type === "reel" && mediaUrl?.includes(".mp4");
 
+          const typeLabel = item.type?.toUpperCase();
+
           return (
             <div
               key={item.id}
-              className="bg-white rounded-2xl shadow-md overflow-hidden"
+              className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition"
             >
-              <div className="aspect-[3/4] bg-gray-100 flex items-center justify-center">
+              {/* MEDIA */}
+              <div className="aspect-[3/4] bg-gray-100">
                 {mediaUrl ? (
                   isVideo ? (
                     <video
                       src={mediaUrl}
-                      controls
                       className="w-full h-full object-cover"
+                      controls
                     />
                   ) : (
                     <img
                       src={mediaUrl}
-                      alt="prediction"
                       className="w-full h-full object-cover"
                     />
                   )
                 ) : (
-                  <p className="text-sm text-gray-400">No media</p>
+                  <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
+                    No media
+                  </div>
                 )}
               </div>
 
-              <div className="p-4 space-y-2">
-                <p className="text-xs text-gray-500">
-                  {new Date(item.createdAt).toLocaleString()}
-                </p>
+              {/* META */}
+              <div className="p-2 space-y-1">
+                {/* TYPE */}
+                <div className="text-[10px] font-semibold text-blue-600">
+                  {typeLabel}
+                </div>
 
-                <p className="text-sm">
+                {/* TIME */}
+                <div className="text-[10px] text-gray-500">
+                  {new Date(item.createdAt).toLocaleDateString()}{" "}
+                  {new Date(item.createdAt).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </div>
+
+                {/* CREDITS */}
+                <div className="text-[11px] text-gray-700">
                   Credits: {item.creditsUsed || 0}
-                </p>
-
-                <div className="flex gap-2 pt-2">
-                  {mediaUrl && (
-                    <>
-                      <a
-                        href={mediaUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex-1 text-center text-sm px-3 py-2 bg-black text-white rounded-lg"
-                      >
-                        View
-                      </a>
-
-                      <a
-                        href={mediaUrl}
-                        download
-                        className="flex-1 text-center text-sm px-3 py-2 bg-gray-200 rounded-lg"
-                      >
-                        Download
-                      </a>
-                    </>
-                  )}
                 </div>
               </div>
             </div>
