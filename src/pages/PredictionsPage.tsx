@@ -135,9 +135,9 @@ export default function PredictionsPage() {
                     marginTop: "4px",
                   }}
                 >
-                  {item.creditsUsed !== undefined && (
-  <span>{item.creditsUsed} {item.creditsUsed === 1 ? "credit" : "credits"}</span>
-)}
+                  <span>
+  {item.creditsUsed ?? 0} {((item.creditsUsed ?? 0) === 1 ? "credit" : "credits")}
+</span>
                   <span style={{ textTransform: "uppercase" }}>
                     {item.type}
                   </span>
