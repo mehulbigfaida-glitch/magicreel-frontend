@@ -1,9 +1,12 @@
+import { useAuthStore } from "../store/authStore";
 import "./AppHeader.css";
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 
 export default function AppHeader() {
   const location = useLocation();
+
+  const user = useAuthStore((state) => state.user); // ✅ added
 
   const [helpOpen, setHelpOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -74,8 +77,9 @@ export default function AppHeader() {
 
       <div className="mr-header-right">
 
+        {/* ✅ FIXED CREDITS */}
         <div className="mr-credits">
-          Credits: 48
+          Credits: {user?.creditsAvailable ?? 0}
         </div>
 
         {/* PROFILE MENU */}
