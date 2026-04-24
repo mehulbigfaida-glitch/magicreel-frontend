@@ -6,12 +6,19 @@ import { useState } from "react";
 export default function AppHeader() {
   const location = useLocation();
 
-  const user = useAuthStore((state) => state.user); // ✅ added
+  // ✅ read BOTH user + loading
+  const user = useAuthStore((state) => state.user);
+  const loading = useAuthStore((state) => state.loading);
 
   const [helpOpen, setHelpOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
   const isActive = (path: string) => location.pathname.startsWith(path);
+
+  // ✅ DO NOT render header until auth is ready
+  if (loading) {
+    return null;
+  }
 
   return (
     <header className="mr-header">
@@ -44,7 +51,6 @@ export default function AppHeader() {
         </Link>
 
         {/* HELP MENU */}
-
         <div
           className="mr-dropdown"
           onMouseEnter={() => setHelpOpen(true)}
@@ -56,19 +62,9 @@ export default function AppHeader() {
 
           {helpOpen && (
             <div className="mr-dropdown-menu">
-
-              <Link to="/docs">
-                Documentation
-              </Link>
-
-              <Link to="/faq">
-                FAQ
-              </Link>
-
-              <Link to="/contact">
-                Contact Support
-              </Link>
-
+              <Link to="/docs">Documentation</Link>
+              <Link to="/faq">FAQ</Link>
+              <Link to="/contact">Contact Support</Link>
             </div>
           )}
         </div>
@@ -77,37 +73,27 @@ export default function AppHeader() {
 
       <div className="mr-header-right">
 
-        {/* ✅ FIXED CREDITS */}
+        {/* ✅ CREDITS (correct now) */}
         <div className="mr-credits">
           Credits: {user?.creditsAvailable ?? 0}
         </div>
 
         {/* PROFILE MENU */}
-
         <div
           className="mr-dropdown"
           onMouseEnter={() => setProfileOpen(true)}
           onMouseLeave={() => setProfileOpen(false)}
         >
           <div className="mr-profile">
-            Profile
+            {/* ✅ show initial */}
+            {user?.email ? user.email[0].toUpperCase() : "?"}
           </div>
 
           {profileOpen && (
             <div className="mr-dropdown-menu">
-
-              <Link to="/dashboard">
-                Dashboard
-              </Link>
-
-              <Link to="/settings">
-                Settings
-              </Link>
-
-              <Link to="/logout">
-                Logout
-              </Link>
-
+              <Link to="/dashboard">Dashboard</Link>
+              <Link to="/settings">Settings</Link>
+              <Link to="/logout">Logout</Link>
             </div>
           )}
         </div>
