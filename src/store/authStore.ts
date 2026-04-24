@@ -19,7 +19,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const token = localStorage.getItem("token");
 
+      console.log("🔐 Token:", token);
+
       if (!token) {
+        console.log("❌ No token found");
         set({ user: null, loading: false });
         return;
       }
@@ -33,15 +36,31 @@ export const useAuthStore = create<AuthState>((set) => ({
         }
       );
 
+      console.log("📡 /me status:", res.status);
+
       const data = await res.json();
 
-      if (res.ok) {
-        set({ user: data.user, loading: false });
+      console.log("👤 /me response:", data);
+
+      // 🔥 STRICT SAFE SET
+      if (res.ok && data?.user) {
+        set({
+          user: data.user,
+          loading: false,
+        });
       } else {
-        set({ user: null, loading: false });
+        console.log("❌ Invalid /me response");
+        set({
+          user: null,
+          loading: false,
+        });
       }
-    } catch {
-      set({ user: null, loading: false });
+    } catch (err) {
+      console.error("❌ fetchMe failed:", err);
+      set({
+        user: null,
+        loading: false,
+      });
     }
   },
 
