@@ -64,11 +64,7 @@ function GlobalHeader() {
     window.location.reload();
   };
 
-  const initial = user?.email
-    ? user.email.charAt(0).toUpperCase()
-    : "?";
-
-  const lockAdvancedPacks =
+    const lockAdvancedPacks =
     user?.plan === "FREE" ||
     user?.plan === "BASIC";
 
@@ -171,30 +167,34 @@ function GlobalHeader() {
         </nav>
       </div>
 
-      {/* 🔥 ALWAYS RENDER HEADER RIGHT */}
-      <div className="mr-header-right">
+      {/* 🔥 HEADER RIGHT */}
+<div className="mr-header-right">
 
-        <span className="mr-credits">
-          {(user?.creditsAvailable ?? 0)} Credits
-        </span>
+  {/* ✅ Credits */}
+  <span className="mr-credits">
+    {user ? `${user.creditsAvailable} Credits` : ""}
+  </span>
 
-        <div className="mr-profile-menu">
+  {/* ✅ Profile */}
+  <div className="mr-profile-menu">
 
-          <div className="mr-user-circle">
-            {initial}
-          </div>
+    <div className="mr-user-circle">
+      {user?.email
+        ? user.email.charAt(0).toUpperCase()
+        : ""}
+    </div>
 
-          <div className="mr-profile-dropdown">
-            <a href="/dashboard">Dashboard</a>
-            <a href="/settings">Settings</a>
-            <button onClick={handleLogout}>
-              Logout
-            </button>
-          </div>
+    <div className="mr-profile-dropdown">
+      <a href="/dashboard">Dashboard</a>
+      <a href="/settings">Settings</a>
+      <button onClick={handleLogout}>
+        Logout
+      </button>
+    </div>
 
-        </div>
+  </div>
 
-      </div>
+</div>
 
     </header>
   );
