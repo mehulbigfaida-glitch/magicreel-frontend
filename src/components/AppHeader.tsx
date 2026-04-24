@@ -7,20 +7,13 @@ export default function AppHeader() {
   const location = useLocation();
 
   // ✅ read BOTH user + loading
-  const user = useAuthStore((state) => state.user);
-  const loading = useAuthStore((state) => state.loading);
-
+  const { user } = useAuthStore();
   const [helpOpen, setHelpOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
   const isActive = (path: string) => location.pathname.startsWith(path);
 
-  // ✅ DO NOT render header until auth is ready
-  if (loading) {
-    return null;
-  }
-
-  return (
+   return (
     <header className="mr-header">
 
       <Link to="/" className="mr-logo">
