@@ -167,34 +167,32 @@ function GlobalHeader() {
         </nav>
       </div>
 
-      {/* 🔥 HEADER RIGHT */}
-<div className="mr-header-right">
+{/* 🔥 HEADER RIGHT */}
+{user && (
+  <div className="mr-header-right">
 
-  {/* ✅ Credits */}
-  <span className="mr-credits">
-    {user ? `${user.creditsAvailable} Credits` : ""}
-  </span>
+    <span className="mr-credits">
+      {user.creditsAvailable} Credits
+    </span>
 
-  {/* ✅ Profile */}
-  <div className="mr-profile-menu">
+    <div className="mr-profile-menu">
 
-    <div className="mr-user-circle">
-      {user?.email
-        ? user.email.charAt(0).toUpperCase()
-        : ""}
-    </div>
+      <div className="mr-user-circle">
+        {user.email.charAt(0).toUpperCase()}
+      </div>
 
-    <div className="mr-profile-dropdown">
-      <a href="/dashboard">Dashboard</a>
-      <a href="/settings">Settings</a>
-      <button onClick={handleLogout}>
-        Logout
-      </button>
+      <div className="mr-profile-dropdown">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/settings">Settings</a>
+        <button onClick={handleLogout}>
+          Logout
+        </button>
+      </div>
+
     </div>
 
   </div>
-
-</div>
+)}
 
     </header>
   );
