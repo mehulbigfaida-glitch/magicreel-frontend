@@ -1,3 +1,4 @@
+import { useAuthStore } from "./store/authStore"; // add at top
 import Login from "./pages/Login";
 import {
   BrowserRouter,
@@ -21,7 +22,7 @@ import PredictionsPage from "./pages/PredictionsPage";
 import DashboardPage from "./pages/dashboard/DashboardPage";
 
 import { GenerateProvider } from "./context/GenerateContext";
-import { AuthProvider, useAuth } from "./context/AuthContext";
+import { AuthProvider } from "./context/AuthContext";
 import CreatePageV3 from "./v3/pages/CreatePageV3";
 // import ShareStudioPage from "./pages/reel/ShareStudioPage";
 import ReelMobileView from "./pages/reel/ReelMobileView";
@@ -40,9 +41,10 @@ function GlobalHeader() {
   const location = useLocation();
   const isSharePage = location.pathname.startsWith("/s/");
   const navigate = useNavigate();
-  const { user, loading } = isSharePage
-  ? { user: null, loading: false }
-  : useAuth();
+
+  const { user } = isSharePage
+    ? { user: null }
+    : useAuthStore();
 
   const hideHeaderRoutes = [
     "/create-v2",
@@ -63,7 +65,7 @@ function GlobalHeader() {
 
   const initial = user?.email
     ? user.email.charAt(0).toUpperCase()
-    : "";
+    : "?";
 
   const lockAdvancedPacks =
     user?.plan === "FREE" ||
@@ -73,15 +75,11 @@ function GlobalHeader() {
     <header className="mr-global-header">
 
       <div className="mr-header-left">
-
         <a href="/" className="mr-logo-link">
           MagicReel
         </a>
 
         <nav className="mr-main-nav">
-
-          {/* CREATE MENU */}
-
           <div className="mr-create-menu">
             <span className="mr-create-trigger">
               Create ▾
@@ -160,47 +158,42 @@ function GlobalHeader() {
 
           <a href="/plans">Plans</a>
 
-          {/* HELP MENU */}
           <div className="mr-help-menu">
             Help ▾
-
             <div className="mr-help-dropdown">
               <a href="/docs">Documentation</a>
-              <a href="/docs/image-quality">Image Guidelines</a> {/* 🔥 NEW */}
+              <a href="/docs/image-quality">Image Guidelines</a>
               <a href="/faq">FAQ</a>
               <a href="/contact">Contact</a>
             </div>
           </div>
-
         </nav>
-
       </div>
 
-      {!loading && user && (
-        <div className="mr-header-right">
+      {/* 🔥 ALWAYS RENDER HEADER RIGHT */}
+      <div className="mr-header-right">
 
-          <span className="mr-credits">
-  {(user?.creditsAvailable ?? 0)} Credits
-</span>
+        <span className="mr-credits">
+          {(user?.creditsAvailable ?? 0)} Credits
+        </span>
 
-          <div className="mr-profile-menu">
+        <div className="mr-profile-menu">
 
-            <div className="mr-user-circle">
-              {initial}
-            </div>
+          <div className="mr-user-circle">
+            {initial}
+          </div>
 
-            <div className="mr-profile-dropdown">
-              <a href="/dashboard">Dashboard</a>
-              <a href="/settings">Settings</a>
-              <button onClick={handleLogout}>
-                Logout
-              </button>
-            </div>
-
+          <div className="mr-profile-dropdown">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/settings">Settings</a>
+            <button onClick={handleLogout}>
+              Logout
+            </button>
           </div>
 
         </div>
-      )}
+
+      </div>
 
     </header>
   );
