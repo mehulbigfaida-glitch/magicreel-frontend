@@ -1,4 +1,5 @@
 import { useAuthStore } from "./store/authStore"; // add at top
+import React from "react";
 import Login from "./pages/Login";
 import {
   BrowserRouter,
@@ -244,15 +245,20 @@ function AppRoutes() {
 ========================= */
 
 function AppLayout() {
+  const fetchMe = useAuthStore((state) => state.fetchMe);
+
+  // 🔥 THIS WAS MISSING
+  React.useEffect(() => {
+    fetchMe();
+  }, [fetchMe]);
+
   return (
     <div className="mr-app-wrapper">
-
       <GlobalHeader />
 
       <div className="mr-app-content">
         <AppRoutes />
       </div>
-
     </div>
   );
 }
