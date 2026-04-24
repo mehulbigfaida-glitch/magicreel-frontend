@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import "../CreatePage.css";
-import { useAuth } from "../../context/AuthContext";
+
 import AppShell from "../../layout/AppShell";
 import StudioSidebar from "../StudioSidebar";
 import CreateV2Layout from "./CreateV2Layout";
@@ -18,6 +18,7 @@ import type { AvatarType } from "../StudioSidebar";
 
 import { CATEGORY_PILLS } from "../../magicreel/config/categoryPills";
 import { useAvatarStore } from "../../store/avatarStore";
+import { useAuthStore } from "../../store/authStore";
 import { API_BASE } from "../../config/api";
 
 type Selection = {
@@ -42,8 +43,6 @@ export default function CreateV2Page() {
 
   const [sceneStyle, setSceneStyle] =
     useState<"ecommerce">("ecommerce");
-
-  const { refreshUser } = useAuth();
 
   const { selectedAvatar, setCategory } =
     useAvatarStore();
@@ -88,9 +87,8 @@ export default function CreateV2Page() {
   
 
   const pollRef = useRef<number | null>(null);
-
   const navigate = useNavigate();
-
+  const fetchMe = useAuthStore((s) => s.fetchMe);
   /* ---------------- Avatar Drawer ---------------- */
 
   useEffect(() => {
@@ -237,7 +235,7 @@ const generateHero = async () => {
     setFrontRunId(data.frontRunId);
     setBackRunId(data.backRunId || null);
 
-    await refreshUser();
+    await fetchMe();
 
   } catch (err: any) {
 

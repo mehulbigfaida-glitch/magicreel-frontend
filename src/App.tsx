@@ -1,6 +1,4 @@
-import { useAuthStore } from "./store/authStore"; // add at top
 import React from "react";
-import Login from "./pages/Login";
 import {
   BrowserRouter,
   Routes,
@@ -9,30 +7,43 @@ import {
   useNavigate,
 } from "react-router-dom";
 
+import { useAuthStore } from "./store/authStore";
+
+/* =========================
+   PAGES
+========================= */
+
 import HomePage from "./pages/HomePage";
 import CreatePage from "./pages/CreatePage";
 import ViewPage from "./pages/ViewPage";
 import TryOnDemo from "./pages/TryOnDemo";
 import PlansPage from "./pages/PlansPage";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+
 import CreateV2Page from "./pages/create-v2/CreateV2Page";
 import LookbookPage from "./pages/create-v2/lookbook/LookbookPage";
 import CinematicPage from "./pages/create-v2/cinematic/CinematicPage";
 
 import ReelViewerPage from "./pages/reel/ReelViewerPage";
+import ReelMobileView from "./pages/reel/ReelMobileView";
+
+
 import PredictionsPage from "./pages/PredictionsPage";
 import DashboardPage from "./pages/dashboard/DashboardPage";
 
-import { GenerateProvider } from "./context/GenerateContext";
-import { AuthProvider } from "./context/AuthContext";
-import CreatePageV3 from "./v3/pages/CreatePageV3";
-// import ShareStudioPage from "./pages/reel/ShareStudioPage";
-import ReelMobileView from "./pages/reel/ReelMobileView";
 import SharePage from "./pages/SharePage";
-/* 🔥 NEW IMPORT */
 import ImageQualityPage from "./pages/docs/ImageQualityPage";
+import CreatePageV3 from "./v3/pages/CreatePageV3";
+
+/* =========================
+   CONTEXT
+========================= */
+
+import { GenerateProvider } from "./context/GenerateContext";
+
 
 import "./App.css";
-import ShareStudioPage from "./pages/reel/ShareStudioPage";
 
 /* =========================
    GLOBAL HEADER
@@ -40,8 +51,9 @@ import ShareStudioPage from "./pages/reel/ShareStudioPage";
 
 function GlobalHeader() {
   const location = useLocation();
-  const isSharePage = location.pathname.startsWith("/s/");
   const navigate = useNavigate();
+
+  const isSharePage = location.pathname.startsWith("/s/");
 
   const { user } = isSharePage
     ? { user: null }
@@ -60,17 +72,16 @@ function GlobalHeader() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    navigate("/");
+    navigate("/login");
     window.location.reload();
   };
 
-    const lockAdvancedPacks =
+  const lockAdvancedPacks =
     user?.plan === "FREE" ||
     user?.plan === "BASIC";
 
   return (
     <header className="mr-global-header">
-
       <div className="mr-header-left">
         <a href="/" className="mr-logo-link">
           MagicReel
@@ -83,7 +94,6 @@ function GlobalHeader() {
             </span>
 
             <div className="mr-create-dropdown">
-
               <a href="/create-v2" className="mr-create-item">
                 <div className="mr-create-item-title">
                   E-Commerce Pack
@@ -138,7 +148,6 @@ function GlobalHeader() {
                   </div>
                 </a>
               )}
-
             </div>
           </div>
 
@@ -159,7 +168,9 @@ function GlobalHeader() {
             Help ▾
             <div className="mr-help-dropdown">
               <a href="/docs">Documentation</a>
-              <a href="/docs/image-quality">Image Guidelines</a>
+              <a href="/docs/image-quality">
+                Image Guidelines
+              </a>
               <a href="/faq">FAQ</a>
               <a href="/contact">Contact</a>
             </div>
@@ -167,33 +178,27 @@ function GlobalHeader() {
         </nav>
       </div>
 
-{/* 🔥 HEADER RIGHT */}
-{user && (
-  <div className="mr-header-right">
+      {user && (
+        <div className="mr-header-right">
+          <span className="mr-credits">
+            {user.creditsAvailable} Credits
+          </span>
 
-    <span className="mr-credits">
-      {user.creditsAvailable} Credits
-    </span>
+          <div className="mr-profile-menu">
+            <div className="mr-user-circle">
+              {user.email.charAt(0).toUpperCase()}
+            </div>
 
-    <div className="mr-profile-menu">
-
-      <div className="mr-user-circle">
-        {user.email.charAt(0).toUpperCase()}
-      </div>
-
-      <div className="mr-profile-dropdown">
-        <a href="/dashboard">Dashboard</a>
-        <a href="/settings">Settings</a>
-        <button onClick={handleLogout}>
-          Logout
-        </button>
-      </div>
-
-    </div>
-
-  </div>
-)}
-
+            <div className="mr-profile-dropdown">
+              <a href="/dashboard">Dashboard</a>
+              <a href="/settings">Settings</a>
+              <button onClick={handleLogout}>
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
@@ -205,36 +210,34 @@ function GlobalHeader() {
 function AppRoutes() {
   return (
     <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/create" element={<CreatePage />} />
+      <Route path="/create-v2" element={<CreateV2Page />} />
+      <Route path="/lookbook" element={<LookbookPage />} />
+      <Route path="/cinematic" element={<CinematicPage />} />
+      <Route path="/plans" element={<PlansPage />} />
+      <Route path="/tryon-demo" element={<TryOnDemo />} />
 
-  <Route path="/" element={<HomePage />} />
-  <Route path="/create" element={<CreatePage />} />
-  <Route path="/create-v2" element={<CreateV2Page />} />
-  <Route path="/lookbook" element={<LookbookPage />} />
-  <Route path="/cinematic" element={<CinematicPage />} />
-  <Route path="/plans" element={<PlansPage />} />
-  <Route path="/tryon-demo" element={<TryOnDemo />} />
-  <Route path="/login" element={<Login />} />
-  <Route path="/view" element={<ViewPage />} />
-  <Route path="/predictions" element={<PredictionsPage />} />
-  // <Route path="/reel/share" element={<ShareStudioPage />} />
-  <Route path="/reel/view" element={<ReelMobileView />} />
-  <Route path="/share/:id" element={<SharePage />} />
-  {/* ✅ FIX: ADD CORRECT REEL ROUTE */}
-  <Route path="/reel" element={<ReelViewerPage />} />
+      {/* 🔐 AUTH */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
 
-  {/* (optional keep old, but not used anymore) */}
-  <Route path="/reel-viewer" element={<ReelViewerPage />} />
+      <Route path="/view" element={<ViewPage />} />
+      <Route path="/predictions" element={<PredictionsPage />} />
 
-  <Route path="/dashboard" element={<DashboardPage />} />
-  <Route path="/v3" element={<CreatePageV3 />} />
+      <Route path="/reel/view" element={<ReelMobileView />} />
+      <Route path="/share/:id" element={<SharePage />} />
+      <Route path="/reel" element={<ReelViewerPage />} />
+      <Route path="/reel-viewer" element={<ReelViewerPage />} />
 
-  {/* 🔥 NEW ROUTE */}
-  <Route
-    path="/docs/image-quality"
-    element={<ImageQualityPage />}
-  />
+      <Route path="/dashboard" element={<DashboardPage />} />
+      <Route path="/v3" element={<CreatePageV3 />} />
 
-</Routes>
+      <Route
+        path="/docs/image-quality"
+        element={<ImageQualityPage />}
+      />
+    </Routes>
   );
 }
 
@@ -245,7 +248,6 @@ function AppRoutes() {
 function AppLayout() {
   const fetchMe = useAuthStore((state) => state.fetchMe);
 
-  // 🔥 THIS WAS MISSING
   React.useEffect(() => {
     fetchMe();
   }, [fetchMe]);
@@ -268,17 +270,9 @@ function AppLayout() {
 export default function App() {
   return (
     <BrowserRouter>
-
-      <AuthProvider>
-
-        <GenerateProvider>
-
-          <AppLayout />
-
-        </GenerateProvider>
-
-      </AuthProvider>
-
+      <GenerateProvider>
+        <AppLayout />
+      </GenerateProvider>
     </BrowserRouter>
   );
 }

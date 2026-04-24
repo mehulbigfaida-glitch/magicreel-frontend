@@ -1,22 +1,17 @@
 import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { API_BASE } from "../config/api";
 import { useAuthStore } from "../store/authStore";
 
-const Login: React.FC = () => {
+const Signup: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
-  const location = useLocation();
-
   const setAuth = useAuthStore((s) => s.setAuth);
 
-  const redirectTo =
-    new URLSearchParams(location.search).get("redirect") || "/create-v2";
-
-  const handleLogin = async () => {
+  const handleSignup = async () => {
     setError("");
 
     if (!email || !password) {
@@ -25,7 +20,7 @@ const Login: React.FC = () => {
     }
 
     try {
-      const res = await fetch(`${API_BASE}/api/auth/login`, {
+      const res = await fetch(`${API_BASE}/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -36,13 +31,13 @@ const Login: React.FC = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Login failed");
+        throw new Error(data.error || "Signup failed");
       }
 
-      // 🔥 SET AUTH (instead of manual localStorage)
+      // 🔥 AUTO LOGIN
       setAuth(data.token, data.user);
 
-      navigate(redirectTo);
+      navigate("/create-v2");
     } catch (err: any) {
       setError(err.message);
     }
@@ -51,7 +46,7 @@ const Login: React.FC = () => {
   return (
     <div style={containerStyle}>
       <div style={cardStyle}>
-        <div style={titleStyle}>MagicReel Login</div>
+        <div style={titleStyle}>Create your account</div>
 
         <input
           type="email"
@@ -71,18 +66,17 @@ const Login: React.FC = () => {
 
         {error && <div style={errorStyle}>{error}</div>}
 
-        <button onClick={handleLogin} style={buttonStyle}>
-          Login
+        <button onClick={handleSignup} style={buttonStyle}>
+          Sign up
         </button>
 
-        {/* 🔥 Signup Redirect */}
         <div style={footerStyle}>
-          Don’t have an account?{" "}
+          Already have an account?{" "}
           <span
             style={linkStyle}
-            onClick={() => navigate("/signup")}
+            onClick={() => navigate("/login")}
           >
-            Sign up
+            Login
           </span>
         </div>
       </div>
@@ -156,4 +150,4 @@ const linkStyle: React.CSSProperties = {
   fontWeight: 500,
 };
 
-export default Login;
+export default Signup;
