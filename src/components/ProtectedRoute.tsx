@@ -6,11 +6,21 @@ interface Props {
 }
 
 export default function ProtectedRoute({ children }: Props) {
-  const token = localStorage.getItem("token");
   const location = useLocation();
 
+  const token =
+    typeof window !== "undefined"
+      ? localStorage.getItem("token")
+      : null;
+
+  // 🔐 HARD BLOCK
   if (!token) {
-    return <Navigate to={`/login?redirect=${location.pathname}`} replace />;
+    return (
+      <Navigate
+        to={`/login?redirect=${encodeURIComponent(location.pathname)}`}
+        replace
+      />
+    );
   }
 
   return <>{children}</>;
