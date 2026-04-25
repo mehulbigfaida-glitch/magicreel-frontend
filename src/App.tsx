@@ -31,7 +31,7 @@ import ReelMobileView from "./pages/reel/ReelMobileView";
 
 import PredictionsPage from "./pages/PredictionsPage";
 import DashboardPage from "./pages/dashboard/DashboardPage";
-
+import ProtectedRoute from "./components/ProtectedRoute";
 import SharePage from "./pages/SharePage";
 import ImageQualityPage from "./pages/docs/ImageQualityPage";
 import CreatePageV3 from "./v3/pages/CreatePageV3";
@@ -210,34 +210,62 @@ function GlobalHeader() {
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/create" element={<CreatePage />} />
-      <Route path="/create-v2" element={<CreateV2Page />} />
-      <Route path="/lookbook" element={<LookbookPage />} />
-      <Route path="/cinematic" element={<CinematicPage />} />
-      <Route path="/plans" element={<PlansPage />} />
-      <Route path="/tryon-demo" element={<TryOnDemo />} />
+  <Route path="/" element={<HomePage />} />
+  <Route path="/create" element={<CreatePage />} />
 
-      {/* 🔐 AUTH */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
+  {/* 🔐 PROTECTED */}
+  <Route
+    path="/create-v2"
+    element={
+      <ProtectedRoute>
+        <CreateV2Page />
+      </ProtectedRoute>
+    }
+  />
 
-      <Route path="/view" element={<ViewPage />} />
-      <Route path="/predictions" element={<PredictionsPage />} />
+  <Route path="/lookbook" element={<LookbookPage />} />
+  <Route path="/cinematic" element={<CinematicPage />} />
+  <Route path="/plans" element={<PlansPage />} />
+  <Route path="/tryon-demo" element={<TryOnDemo />} />
 
-      <Route path="/reel/view" element={<ReelMobileView />} />
-      <Route path="/share/:id" element={<SharePage />} />
-      <Route path="/reel" element={<ReelViewerPage />} />
-      <Route path="/reel-viewer" element={<ReelViewerPage />} />
+  {/* 🔐 AUTH */}
+  <Route path="/login" element={<Login />} />
+  <Route path="/signup" element={<Signup />} />
 
-      <Route path="/dashboard" element={<DashboardPage />} />
-      <Route path="/v3" element={<CreatePageV3 />} />
+  <Route path="/view" element={<ViewPage />} />
 
-      <Route
-        path="/docs/image-quality"
-        element={<ImageQualityPage />}
-      />
-    </Routes>
+  {/* 🔐 PROTECTED */}
+  <Route
+    path="/predictions"
+    element={
+      <ProtectedRoute>
+        <PredictionsPage />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route path="/reel/view" element={<ReelMobileView />} />
+  <Route path="/share/:id" element={<SharePage />} />
+  <Route path="/reel" element={<ReelViewerPage />} />
+  <Route path="/reel-viewer" element={<ReelViewerPage />} />
+
+  {/* 🔐 PROTECTED */}
+  <Route
+    path="/dashboard"
+    element={
+      <ProtectedRoute>
+        <DashboardPage />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route path="/v3" element={<CreatePageV3 />} />
+
+  <Route
+    path="/docs/image-quality"
+    element={<ImageQualityPage />}
+  />
+</Routes>
   );
 }
 
@@ -247,10 +275,19 @@ function AppRoutes() {
 
 function AppLayout() {
   const fetchMe = useAuthStore((state) => state.fetchMe);
+  const setUser = useAuthStore((state) => state.setUser);
 
   React.useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    // 🔥 FORCE RESET IF NO TOKEN
+    if (!token) {
+      setUser(null);
+      return;
+    }
+
     fetchMe();
-  }, [fetchMe]);
+  }, [fetchMe, setUser]);
 
   return (
     <div className="mr-app-wrapper">

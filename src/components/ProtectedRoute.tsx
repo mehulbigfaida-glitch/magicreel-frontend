@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { useAuthStore } from "../store/authStore";
 
 interface Props {
   children: ReactNode;
@@ -8,15 +7,14 @@ interface Props {
 
 export default function ProtectedRoute({ children }: Props) {
   const location = useLocation();
-  const { user, loading } = useAuthStore();
 
-  // ⏳ Wait for auth check
-  if (loading) {
-    return null;
-  }
+  const token =
+    typeof window !== "undefined"
+      ? localStorage.getItem("token")
+      : null;
 
-  // 🔐 Block if not logged in
-  if (!user) {
+  // 🔥 HARD BLOCK (no Zustand dependency)
+  if (!token) {
     return (
       <Navigate
         to={`/login?redirect=${encodeURIComponent(location.pathname)}`}
