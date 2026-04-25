@@ -15,13 +15,30 @@ export default function PredictionsPage() {
   const [data, setData] = useState<Prediction[]>([]);
 
   useEffect(() => {
-    const fetchPredictions = async () => {
+  const fetchPredictions = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        console.log("❌ No token found");
+        return;
+      }
+
       const res = await fetch(
         "https://magicreel-backend-production.up.railway.app/api/predictions",
-        { credentials: "include" }
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       const json = await res.json();
+
+      if (!res.ok) {
+        console.error("❌ Failed to fetch predictions:", json);
+        return;
+      }
 
       const predictions: Prediction[] = Array.isArray(json)
         ? json
@@ -34,10 +51,13 @@ export default function PredictionsPage() {
       );
 
       setData(predictions);
-    };
+    } catch (err) {
+      console.error("❌ Fetch error:", err);
+    }
+  };
 
-    fetchPredictions();
-  }, []);
+  fetchPredictions();
+}, []);
 
   return (
     <div style={{ padding: "24px", maxWidth: "1600px", margin: "0 auto" }}>
