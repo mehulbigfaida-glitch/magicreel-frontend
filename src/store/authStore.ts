@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { API_BASE } from "../config/api";
+
 interface AuthState {
   user: any | null;
   loading: boolean;
@@ -39,12 +39,16 @@ export const useAuthStore = create<AuthState>((set) => ({
     const token = localStorage.getItem("token");
 
     if (!token) {
-      set({ user: null, loading: false });
+      // 🔥 CRITICAL FIX
+      set({
+        user: null,
+        loading: false,
+      });
       return;
     }
 
     const res = await fetch(
-      `${API_BASE}/api/auth/me`,
+      `${import.meta.env.VITE_API_BASE}/api/auth/me`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -52,31 +56,23 @@ export const useAuthStore = create<AuthState>((set) => ({
       }
     );
 
-    // 🔥 IMPORTANT: handle non-JSON safely
-    const text = await res.text();
-
-    let data: any = null;
-    try {
-      data = JSON.parse(text);
-    } catch {
-      console.warn("⚠️ Non-JSON response from /me:", text);
-      set({ user: null, loading: false });
-      return;
-    }
-
-    if (res.ok && data?.user) {
-      set({
-        user: data.user,
-        loading: false,
-      });
-    } else {
+    if (!res.ok) {
+      // 🔥 CRITICAL FIX
       set({
         user: null,
         loading: false,
       });
+      return;
     }
+
+    const data = await res.json();
+
+    set({
+      user: data.user,
+      loading: false,
+    });
   } catch (err) {
-    console.error("fetchMe failed:", err);
+    // 🔥 CRITICAL FIX
     set({
       user: null,
       loading: false,
