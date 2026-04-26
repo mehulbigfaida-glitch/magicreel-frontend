@@ -1,5 +1,5 @@
 import "./PlansPage.css";
-import { useAuthStore } from "../store/authStore";
+
 
 type Plan = {
   name: string;
@@ -65,8 +65,7 @@ const loadRazorpayScript = (): Promise<boolean> => {
 };
 
 export default function PlansPage() {
-  const { refreshCredits } = useAuthStore();
-
+  
   const BACKEND_URL = import.meta.env.VITE_API_BASE;
 
   const handleUpgrade = async (planName: string) => {
@@ -106,7 +105,7 @@ export default function PlansPage() {
         return;
       }
 
-      // 💳 STEP 2 — OPEN RAZORPAY
+            // 💳 STEP 2 — OPEN RAZORPAY
       const options = {
         key: orderData.key,
         amount: orderData.amount,
@@ -115,37 +114,63 @@ export default function PlansPage() {
         description: `${plan} Plan`,
         order_id: orderData.orderId,
 
-        handler: async function (response: any) {
-          // 🔐 STEP 3 — VERIFY PAYMENT
-          const verifyRes = await fetch(
-            `${BACKEND_URL}/api/payments/verify-payment`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-              },
-              body: JSON.stringify({
-                ...response,
-                plan,
-              }),
-            }
-          );
-
-          const verifyData = await verifyRes.json();
-
-          if (!verifyData.success) {
-            alert("Payment verification failed");
-            return;
-          }
-
-          // ✅ REFRESH CREDITS
-          await refreshCredits();
-
-          alert("Payment successful! Credits added.");
-
-          window.location.href = "/create-v2";
+        // ✅ CONTROL PAYMENT METHODS
+        method: {
+          netbanking: true,
+          card: true,
+          upi: true,
+          wallet: true,
+          paylater: false, // ❌ DISABLED
         },
+
+        handler: async function (response: any) {
+  const verifyRes = await fetch(
+    `${BACKEND_URL}/api/payments/verify-payment`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({
+        ...response,
+        plan,
+      }),
+    }
+  );
+
+  const verifyData = await verifyRes.json();
+
+  if (!verifyData.success) {
+    alert("Payment verification failed");
+    return;
+  }
+
+  // ✅ CLEAN UX (no alert)
+  console.log("✅ Payment successful");
+
+  // OPTIONAL: small toast (temporary fallback)
+  const toast = document.createElement("div");
+  toast.innerText = "Payment successful! Credits added.";
+  toast.style.position = "fixed";
+  toast.style.top = "20px";
+  toast.style.right = "20px";
+  toast.style.background = "#22c55e";
+  toast.style.color = "white";
+  toast.style.padding = "12px 18px";
+  toast.style.borderRadius = "8px";
+  toast.style.zIndex = "9999";
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+
+  // Redirect after short delay
+  setTimeout(() => {
+    window.location.href = "/create-v2";
+  }, 1200);
+},
 
         theme: {
           color: "#6366f1",
