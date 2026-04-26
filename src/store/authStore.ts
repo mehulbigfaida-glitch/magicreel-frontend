@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { API_BASE } from "../config/api";
 
 interface AuthState {
   user: any | null;
@@ -7,10 +8,11 @@ interface AuthState {
   setUser: (user: any) => void;
   setAuth: (token: string, user: any) => void;
   fetchMe: () => Promise<void>;
+  refreshCredits: () => Promise<void>;
   logout: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   loading: false,
 
@@ -20,7 +22,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   setUser: (user) => set({ user }),
 
   // ----------------------------
-  // 🔥 SET AUTH (CRITICAL FOR LOGIN/SIGNUP)
+  // 🔥 SET AUTH
   // ----------------------------
   setAuth: (token, user) => {
     localStorage.setItem("token", token);
@@ -32,53 +34,79 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   // ----------------------------
-  // Fetch Current User
+  // Fetch Current User (FULL LOAD)
   // ----------------------------
   fetchMe: async () => {
-  try {
-    const token = localStorage.getItem("token");
+    try {
+      const token = localStorage.getItem("token");
 
-    if (!token) {
-      // 🔥 CRITICAL FIX
-      set({
-        user: null,
-        loading: false,
-      });
-      return;
-    }
+      if (!token) {
+        set({ user: null, loading: false });
+        return;
+      }
 
-    const res = await fetch(
-      `${import.meta.env.VITE_API_BASE}/api/auth/me`,
-      {
+      set({ loading: true });
+
+      const res = await fetch(`${API_BASE}/api/auth/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
-    );
+      });
 
-    if (!res.ok) {
-      // 🔥 CRITICAL FIX
+      if (!res.ok) {
+        set({ user: null, loading: false });
+        return;
+      }
+
+      const data = await res.json();
+
+      // ✅ SAFE SET
+      set({
+        user: data.user || null,
+        loading: false,
+      });
+
+    } catch (err) {
       set({
         user: null,
         loading: false,
       });
-      return;
     }
+  },
 
-    const data = await res.json();
+  // ----------------------------
+  // 🔄 REFRESH CREDITS (SAFE MERGE)
+  // ----------------------------
+  refreshCredits: async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-    set({
-      user: data.user,
-      loading: false,
-    });
-  } catch (err) {
-    // 🔥 CRITICAL FIX
-    set({
-      user: null,
-      loading: false,
-    });
-  }
-},
+      if (!token) return;
+
+      const res = await fetch(`${API_BASE}/api/auth/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) return;
+
+      const data = await res.json();
+
+      const currentUser = get().user;
+
+      // ✅ MERGE instead of overwrite
+      set({
+        user: {
+          ...currentUser,
+          ...data.user,
+        },
+      });
+
+    } catch (err) {
+      console.error("refreshCredits error:", err);
+    }
+  },
 
   // ----------------------------
   // Logout

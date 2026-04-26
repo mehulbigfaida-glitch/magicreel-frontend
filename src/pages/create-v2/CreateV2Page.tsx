@@ -226,11 +226,17 @@ const generateHero = async () => {
     );
 
     const data = await res.json();
-    
 
-    if (!res.ok) {
-      throw new Error(data.error || "Hero failed");
-    }
+// 🚨 CREDIT BLOCK (HIGHEST PRIORITY)
+if (res.status === 403) {
+  window.location.href = "/plans";
+  return;
+}
+
+// ❌ OTHER ERRORS
+if (!res.ok) {
+  throw new Error(data.error || "Hero failed");
+}
 
     setFrontRunId(data.frontRunId);
     setBackRunId(data.backRunId || null);

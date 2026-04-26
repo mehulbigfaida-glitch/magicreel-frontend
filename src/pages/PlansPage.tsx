@@ -1,4 +1,5 @@
 import "./PlansPage.css";
+import { useAuthStore } from "../store/authStore";
 
 type Plan = {
   name: string;
@@ -11,13 +12,13 @@ type Plan = {
 
 const plans: Plan[] = [
   {
-    name: "FREE",
-    price: "₹0",
-    generations: 3,
-    creditPrice: "",
-    packs: ["E-Commerce Pack"],
-  },
-  {
+  name: "FREE",
+  price: "₹0",
+  generations: 1, // ✅ was 3 → now 1
+  creditPrice: "",
+  packs: ["E-Commerce Pack"],
+},
+  { 
     name: "BASIC",
     price: "₹900",
     generations: 10,
@@ -42,9 +43,50 @@ const plans: Plan[] = [
 ];
 
 export default function PlansPage() {
+  const { refreshCredits } = useAuthStore();
 
-  const handleUpgrade = (planName: string) => {
-    alert(`Upgrade to ${planName} coming soon`);
+  const handleUpgrade = async (planName: string) => {
+    try {
+      // ❌ FREE should not call upgrade
+      if (planName === "FREE") {
+        window.location.href = "/create-v2";
+        return;
+      }
+
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE}/api/billing/upgrade`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            plan: planName,
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Upgrade failed");
+        return;
+      }
+
+      // ✅ REFRESH CREDITS (IMPORTANT)
+      await refreshCredits();
+
+      // ✅ SUCCESS UX
+      alert("Upgrade successful!");
+
+      // 🔁 REDIRECT BACK
+      window.location.href = "/create-v2";
+
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong");
+    }
   };
 
   return (

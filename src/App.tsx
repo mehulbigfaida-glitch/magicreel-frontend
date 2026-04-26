@@ -28,7 +28,6 @@ import CinematicPage from "./pages/create-v2/cinematic/CinematicPage";
 import ReelViewerPage from "./pages/reel/ReelViewerPage";
 import ReelMobileView from "./pages/reel/ReelMobileView";
 
-
 import PredictionsPage from "./pages/PredictionsPage";
 import DashboardPage from "./pages/dashboard/DashboardPage";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -42,7 +41,6 @@ import CreatePageV3 from "./v3/pages/CreatePageV3";
 
 import { GenerateProvider } from "./context/GenerateContext";
 
-
 import "./App.css";
 
 /* =========================
@@ -55,9 +53,9 @@ function GlobalHeader() {
 
   const isSharePage = location.pathname.startsWith("/s/");
 
-  const { user } = isSharePage
-    ? { user: null }
-    : useAuthStore();
+  const user = isSharePage
+  ? null
+  : useAuthStore((state) => state.user);
 
   const hideHeaderRoutes = [
     "/create-v2",
@@ -98,9 +96,6 @@ function GlobalHeader() {
                 <div className="mr-create-item-title">
                   E-Commerce Pack
                 </div>
-                <div className="mr-create-item-desc">
-                  Studio product photos for marketplaces
-                </div>
               </a>
 
               {lockAdvancedPacks ? (
@@ -108,21 +103,11 @@ function GlobalHeader() {
                   className="mr-create-item locked"
                   onClick={() => navigate("/plans")}
                 >
-                  <div className="mr-create-item-title">
-                    🔒 Social Pack
-                  </div>
-                  <div className="mr-create-item-desc">
-                    Instagram ready visuals and reels
-                  </div>
+                  🔒 Social Pack
                 </div>
               ) : (
                 <a href="/social-pack" className="mr-create-item">
-                  <div className="mr-create-item-title">
-                    Social Pack
-                  </div>
-                  <div className="mr-create-item-desc">
-                    Instagram ready visuals and reels
-                  </div>
+                  Social Pack
                 </a>
               )}
 
@@ -131,72 +116,44 @@ function GlobalHeader() {
                   className="mr-create-item locked"
                   onClick={() => navigate("/plans")}
                 >
-                  <div className="mr-create-item-title">
-                    🔒 Cinematic Pack
-                  </div>
-                  <div className="mr-create-item-desc">
-                    High-end fashion campaign visuals
-                  </div>
+                  🔒 Cinematic Pack
                 </div>
               ) : (
                 <a href="/cinematic" className="mr-create-item">
-                  <div className="mr-create-item-title">
-                    Cinematic Pack
-                  </div>
-                  <div className="mr-create-item-desc">
-                    High-end fashion campaign visuals
-                  </div>
+                  Cinematic Pack
                 </a>
               )}
             </div>
           </div>
 
-          <a
-            href="/predictions"
-            className={
-              location.pathname === "/predictions"
-                ? "active"
-                : ""
-            }
-          >
-            Creations
-          </a>
-
+          <a href="/predictions">Creations</a>
           <a href="/plans">Plans</a>
-
-          <div className="mr-help-menu">
-            Help ▾
-            <div className="mr-help-dropdown">
-              <a href="/docs">Documentation</a>
-              <a href="/docs/image-quality">
-                Image Guidelines
-              </a>
-              <a href="/faq">FAQ</a>
-              <a href="/contact">Contact</a>
-            </div>
-          </div>
         </nav>
       </div>
 
-      {user && (
+      {/* ✅ SAFE HEADER RENDER */}
+      {user && user.email ? (
         <div className="mr-header-right">
           <span className="mr-credits">
-            {user.creditsAvailable} Credits
+            {user.creditsAvailable ?? 0} Credits
           </span>
 
           <div className="mr-profile-menu">
             <div className="mr-user-circle">
-              {user.email.charAt(0).toUpperCase()}
+              {user.email?.charAt(0)?.toUpperCase() || "U"}
             </div>
 
             <div className="mr-profile-dropdown">
               <a href="/dashboard">Dashboard</a>
-              <a href="/settings">Settings</a>
               <button onClick={handleLogout}>
                 Logout
               </button>
             </div>
           </div>
+        </div>
+      ) : (
+        <div className="mr-header-right">
+          <span className="mr-credits">...</span>
         </div>
       )}
     </header>
@@ -210,62 +167,58 @@ function GlobalHeader() {
 function AppRoutes() {
   return (
     <Routes>
-  <Route path="/" element={<HomePage />} />
-  <Route path="/create" element={<CreatePage />} />
+      <Route path="/" element={<HomePage />} />
+      <Route path="/create" element={<CreatePage />} />
 
-  {/* 🔐 PROTECTED */}
-  <Route
-    path="/create-v2"
-    element={
-      <ProtectedRoute>
-        <CreateV2Page />
-      </ProtectedRoute>
-    }
-  />
+      <Route
+        path="/create-v2"
+        element={
+          <ProtectedRoute>
+            <CreateV2Page />
+          </ProtectedRoute>
+        }
+      />
 
-  <Route path="/lookbook" element={<LookbookPage />} />
-  <Route path="/cinematic" element={<CinematicPage />} />
-  <Route path="/plans" element={<PlansPage />} />
-  <Route path="/tryon-demo" element={<TryOnDemo />} />
+      <Route path="/lookbook" element={<LookbookPage />} />
+      <Route path="/cinematic" element={<CinematicPage />} />
+      <Route path="/plans" element={<PlansPage />} />
+      <Route path="/tryon-demo" element={<TryOnDemo />} />
 
-  {/* 🔐 AUTH */}
-  <Route path="/login" element={<Login />} />
-  <Route path="/signup" element={<Signup />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
 
-  <Route path="/view" element={<ViewPage />} />
+      <Route path="/view" element={<ViewPage />} />
 
-  {/* 🔐 PROTECTED */}
-  <Route
-    path="/predictions"
-    element={
-      <ProtectedRoute>
-        <PredictionsPage />
-      </ProtectedRoute>
-    }
-  />
+      <Route
+        path="/predictions"
+        element={
+          <ProtectedRoute>
+            <PredictionsPage />
+          </ProtectedRoute>
+        }
+      />
 
-  <Route path="/reel/view" element={<ReelMobileView />} />
-  <Route path="/share/:id" element={<SharePage />} />
-  <Route path="/reel" element={<ReelViewerPage />} />
-  <Route path="/reel-viewer" element={<ReelViewerPage />} />
+      <Route path="/reel/view" element={<ReelMobileView />} />
+      <Route path="/share/:id" element={<SharePage />} />
+      <Route path="/reel" element={<ReelViewerPage />} />
+      <Route path="/reel-viewer" element={<ReelViewerPage />} />
 
-  {/* 🔐 PROTECTED */}
-  <Route
-    path="/dashboard"
-    element={
-      <ProtectedRoute>
-        <DashboardPage />
-      </ProtectedRoute>
-    }
-  />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <DashboardPage />
+          </ProtectedRoute>
+        }
+      />
 
-  <Route path="/v3" element={<CreatePageV3 />} />
+      <Route path="/v3" element={<CreatePageV3 />} />
 
-  <Route
-    path="/docs/image-quality"
-    element={<ImageQualityPage />}
-  />
-</Routes>
+      <Route
+        path="/docs/image-quality"
+        element={<ImageQualityPage />}
+      />
+    </Routes>
   );
 }
 
@@ -277,22 +230,24 @@ function AppLayout() {
   const fetchMe = useAuthStore((state) => state.fetchMe);
   const setUser = useAuthStore((state) => state.setUser);
 
+  const location = useLocation(); // 🔥 ADD THIS
+
   React.useEffect(() => {
     const token = localStorage.getItem("token");
 
-    // 🔥 FORCE RESET IF NO TOKEN
     if (!token) {
       setUser(null);
       return;
     }
 
+    // 🔥 RUN ON EVERY ROUTE CHANGE
     fetchMe();
-  }, [fetchMe, setUser]);
+
+  }, [location.pathname]); // 🔥 KEY FIX
 
   return (
     <div className="mr-app-wrapper">
       <GlobalHeader />
-
       <div className="mr-app-content">
         <AppRoutes />
       </div>
