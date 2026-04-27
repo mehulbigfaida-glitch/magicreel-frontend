@@ -1,5 +1,5 @@
 import "./PlansPage.css";
-
+import { useEffect, useState } from "react";
 
 type Plan = {
   name: string;
@@ -65,12 +65,39 @@ const loadRazorpayScript = (): Promise<boolean> => {
 };
 
 export default function PlansPage() {
-  
   const BACKEND_URL = import.meta.env.VITE_API_BASE;
+
+  // ✅ NEW STATE
+  const [payments, setPayments] = useState<any[]>([]);
+
+  // ✅ FETCH PAYMENT HISTORY
+  const fetchPayments = async () => {
+    try {
+      const res = await fetch(
+        `${BACKEND_URL}/api/payments/history`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      const data = await res.json();
+
+      if (data.success) {
+        setPayments(data.data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch payments", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchPayments();
+  }, []);
 
   const handleUpgrade = async (planName: string) => {
     try {
-      // ✅ FREE FLOW (unchanged)
       if (planName === "FREE") {
         window.location.href = "/create-v2";
         return;
@@ -78,14 +105,12 @@ export default function PlansPage() {
 
       const plan = planName as PaidPlan;
 
-      // 🔧 Load Razorpay
       const loaded = await loadRazorpayScript();
       if (!loaded) {
         alert("Failed to load payment system");
         return;
       }
 
-      // 🔐 STEP 1 — CREATE ORDER
       const orderRes = await fetch(
         `${BACKEND_URL}/api/payments/create-order`,
         {
@@ -105,7 +130,6 @@ export default function PlansPage() {
         return;
       }
 
-            // 💳 STEP 2 — OPEN RAZORPAY
       const options = {
         key: orderData.key,
         amount: orderData.amount,
@@ -114,63 +138,62 @@ export default function PlansPage() {
         description: `${plan} Plan`,
         order_id: orderData.orderId,
 
-        // ✅ CONTROL PAYMENT METHODS
         method: {
           netbanking: true,
           card: true,
           upi: true,
           wallet: true,
-          paylater: false, // ❌ DISABLED
+          paylater: false,
         },
 
         handler: async function (response: any) {
-  const verifyRes = await fetch(
-    `${BACKEND_URL}/api/payments/verify-payment`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      body: JSON.stringify({
-        ...response,
-        plan,
-      }),
-    }
-  );
+          const verifyRes = await fetch(
+            `${BACKEND_URL}/api/payments/verify-payment`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+              body: JSON.stringify({
+                ...response,
+                plan,
+              }),
+            }
+          );
 
-  const verifyData = await verifyRes.json();
+          const verifyData = await verifyRes.json();
 
-  if (!verifyData.success) {
-    alert("Payment verification failed");
-    return;
-  }
+          if (!verifyData.success) {
+            alert("Payment verification failed");
+            return;
+          }
 
-  // ✅ CLEAN UX (no alert)
-  console.log("✅ Payment successful");
+          console.log("✅ Payment successful");
 
-  // OPTIONAL: small toast (temporary fallback)
-  const toast = document.createElement("div");
-  toast.innerText = "Payment successful! Credits added.";
-  toast.style.position = "fixed";
-  toast.style.top = "20px";
-  toast.style.right = "20px";
-  toast.style.background = "#22c55e";
-  toast.style.color = "white";
-  toast.style.padding = "12px 18px";
-  toast.style.borderRadius = "8px";
-  toast.style.zIndex = "9999";
-  document.body.appendChild(toast);
+          const toast = document.createElement("div");
+          toast.innerText = "Payment successful! Credits added.";
+          toast.style.position = "fixed";
+          toast.style.top = "20px";
+          toast.style.right = "20px";
+          toast.style.background = "#22c55e";
+          toast.style.color = "white";
+          toast.style.padding = "12px 18px";
+          toast.style.borderRadius = "8px";
+          toast.style.zIndex = "9999";
+          document.body.appendChild(toast);
 
-  setTimeout(() => {
-    toast.remove();
-  }, 3000);
+          setTimeout(() => {
+            toast.remove();
+          }, 3000);
 
-  // Redirect after short delay
-  setTimeout(() => {
-    window.location.href = "/create-v2";
-  }, 1200);
-},
+          // 🔥 REFETCH HISTORY AFTER PAYMENT
+          fetchPayments();
+
+          setTimeout(() => {
+            window.location.href = "/create-v2";
+          }, 1200);
+        },
 
         theme: {
           color: "#6366f1",
@@ -179,7 +202,6 @@ export default function PlansPage() {
 
       const rzp = new window.Razorpay(options);
       rzp.open();
-
     } catch (err) {
       console.error(err);
       alert("Something went wrong");
@@ -227,6 +249,39 @@ export default function PlansPage() {
             </button>
           </div>
         ))}
+      </div>
+
+      {/* 🔥 PAYMENT HISTORY UI */}
+      <div style={{ marginTop: "50px", maxWidth: "900px", marginInline: "auto" }}>
+        <h2 style={{ color: "white", marginBottom: "20px" }}>
+          Payment History
+        </h2>
+
+        {payments.length === 0 ? (
+          <p style={{ color: "#aaa" }}>No payments yet</p>
+        ) : (
+          <div>
+            {payments.map((p) => (
+              <div
+                key={p.id}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  padding: "14px",
+                  borderBottom: "1px solid #333",
+                  color: "white",
+                }}
+              >
+                <span>{p.plan}</span>
+                <span>₹{p.amount / 100}</span>
+                <span>{p.status}</span>
+                <span>
+                  {new Date(p.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="enterprise-section">
