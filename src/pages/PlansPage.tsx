@@ -70,13 +70,7 @@ export default function PlansPage() {
   const [payments, setPayments] = useState<any[]>([]);
   const [userInfo, setUserInfo] = useState<any>(null);
 
-  // 🔥 NEW: USAGE STATE
-  const [usage, setUsage] = useState({
-    total: 0,
-    used: 0,
-    remaining: 0,
-  });
-
+  // ✅ FETCH PAYMENTS
   const fetchPayments = async () => {
     try {
       const res = await fetch(`${BACKEND_URL}/api/payments/history`, {
@@ -92,6 +86,7 @@ export default function PlansPage() {
     }
   };
 
+  // ✅ FETCH USER INFO
   const fetchUser = async () => {
     try {
       const res = await fetch(`${BACKEND_URL}/api/auth/me`, {
@@ -111,24 +106,6 @@ export default function PlansPage() {
     fetchPayments();
     fetchUser();
   }, []);
-
-  // 🔥 NEW: CALCULATE USAGE
-  useEffect(() => {
-    if (payments.length && userInfo) {
-      const totalPurchased = payments.reduce((sum, p) => {
-        return sum + p.amount / 100;
-      }, 0);
-
-      const remaining = userInfo.credits_available || 0;
-      const used = Math.max(totalPurchased - remaining, 0);
-
-      setUsage({
-        total: totalPurchased,
-        used,
-        remaining,
-      });
-    }
-  }, [payments, userInfo]);
 
   const handleUpgrade = async (planName: string) => {
     try {
@@ -203,6 +180,9 @@ export default function PlansPage() {
             return;
           }
 
+          console.log("✅ Payment successful");
+
+          // toast
           const toast = document.createElement("div");
           toast.innerText = "Payment successful! Credits added.";
           toast.style.position = "fixed";
@@ -217,6 +197,7 @@ export default function PlansPage() {
 
           setTimeout(() => toast.remove(), 3000);
 
+          // 🔥 refresh UI data
           fetchPayments();
           fetchUser();
 
@@ -245,7 +226,7 @@ export default function PlansPage() {
         <p>Generate studio-quality fashion visuals instantly</p>
       </div>
 
-      {/* CURRENT PLAN */}
+      {/* ✅ CURRENT PLAN STRIP */}
       {userInfo && (
         <div
           style={{
@@ -255,59 +236,21 @@ export default function PlansPage() {
             background: "#111827",
             border: "1px solid #1f2937",
             borderRadius: "12px",
+            display: "flex",
+            justifyContent: "space-between",
             color: "white",
           }}
         >
-          <div style={{ color: "#9ca3af", fontSize: "14px" }}>
-            Current Plan
-          </div>
-          <div style={{ fontSize: "18px", fontWeight: 600 }}>
-            {userInfo.plan === "FREE"
-              ? "Free Plan"
-              : `${userInfo.plan} Plan`}
-          </div>
-        </div>
-      )}
-
-      {/* 🔥 NEW: USAGE TRACKER */}
-      {usage.total > 0 && (
-        <div style={{ marginBottom: "40px", maxWidth: "900px", marginInline: "auto" }}>
-          <h2 style={{ color: "white", marginBottom: "15px" }}>
-            Credits Usage
-          </h2>
-
-          <div style={{
-            background: "#111827",
-            padding: "20px",
-            borderRadius: "12px",
-            border: "1px solid #1f2937",
-            color: "white"
-          }}>
-            <div style={{ marginBottom: "10px" }}>
-              Total: {usage.total}
+          <div>
+            <div style={{ color: "#9ca3af", fontSize: "14px" }}>
+              Current Plan
             </div>
-            <div style={{ marginBottom: "10px" }}>
-              Used: {usage.used}
-            </div>
-            <div style={{ marginBottom: "15px" }}>
-              Remaining: {usage.remaining}
-            </div>
-
-            <div style={{
-              height: "8px",
-              background: "#1f2937",
-              borderRadius: "4px",
-              overflow: "hidden"
-            }}>
-              <div
-                style={{
-                  width: `${(usage.used / usage.total) * 100}%`,
-                  background: "#6366f1",
-                  height: "100%"
-                }}
-              />
+            <div style={{ fontSize: "18px", fontWeight: 600 }}>
+              {userInfo.plan === "FREE" ? "Free Plan" : `${userInfo.plan} Plan`}
             </div>
           </div>
+
+          
         </div>
       )}
 
@@ -347,7 +290,73 @@ export default function PlansPage() {
         ))}
       </div>
 
-      {/* PAYMENT HISTORY stays same */}
+      {/* PAYMENT HISTORY */}
+      <div style={{ marginTop: "60px", maxWidth: "1000px", marginInline: "auto" }}>
+        <h2 style={{ color: "white", marginBottom: "20px" }}>
+          Payment History
+        </h2>
+
+        {payments.length === 0 ? (
+          <p style={{ color: "#aaa" }}>No payments yet</p>
+        ) : (
+          <div
+            style={{
+              background: "#0f172a",
+              borderRadius: "12px",
+              border: "1px solid #1e293b",
+            }}
+          >
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr 1fr 1fr",
+                padding: "14px 20px",
+                background: "#111827",
+                color: "#9ca3af",
+              }}
+            >
+              <span>Plan</span>
+              <span>Amount</span>
+              <span>Status</span>
+              <span>Date</span>
+            </div>
+
+            {payments.map((p) => (
+              <div
+                key={p.id}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr 1fr 1fr",
+                  padding: "16px 20px",
+                  borderTop: "1px solid #1f2937",
+                  color: "white",
+                }}
+              >
+                <span>{p.plan}</span>
+                <span>₹{p.amount / 100}</span>
+                <span style={{ color: "#22c55e" }}>{p.status}</span>
+                <span style={{ color: "#9ca3af" }}>
+                  {new Date(p.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="enterprise-section">
+        <h2>Enterprise</h2>
+        <p>
+          For large brands and agencies requiring high-volume generation
+        </p>
+
+        <button
+          className="enterprise-btn"
+          onClick={() => (window.location.href = "mailto:sales@magicreel.in")}
+        >
+          Contact Sales
+        </button>
+      </div>
     </div>
   );
 }
