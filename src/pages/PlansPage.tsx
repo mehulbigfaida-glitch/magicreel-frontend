@@ -246,18 +246,11 @@ export default function PlansPage() {
               Current Plan
             </div>
             <div style={{ fontSize: "18px", fontWeight: 600 }}>
-              {userInfo.plan}
+              {userInfo.plan === "FREE" ? "Free Plan" : `${userInfo.plan} Plan`}
             </div>
           </div>
 
-          <div style={{ textAlign: "right" }}>
-            <div style={{ color: "#9ca3af", fontSize: "14px" }}>
-              Credits Available
-            </div>
-            <div style={{ fontSize: "18px", fontWeight: 600 }}>
-              {userInfo.credits_available}
-            </div>
-          </div>
+          
         </div>
       )}
 
