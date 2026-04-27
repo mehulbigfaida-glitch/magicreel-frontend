@@ -67,33 +67,44 @@ const loadRazorpayScript = (): Promise<boolean> => {
 export default function PlansPage() {
   const BACKEND_URL = import.meta.env.VITE_API_BASE;
 
-  // ✅ NEW STATE
   const [payments, setPayments] = useState<any[]>([]);
+  const [userInfo, setUserInfo] = useState<any>(null);
 
-  // ✅ FETCH PAYMENT HISTORY
+  // ✅ FETCH PAYMENTS
   const fetchPayments = async () => {
     try {
-      const res = await fetch(
-        `${BACKEND_URL}/api/payments/history`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const res = await fetch(`${BACKEND_URL}/api/payments/history`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
       const data = await res.json();
-
-      if (data.success) {
-        setPayments(data.data);
-      }
+      if (data.success) setPayments(data.data);
     } catch (err) {
       console.error("Failed to fetch payments", err);
     }
   };
 
+  // ✅ FETCH USER INFO
+  const fetchUser = async () => {
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/auth/me`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      const data = await res.json();
+      if (data.user) setUserInfo(data.user);
+    } catch (err) {
+      console.error("Failed to fetch user", err);
+    }
+  };
+
   useEffect(() => {
     fetchPayments();
+    fetchUser();
   }, []);
 
   const handleUpgrade = async (planName: string) => {
@@ -171,6 +182,7 @@ export default function PlansPage() {
 
           console.log("✅ Payment successful");
 
+          // toast
           const toast = document.createElement("div");
           toast.innerText = "Payment successful! Credits added.";
           toast.style.position = "fixed";
@@ -183,12 +195,11 @@ export default function PlansPage() {
           toast.style.zIndex = "9999";
           document.body.appendChild(toast);
 
-          setTimeout(() => {
-            toast.remove();
-          }, 3000);
+          setTimeout(() => toast.remove(), 3000);
 
-          // 🔥 REFETCH HISTORY AFTER PAYMENT
+          // 🔥 refresh UI data
           fetchPayments();
+          fetchUser();
 
           setTimeout(() => {
             window.location.href = "/create-v2";
@@ -214,6 +225,41 @@ export default function PlansPage() {
         <h1>MagicReel Pricing</h1>
         <p>Generate studio-quality fashion visuals instantly</p>
       </div>
+
+      {/* ✅ CURRENT PLAN STRIP */}
+      {userInfo && (
+        <div
+          style={{
+            maxWidth: "900px",
+            margin: "0 auto 30px auto",
+            padding: "16px 20px",
+            background: "#111827",
+            border: "1px solid #1f2937",
+            borderRadius: "12px",
+            display: "flex",
+            justifyContent: "space-between",
+            color: "white",
+          }}
+        >
+          <div>
+            <div style={{ color: "#9ca3af", fontSize: "14px" }}>
+              Current Plan
+            </div>
+            <div style={{ fontSize: "18px", fontWeight: 600 }}>
+              {userInfo.plan}
+            </div>
+          </div>
+
+          <div style={{ textAlign: "right" }}>
+            <div style={{ color: "#9ca3af", fontSize: "14px" }}>
+              Credits Available
+            </div>
+            <div style={{ fontSize: "18px", fontWeight: 600 }}>
+              {userInfo.credits_available}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="plans-grid">
         {plans.map((plan) => (
@@ -251,8 +297,8 @@ export default function PlansPage() {
         ))}
       </div>
 
-      {/* 🔥 PAYMENT HISTORY UI */}
-      <div style={{ marginTop: "50px", maxWidth: "900px", marginInline: "auto" }}>
+      {/* PAYMENT HISTORY */}
+      <div style={{ marginTop: "60px", maxWidth: "1000px", marginInline: "auto" }}>
         <h2 style={{ color: "white", marginBottom: "20px" }}>
           Payment History
         </h2>
@@ -260,22 +306,43 @@ export default function PlansPage() {
         {payments.length === 0 ? (
           <p style={{ color: "#aaa" }}>No payments yet</p>
         ) : (
-          <div>
+          <div
+            style={{
+              background: "#0f172a",
+              borderRadius: "12px",
+              border: "1px solid #1e293b",
+            }}
+          >
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr 1fr 1fr",
+                padding: "14px 20px",
+                background: "#111827",
+                color: "#9ca3af",
+              }}
+            >
+              <span>Plan</span>
+              <span>Amount</span>
+              <span>Status</span>
+              <span>Date</span>
+            </div>
+
             {payments.map((p) => (
               <div
                 key={p.id}
                 style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  padding: "14px",
-                  borderBottom: "1px solid #333",
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr 1fr 1fr",
+                  padding: "16px 20px",
+                  borderTop: "1px solid #1f2937",
                   color: "white",
                 }}
               >
                 <span>{p.plan}</span>
                 <span>₹{p.amount / 100}</span>
-                <span>{p.status}</span>
-                <span>
+                <span style={{ color: "#22c55e" }}>{p.status}</span>
+                <span style={{ color: "#9ca3af" }}>
                   {new Date(p.createdAt).toLocaleDateString()}
                 </span>
               </div>
