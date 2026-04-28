@@ -27,6 +27,8 @@ type Selection = {
   pill: string | null;
 };
 
+
+
 const initialSelection: Selection = {
   category: null,
   subType: null,
@@ -83,12 +85,33 @@ export default function CreateV2Page() {
   const [heroError, setHeroError] =
     useState<string | null>(null);
 
+  const [creditsMsg, setCreditsMsg] = useState<string | null>(null);
+
   /* 🔥 ADD THESE 2 LINES */
   
 
   const pollRef = useRef<number | null>(null);
   const navigate = useNavigate();
   const fetchMe = useAuthStore((s) => s.fetchMe);
+  useEffect(() => {
+  const raw = sessionStorage.getItem("creditsAdded");
+  if (!raw) return;
+
+  try {
+    const { plan, amount } = JSON.parse(raw);
+    const rupees = amount ? amount / 100 : null;
+
+    const msg = rupees
+      ? `✨ ${plan} Plan activated. ₹${rupees} credited. Start creating.`
+      : `✨ ${plan} Plan activated. Credits added. Start creating.`;
+
+    setCreditsMsg(msg);
+  } catch {
+    setCreditsMsg("✨ Credits added successfully. Start creating.");
+  }
+
+  sessionStorage.removeItem("creditsAdded");
+}, []);
   /* ---------------- Avatar Drawer ---------------- */
 
   useEffect(() => {
@@ -369,6 +392,37 @@ useEffect(() => {
 
   return (
     <>
+      {creditsMsg && (
+  <div
+    style={{
+      maxWidth: "900px",
+      margin: "16px auto",
+      padding: "12px 16px",
+      background: "#052e16",
+      border: "1px solid #14532d",
+      borderRadius: "10px",
+      color: "#86efac",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+    }}
+  >
+    <span>{creditsMsg}</span>
+
+    <button
+      onClick={() => setCreditsMsg(null)}
+      style={{
+        background: "transparent",
+        border: "none",
+        color: "#86efac",
+        cursor: "pointer",
+      }}
+    >
+      ✕
+    </button>
+  </div>
+)}
+      
       <AppShell
         sidebar={
           <StudioSidebar
