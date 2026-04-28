@@ -93,6 +93,7 @@ export default function CreateV2Page() {
   const pollRef = useRef<number | null>(null);
   const navigate = useNavigate();
   const fetchMe = useAuthStore((s) => s.fetchMe);
+  const user = useAuthStore((s) => s.user);
   useEffect(() => {
   const raw = sessionStorage.getItem("creditsAdded");
   if (!raw) return;
@@ -391,38 +392,74 @@ useEffect(() => {
 /* ================= UI ================= */
 
   return (
-    <>
-      {creditsMsg && (
-  <div
-    style={{
-      maxWidth: "900px",
-      margin: "16px auto",
-      padding: "12px 16px",
-      background: "#052e16",
-      border: "1px solid #14532d",
-      borderRadius: "10px",
-      color: "#86efac",
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-    }}
-  >
-    <span>{creditsMsg}</span>
+  <>
+    {creditsMsg && (
+      <div
+        style={{
+          maxWidth: "900px",
+          margin: "16px auto",
+          padding: "12px 16px",
+          background: "#052e16",
+          border: "1px solid #14532d",
+          borderRadius: "10px",
+          color: "#86efac",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <span>{creditsMsg}</span>
 
-    <button
-      onClick={() => setCreditsMsg(null)}
-      style={{
-        background: "transparent",
-        border: "none",
-        color: "#86efac",
-        cursor: "pointer",
-      }}
-    >
-      ✕
-    </button>
-  </div>
-)}
-      
+        <button
+          onClick={() => setCreditsMsg(null)}
+          style={{
+            background: "transparent",
+            border: "none",
+            color: "#86efac",
+            cursor: "pointer",
+          }}
+        >
+          ✕
+        </button>
+      </div>
+    )}
+
+    {/* 🔥 LOW CREDIT TRIGGER */}
+    {user && user.credits_available <= 3 && (
+      <div
+        style={{
+          maxWidth: "900px",
+          margin: "0 auto 16px auto",
+          padding: "10px 14px",
+          background: "#1f2937",
+          border: "1px solid #374151",
+          borderRadius: "10px",
+          color: "#fbbf24",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <span>
+          ⚠️ You're running low on credits. Upgrade to continue.
+        </span>
+
+        <button
+          onClick={() => (window.location.href = "/plans")}
+          style={{
+            background: "#6366f1",
+            border: "none",
+            color: "white",
+            padding: "6px 12px",
+            borderRadius: "6px",
+            cursor: "pointer",
+          }}
+        >
+          Upgrade
+        </button>
+      </div>
+    )}
+
       <AppShell
         sidebar={
           <StudioSidebar
