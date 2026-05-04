@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
+
 type CreativeGoal =
   | "lookbook"
   | "instagram"
@@ -164,37 +165,75 @@ export default function SocialPackPage() {
   };
 
   const handleGenerate = async () => {
-    try {
-      setIsGenerating(true);
+  try {
+    setIsGenerating(true);
 
-      const payload = {
-        creativeGoal,
-        brandName,
-        heading,
-        subheading,
-        creativeDirection,
-        replaceBackground,
-        backgroundPrompt,
-        elements,
-      };
+    const payload = {
+      creativeGoal,
 
-      console.log(
-        "SOCIAL PACK PAYLOAD:",
-        payload
-      );
+      creativeDirection,
 
-      setTimeout(() => {
-        setIsGenerating(false);
+      brandName,
 
-        alert(
-          "Social Pack generation pipeline coming next 🚀"
-        );
-      }, 1800);
-    } catch (err) {
-      console.error(err);
-      setIsGenerating(false);
-    }
-  };
+      heading,
+
+      subheading,
+
+      replaceBackground,
+
+      backgroundPrompt,
+
+      elements,
+    };
+
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/social-pack/generate`,
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+
+        body: JSON.stringify(
+          payload
+        ),
+      }
+    );
+
+    const data =
+      await response.json();
+
+    console.log(
+      "===================================="
+    );
+
+    console.log(
+      "MAGICREEL FASHION INTELLIGENCE"
+    );
+
+    console.log(
+      "===================================="
+    );
+
+    console.log(data);
+
+    console.log(
+      "===================================="
+    );
+
+    setIsGenerating(false);
+
+    alert(
+      "Fashion Intelligence orchestration generated successfully 🚀"
+    );
+  } catch (err) {
+    console.error(err);
+
+    setIsGenerating(false);
+  }
+};
 
   /* =========================================================
      UI
