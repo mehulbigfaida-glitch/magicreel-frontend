@@ -22,6 +22,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 
 import CreateV2Page from "./pages/create-v2/CreateV2Page";
+import SocialPackPage from "./pages/create-v2/SocialPackPage";
 import LookbookPage from "./pages/create-v2/lookbook/LookbookPage";
 import CinematicPage from "./pages/create-v2/cinematic/CinematicPage";
 
@@ -178,6 +179,15 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
+    <Route
+  path="/create/social-pack"
+  element={
+    <ProtectedRoute>
+      <SocialPackPage />
+    </ProtectedRoute>
+  }
+/>
 
       <Route path="/lookbook" element={<LookbookPage />} />
       <Route path="/cinematic" element={<CinematicPage />} />

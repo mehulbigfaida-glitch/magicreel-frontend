@@ -155,21 +155,31 @@ export default function HomePage() {
 
           </div>
 
-          <div className="mr-home-pack-card disabled">
+          <div className="mr-home-pack-card">
 
-            <h3>Campaign Pack</h3>
+  <h3>Social Pack</h3>
 
-            <p>
-              Marketing visuals <br />
-              Social media campaigns <br />
-              Seasonal fashion shoots
-            </p>
+  <p>
+    Branded fashion creatives <br />
+    Instagram campaign visuals <br />
+    Tradeshow & social promotions
+  </p>
 
-            <button disabled>
-              Coming Soon
-            </button>
+  <button
+    onClick={() => {
+      const token = localStorage.getItem("token");
 
-          </div>
+      if (token) {
+        navigate("/create/social-pack");
+      } else {
+        navigate("/login");
+      }
+    }}
+  >
+    Create
+  </button>
+
+</div>
 
         </div>
 

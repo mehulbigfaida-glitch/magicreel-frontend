@@ -26,7 +26,6 @@ export default function HeroPreviewPanel({
   showToggle = false,
   activeView = "front",
   onToggle,
-  
 
   /* 🔥 FIX: ADD THESE */
   reelUrl,
@@ -67,8 +66,8 @@ export default function HeroPreviewPanel({
     };
 
     if (menuOpen) {
-  document.addEventListener("click", handleClickOutside);
-}
+      document.addEventListener("click", handleClickOutside);
+    }
 
     return () => {
       document.removeEventListener("click", handleClickOutside);
@@ -87,32 +86,46 @@ export default function HeroPreviewPanel({
      GENERATE LOOKBOOK
   ----------------------------- */
   const handleGenerateLookbook = () => {
-  if (!heroImageUrl) return;
+    if (!heroImageUrl) return;
 
-  setMenuOpen(false);
+    setMenuOpen(false);
 
-  const url = `/lookbook?hero=${encodeURIComponent(heroImageUrl)}${
-    backHeroImageUrl
-      ? `&back=${encodeURIComponent(backHeroImageUrl)}`
-      : ""
-  }`;
+    const url = `/lookbook?hero=${encodeURIComponent(heroImageUrl)}${
+      backHeroImageUrl
+        ? `&back=${encodeURIComponent(backHeroImageUrl)}`
+        : ""
+    }`;
 
-  window.open(url, "_blank");
-};
+    window.open(url, "_blank");
+  };
 
   /* -----------------------------
-   GENERATE REEL (LOOKBOOK FLOW)
------------------------------ */
-const handleGenerateReel = () => {
-  if (!heroImageUrl) return;
+     GENERATE REEL
+  ----------------------------- */
+  const handleGenerateReel = () => {
+    if (!heroImageUrl) return;
 
-  setMenuOpen(false);
+    setMenuOpen(false);
 
-  window.open(
-    `/reel?hero=${encodeURIComponent(heroImageUrl)}`,
-    "_blank"
-  );
-};
+    window.open(
+      `/reel?hero=${encodeURIComponent(heroImageUrl)}`,
+      "_blank"
+    );
+  };
+
+  /* -----------------------------
+     CREATE SOCIAL PACK
+  ----------------------------- */
+  const handleCreateSocialPack = () => {
+    if (!heroImageUrl) return;
+
+    setMenuOpen(false);
+
+    window.open(
+      `/create/social-pack?hero=${encodeURIComponent(heroImageUrl)}`,
+      "_blank"
+    );
+  };
 
   /* -----------------------------
      TOGGLE MENU
@@ -205,21 +218,24 @@ const handleGenerateReel = () => {
                 <div className="ai-dropdown">
 
                   <button
-  onClick={handleGenerateLookbook}
-  disabled={!heroImageUrl}
->
-  Generate Lookbook
-</button>
+                    onClick={handleGenerateLookbook}
+                    disabled={!heroImageUrl}
+                  >
+                    Generate Lookbook
+                  </button>
 
                   <button
                     onClick={handleGenerateReel}
-                    disabled={false}
+                    disabled={!heroImageUrl}
                   >
                     Generate Reel
                   </button>
 
-                  <button disabled>
-                    Create Ad Creatives (Soon)
+                  <button
+                    onClick={handleCreateSocialPack}
+                    disabled={!heroImageUrl}
+                  >
+                    Create Social Pack
                   </button>
 
                   <button onClick={handleDownloadHero}>
