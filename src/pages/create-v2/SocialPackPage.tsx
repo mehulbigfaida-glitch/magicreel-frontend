@@ -66,10 +66,16 @@ export default function SocialPackPage() {
   ========================================================= */
 
   const [heroPreview, setHeroPreview] =
-    useState<string | null>(null);
+  useState<string | null>(null);
 
-  const [logoPreview, setLogoPreview] =
-    useState<string | null>(null);
+const [logoPreview, setLogoPreview] =
+  useState<string | null>(null);
+
+const [heroImageUrl, setHeroImageUrl] =
+  useState("");
+
+const [logoImageUrl, setLogoImageUrl] =
+  useState("");
 
   const [brandName, setBrandName] =
     useState("");
@@ -135,43 +141,103 @@ export default function SocialPackPage() {
   };
 
   /* =========================================================
-     HANDLERS
-  ========================================================= */
+   HANDLERS
+========================================================= */
 
-  const handleHeroUpload = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = e.target.files?.[0];
+const uploadToCloudinary = async (
+  file: File
+) => {
 
-    if (!file) return;
+  const formData = new FormData();
 
-    const url = URL.createObjectURL(file);
+  formData.append("file", file);
 
-    setHeroPreview(url);
-  };
+  formData.append(
+    "upload_preset",
+    "magicreel"
+  );
 
-  const handleLogoUpload = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = e.target.files?.[0];
+  const response = await fetch(
+    `https://api.cloudinary.com/v1_1/${
+      import.meta.env
+        .VITE_CLOUDINARY_CLOUD_NAME
+    }/image/upload`,
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
 
-    if (!file) return;
+  const data = await response.json();
 
-    const url = URL.createObjectURL(file);
+  return data.secure_url;
+};
 
-    setLogoPreview(url);
-  };
+const handleHeroUpload = async (
+  e: React.ChangeEvent<HTMLInputElement>
+) => {
 
-  const handleGenerate = async () => {
+  const file = e.target.files?.[0];
+
+  if (!file) return;
+
+  const preview =
+    URL.createObjectURL(file);
+
+  setHeroPreview(preview);
+
+  const uploadedUrl =
+    await uploadToCloudinary(file);
+
+  setHeroImageUrl(uploadedUrl);
+
+  console.log(
+    "HERO URL:",
+    uploadedUrl
+  );
+};
+
+const handleLogoUpload = async (
+  e: React.ChangeEvent<HTMLInputElement>
+) => {
+
+  const file = e.target.files?.[0];
+
+  if (!file) return;
+
+  const preview =
+    URL.createObjectURL(file);
+
+  setLogoPreview(preview);
+
+  const uploadedUrl =
+    await uploadToCloudinary(file);
+
+  setLogoImageUrl(uploadedUrl);
+
+  console.log(
+    "LOGO URL:",
+    uploadedUrl
+  );
+};
+
+const handleGenerate = async () => {
+
   try {
+
     setIsGenerating(true);
 
     const payload = {
       mode: "social-pack",
+
       outputs: selectedGoals,
+
       inputs: {
-        heroImage: heroPreview,
-        logo: logoPreview,
+        heroImage:
+          heroImageUrl,
+
+        logo:
+          logoImageUrl,
 
         brandName,
         heading,
@@ -185,24 +251,45 @@ export default function SocialPackPage() {
       },
     };
 
+    console.log(
+      "SOCIAL PAYLOAD:",
+      payload
+    );
+
     const response = await fetch(
       `${import.meta.env.VITE_API_URL}/api/social-pack/generate`,
       {
         method: "POST",
+
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type":
+            "application/json",
         },
-        body: JSON.stringify(payload),
+
+        body: JSON.stringify(
+          payload
+        ),
       }
     );
 
-    const data = await response.json();
+    const data =
+      await response.json();
 
-    setResults(data);
+    console.log(
+      "SOCIAL RESULT:",
+      data
+    );
+
+    setResults(
+      data.results || {}
+    );
 
     setIsGenerating(false);
+
   } catch (err) {
+
     console.error(err);
+
     setIsGenerating(false);
   }
 };
