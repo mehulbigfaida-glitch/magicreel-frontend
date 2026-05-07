@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 
 type CreativeGoal =
@@ -71,9 +71,6 @@ export default function SocialPackPage() {
   const [logoPreview, setLogoPreview] =
     useState<string | null>(null);
 
-  const [creativeGoal, setCreativeGoal] =
-    useState<CreativeGoal>("lookbook");
-
   const [brandName, setBrandName] =
     useState("");
 
@@ -102,6 +99,9 @@ export default function SocialPackPage() {
   const [isGenerating, setIsGenerating] =
     useState(false);
 
+  const [selectedGoals, setSelectedGoals] = useState<CreativeGoal[]>([]);
+  const [results, setResults] = useState<Record<string, string> | null>(null);
+
   /* =========================================================
      HERO FROM QUERY
   ========================================================= */
@@ -122,9 +122,7 @@ export default function SocialPackPage() {
      HELPERS
   ========================================================= */
 
-  const canGenerate = useMemo(() => {
-    return !!heroPreview;
-  }, [heroPreview]);
+  const canGenerate = !!heroPreview && selectedGoals.length > 0;
 
   const toggleElement = (item: string) => {
     setElements((prev) => {
@@ -169,68 +167,42 @@ export default function SocialPackPage() {
     setIsGenerating(true);
 
     const payload = {
-      creativeGoal,
+      mode: "social-pack",
+      outputs: selectedGoals,
+      inputs: {
+        heroImage: heroPreview,
+        logo: logoPreview,
 
-      creativeDirection,
+        brandName,
+        heading,
+        subheading,
+        creativeDirection,
 
-      brandName,
+        replaceBackground,
+        backgroundPrompt,
 
-      heading,
-
-      subheading,
-
-      replaceBackground,
-
-      backgroundPrompt,
-
-      elements,
+        elements,
+      },
     };
 
     const response = await fetch(
       `${import.meta.env.VITE_API_URL}/api/social-pack/generate`,
       {
         method: "POST",
-
         headers: {
-          "Content-Type":
-            "application/json",
+          "Content-Type": "application/json",
         },
-
-        body: JSON.stringify(
-          payload
-        ),
+        body: JSON.stringify(payload),
       }
     );
 
-    const data =
-      await response.json();
+    const data = await response.json();
 
-    console.log(
-      "===================================="
-    );
-
-    console.log(
-      "MAGICREEL FASHION INTELLIGENCE"
-    );
-
-    console.log(
-      "===================================="
-    );
-
-    console.log(data);
-
-    console.log(
-      "===================================="
-    );
+    setResults(data);
 
     setIsGenerating(false);
-
-    alert(
-      "Fashion Intelligence orchestration generated successfully 🚀"
-    );
   } catch (err) {
     console.error(err);
-
     setIsGenerating(false);
   }
 };
@@ -419,15 +391,19 @@ export default function SocialPackPage() {
           }}
         >
           {creativeGoals.map((goal) => {
-            const active =
-              creativeGoal === goal.value;
+            const active = selectedGoals.includes(goal.value);
 
             return (
               <button
                 key={goal.value}
-                onClick={() =>
-                  setCreativeGoal(goal.value)
-                }
+                onClick={() => {
+  setSelectedGoals((prev) => {
+    if (prev.includes(goal.value)) {
+      return prev.filter((g) => g !== goal.value);
+    }
+    return [...prev, goal.value];
+  });
+}}
                 style={{
                   border: active
                     ? "1px solid rgba(255,255,255,0.24)"
@@ -826,47 +802,84 @@ export default function SocialPackPage() {
         </div>
 
         {/* ========================================================= */}
-        {/* GENERATE */}
-        {/* ========================================================= */}
+{/* GENERATE */}
+{/* ========================================================= */}
 
-        <button
-          disabled={
-            !canGenerate ||
-            isGenerating
-          }
-          onClick={handleGenerate}
-          style={{
-            width: "100%",
-            marginTop: 52,
-            border: "none",
-            borderRadius: 32,
-            padding:
-              "28px 30px",
-            background:
-              !canGenerate ||
-              isGenerating
-                ? "#2d3442"
-                : "#ffffff",
-            color:
-              !canGenerate ||
-              isGenerating
-                ? "#95a0b4"
-                : "#000",
-            fontWeight: 700,
-            fontSize: 20,
-            cursor:
-              !canGenerate ||
-              isGenerating
-                ? "not-allowed"
-                : "pointer",
-            transition:
-              "all 0.2s ease",
-          }}
-        >
-          {isGenerating
-            ? "Generating Social Pack..."
-            : "Generate Social Pack • 1 Credit"}
-        </button>
+<button
+  disabled={
+    !canGenerate ||
+    isGenerating
+  }
+  onClick={handleGenerate}
+  style={{
+    width: "100%",
+    marginTop: 52,
+    border: "none",
+    borderRadius: 32,
+    padding: "28px 30px",
+    background:
+      !canGenerate ||
+      isGenerating
+        ? "#2d3442"
+        : "#ffffff",
+    color:
+      !canGenerate ||
+      isGenerating
+        ? "#95a0b4"
+        : "#000",
+    fontWeight: 700,
+    fontSize: 20,
+    cursor:
+      !canGenerate ||
+      isGenerating
+        ? "not-allowed"
+        : "pointer",
+    transition: "all 0.2s ease",
+  }}
+>
+  {isGenerating
+    ? "Generating Social Pack..."
+    : `Generate ${selectedGoals.length} Creative${
+        selectedGoals.length > 1 ? "s" : ""
+      }`}
+</button>
+
+{/* ========================================================= */}
+{/* RESULTS */}
+{/* ========================================================= */}
+
+{results && (
+  <div style={{ marginTop: 60 }}>
+    <h2 style={{ marginBottom: 20 }}>
+      Your Social Pack
+    </h2>
+
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns:
+          "repeat(auto-fit, minmax(260px, 1fr))",
+        gap: 20,
+      }}
+    >
+      {Object.entries(results).map(([key, url]) => (
+        <div key={key}>
+          <img
+            src={url}
+            style={{
+              width: "100%",
+              borderRadius: 16,
+            }}
+          />
+          <div style={{ marginTop: 10 }}>
+            {key}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
       </div>
     </div>
   );
