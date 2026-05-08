@@ -35,6 +35,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import SharePage from "./pages/SharePage";
 import ImageQualityPage from "./pages/docs/ImageQualityPage";
 import CreatePageV3 from "./v3/pages/CreatePageV3";
+import SocialCampaignPage from "./pages/create-v3/SocialCampaignPage";
 
 /* =========================
    CONTEXT
@@ -187,6 +188,11 @@ function AppRoutes() {
       <SocialPackPage />
     </ProtectedRoute>
   }
+/>
+
+<Route
+  path="/create/social-campaign"
+  element={<SocialCampaignPage />}
 />
 
       <Route path="/lookbook" element={<LookbookPage />} />
