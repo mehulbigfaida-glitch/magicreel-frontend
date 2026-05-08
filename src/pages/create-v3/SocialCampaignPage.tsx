@@ -3,57 +3,95 @@ import { useState } from "react";
 const editorialWorlds = [
   {
     id: "dark-aristocracy",
-
     title: "Dark Aristocracy",
-
-    subtitle:
-      "Sculptural luxury portraiture with cinematic darkness and emotional restraint.",
-
-    accent:
-      "linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.02))",
   },
 
   {
     id: "poetic-nature",
-
     title: "Poetic Nature",
-
-    subtitle:
-      "Romantic environmental storytelling with cinematic stillness and emotional softness.",
-
-    accent:
-      "linear-gradient(135deg, rgba(120,119,198,0.20), rgba(255,255,255,0.02))",
   },
 
   {
     id: "museum-couture",
-
     title: "Museum Couture",
-
-    subtitle:
-      "Architectural couture presentation with gallery-inspired luxury framing.",
-
-    accent:
-      "linear-gradient(135deg, rgba(255,220,180,0.14), rgba(255,255,255,0.02))",
   },
 
   {
     id: "urban-luxury-cinema",
-
     title: "Urban Luxury Cinema",
-
-    subtitle:
-      "Modern nightlife fashion energy with cinematic city atmosphere.",
-
-    accent:
-      "linear-gradient(135deg, rgba(180,180,255,0.14), rgba(255,255,255,0.02))",
   },
 ];
 
 export default function SocialCampaignPage() {
-  const [selectedWorld, setSelectedWorld] = useState(
-    editorialWorlds[0]
-  );
+  const [, setHeroImage] =
+    useState<File | null>(null);
+
+  const [heroPreview, setHeroPreview] =
+    useState<string | null>(null);
+
+  const [, setLogoImage] =
+    useState<File | null>(null);
+
+  const [logoPreview, setLogoPreview] =
+    useState<string | null>(null);
+
+  const [selectedWorld, setSelectedWorld] =
+    useState<(typeof editorialWorlds)[0] | null>(
+      null
+    );
+
+    const [loadingRecommendation, setLoadingRecommendation] =
+    useState(false);
+
+  async function analyzeCampaign() {
+  try {
+    setLoadingRecommendation(true);
+
+    const response = await fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/api/editorial/recommend`,
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+
+        body: JSON.stringify({
+          category:
+            "black evening gown",
+
+          western: true,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (
+      data?.success &&
+      data?.recommendation
+    ) {
+      const matchedWorld =
+        editorialWorlds.find(
+          (world) =>
+            world.title ===
+            data.recommendation
+              .primaryWorld
+        );
+
+      if (matchedWorld) {
+        setSelectedWorld(
+          matchedWorld
+        );
+      }
+    }
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setLoadingRecommendation(false);
+  }
+}
 
   return (
     <div
@@ -102,85 +140,32 @@ export default function SocialCampaignPage() {
               maxWidth: 900,
             }}
           >
-            AI-powered luxury fashion campaign direction
-            with editorial intelligence, cinematic
-            coherence, and campaign DNA orchestration.
+            Upload a luxury fashion hero image and
+            generate a cinematic multi-asset campaign
+            with AI editorial intelligence.
           </p>
         </div>
 
+        {/* UPLOAD SECTION */}
+
         <div
           style={{
             display: "grid",
             gridTemplateColumns:
-              "repeat(auto-fit, minmax(280px, 1fr))",
-            gap: 20,
+              "repeat(auto-fit, minmax(340px, 1fr))",
+            gap: 24,
             marginBottom: 40,
           }}
         >
-          {editorialWorlds.map((world) => {
-            const active =
-              selectedWorld.id === world.id;
+          {/* HERO IMAGE */}
 
-            return (
-              <button
-                key={world.id}
-                onClick={() => setSelectedWorld(world)}
-                style={{
-                  padding: 24,
-                  borderRadius: 24,
-                  border: active
-                    ? "1px solid white"
-                    : "1px solid rgba(255,255,255,0.08)",
-
-                  background: world.accent,
-
-                  textAlign: "left",
-
-                  color: "white",
-
-                  cursor: "pointer",
-
-                  transition: "all 0.2s ease",
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: 28,
-                    fontWeight: 300,
-                    marginBottom: 14,
-                  }}
-                >
-                  {world.title}
-                </div>
-
-                <div
-                  style={{
-                    fontSize: 14,
-                    lineHeight: 1.7,
-                    opacity: 0.7,
-                  }}
-                >
-                  {world.subtitle}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns:
-              "repeat(auto-fit, minmax(320px, 1fr))",
-            gap: 20,
-          }}
-        >
           <div
             style={{
               padding: 28,
               borderRadius: 28,
               background:
                 "rgba(255,255,255,0.03)",
+
               border:
                 "1px solid rgba(255,255,255,0.08)",
             }}
@@ -191,32 +176,68 @@ export default function SocialCampaignPage() {
                 letterSpacing: 3,
                 textTransform: "uppercase",
                 opacity: 0.5,
+                marginBottom: 16,
+              }}
+            >
+              Hero Image
+            </div>
+
+            <div
+              style={{
+                fontSize: 30,
+                fontWeight: 300,
                 marginBottom: 14,
               }}
             >
-              Selected Editorial World
+              Upload Campaign Hero
             </div>
 
             <div
               style={{
-                fontSize: 36,
-                fontWeight: 300,
-                marginBottom: 20,
-              }}
-            >
-              {selectedWorld.title}
-            </div>
-
-            <div
-              style={{
-                fontSize: 15,
-                lineHeight: 1.8,
                 opacity: 0.7,
+                lineHeight: 1.7,
+                marginBottom: 24,
               }}
             >
-              {selectedWorld.subtitle}
+              Upload the primary luxury fashion
+              campaign image.
             </div>
+
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file =
+                  e.target.files?.[0] || null;
+
+                setHeroImage(file);
+
+                if (file) {
+                  setHeroPreview(
+                    URL.createObjectURL(file)
+                  );
+
+                  analyzeCampaign();
+                }
+              }}
+            />
+
+            {heroPreview && (
+              <img
+                src={heroPreview}
+                alt="Hero Preview"
+                style={{
+                  marginTop: 20,
+                  width: "100%",
+                  borderRadius: 20,
+                  objectFit: "cover",
+                  maxHeight: 340,
+                }}
+              />
+            )}
           </div>
+
+          {/* LOGO */}
 
           <div
             style={{
@@ -224,6 +245,177 @@ export default function SocialCampaignPage() {
               borderRadius: 28,
               background:
                 "rgba(255,255,255,0.03)",
+
+              border:
+                "1px solid rgba(255,255,255,0.08)",
+            }}
+          >
+            <div
+              style={{
+                fontSize: 12,
+                letterSpacing: 3,
+                textTransform: "uppercase",
+                opacity: 0.5,
+                marginBottom: 16,
+              }}
+            >
+              Brand Logo
+            </div>
+
+            <div
+              style={{
+                fontSize: 30,
+                fontWeight: 300,
+                marginBottom: 14,
+              }}
+            >
+              Upload Logo (Optional)
+            </div>
+
+            <div
+              style={{
+                opacity: 0.7,
+                lineHeight: 1.7,
+                marginBottom: 24,
+              }}
+            >
+              Add brand identity for campaign-ready
+              luxury compositions.
+            </div>
+
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file =
+                  e.target.files?.[0] || null;
+
+                setLogoImage(file);
+
+                if (file) {
+                  setLogoPreview(
+                    URL.createObjectURL(file)
+                  );
+                }
+              }}
+            />
+
+            {logoPreview && (
+              <img
+                src={logoPreview}
+                alt="Logo Preview"
+                style={{
+                  marginTop: 20,
+                  width: 140,
+                  borderRadius: 14,
+                  background: "white",
+                  padding: 12,
+                  objectFit: "contain",
+                }}
+              />
+            )}
+          </div>
+        </div>
+
+        {/* AI RECOMMENDATION */}
+
+        <div
+          style={{
+            marginBottom: 40,
+            padding: 32,
+            borderRadius: 30,
+            background:
+              "rgba(255,255,255,0.03)",
+
+            border:
+              "1px solid rgba(255,255,255,0.08)",
+          }}
+        >
+          <div
+            style={{
+              fontSize: 12,
+              letterSpacing: 3,
+              textTransform: "uppercase",
+              opacity: 0.5,
+              marginBottom: 20,
+            }}
+          >
+            AI Editorial Recommendation
+          </div>
+
+{loadingRecommendation && (
+  <div
+    style={{
+      marginBottom: 20,
+      opacity: 0.7,
+    }}
+  >
+    Analyzing cinematic campaign DNA...
+  </div>
+)}
+
+          <div
+            style={{
+              display: "flex",
+              gap: 14,
+              flexWrap: "wrap",
+            }}
+          >
+            {editorialWorlds.map((world) => {
+              const active =
+                selectedWorld?.id === world.id;
+
+              return (
+                <button
+                  key={world.id}
+                  onClick={() =>
+                    setSelectedWorld(world)
+                  }
+                  style={{
+                    padding: "14px 22px",
+                    borderRadius: 999,
+                    border: active
+                      ? "1px solid white"
+                      : "1px solid rgba(255,255,255,0.08)",
+
+                    background: active
+                      ? "white"
+                      : "transparent",
+
+                    color: active
+                      ? "black"
+                      : "white",
+
+                    cursor: "pointer",
+
+                    fontSize: 14,
+                  }}
+                >
+                  {world.title}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* OUTPUTS */}
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns:
+              "repeat(auto-fit, minmax(320px, 1fr))",
+            gap: 20,
+            marginBottom: 40,
+          }}
+        >
+          <div
+            style={{
+              padding: 28,
+              borderRadius: 28,
+              background:
+                "rgba(255,255,255,0.03)",
+
               border:
                 "1px solid rgba(255,255,255,0.08)",
             }}
@@ -273,6 +465,7 @@ export default function SocialCampaignPage() {
               borderRadius: 28,
               background:
                 "rgba(255,255,255,0.03)",
+
               border:
                 "1px solid rgba(255,255,255,0.08)",
             }}
@@ -291,6 +484,34 @@ export default function SocialCampaignPage() {
 
             <div
               style={{
+                marginBottom: 20,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 32,
+                  fontWeight: 300,
+                  marginBottom: 12,
+                }}
+              >
+                {selectedWorld?.title ||
+                  "Awaiting AI Analysis"}
+              </div>
+
+              <div
+                style={{
+                  opacity: 0.7,
+                  lineHeight: 1.7,
+                }}
+              >
+                {selectedWorld
+                  ? "AI-recommended editorial world based on cinematic garment analysis."
+                  : "Upload a hero image to generate editorial recommendations."}
+              </div>
+            </div>
+
+            <div
+              style={{
                 display: "flex",
                 flexDirection: "column",
                 gap: 12,
@@ -303,16 +524,17 @@ export default function SocialCampaignPage() {
 
               <div>• Luxury atmosphere</div>
 
-              <div>• Campaign consistency</div>
-
               <div>• Fashion-house direction</div>
+
+              <div>• Campaign continuity</div>
             </div>
           </div>
         </div>
 
+        {/* GENERATE */}
+
         <div
           style={{
-            marginTop: 40,
             padding: 32,
             borderRadius: 30,
             background:
