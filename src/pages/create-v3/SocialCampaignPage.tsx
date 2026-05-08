@@ -1,103 +1,369 @@
-export default function SocialCampaignPage() {
-  return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="mx-auto max-w-7xl px-6 py-10">
-        <div className="mb-10">
-          <p className="text-sm uppercase tracking-[0.3em] text-neutral-500">
-            MagicReel V3
-          </p>
+import { useState } from "react";
 
-          <h1 className="mt-3 text-5xl font-light tracking-tight">
+const editorialWorlds = [
+  {
+    id: "dark-aristocracy",
+
+    title: "Dark Aristocracy",
+
+    subtitle:
+      "Sculptural luxury portraiture with cinematic darkness and emotional restraint.",
+
+    accent:
+      "linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.02))",
+  },
+
+  {
+    id: "poetic-nature",
+
+    title: "Poetic Nature",
+
+    subtitle:
+      "Romantic environmental storytelling with cinematic stillness and emotional softness.",
+
+    accent:
+      "linear-gradient(135deg, rgba(120,119,198,0.20), rgba(255,255,255,0.02))",
+  },
+
+  {
+    id: "museum-couture",
+
+    title: "Museum Couture",
+
+    subtitle:
+      "Architectural couture presentation with gallery-inspired luxury framing.",
+
+    accent:
+      "linear-gradient(135deg, rgba(255,220,180,0.14), rgba(255,255,255,0.02))",
+  },
+
+  {
+    id: "urban-luxury-cinema",
+
+    title: "Urban Luxury Cinema",
+
+    subtitle:
+      "Modern nightlife fashion energy with cinematic city atmosphere.",
+
+    accent:
+      "linear-gradient(135deg, rgba(180,180,255,0.14), rgba(255,255,255,0.02))",
+  },
+];
+
+export default function SocialCampaignPage() {
+  const [selectedWorld, setSelectedWorld] = useState(
+    editorialWorlds[0]
+  );
+
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#050505",
+        color: "white",
+        padding: "40px",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 1400,
+          margin: "0 auto",
+        }}
+      >
+        <div style={{ marginBottom: 40 }}>
+          <div
+            style={{
+              fontSize: 12,
+              letterSpacing: 4,
+              textTransform: "uppercase",
+              opacity: 0.5,
+              marginBottom: 12,
+            }}
+          >
+            MagicReel V3
+          </div>
+
+          <h1
+            style={{
+              fontSize: 54,
+              fontWeight: 300,
+              margin: 0,
+            }}
+          >
             Social Campaign
           </h1>
 
-          <p className="mt-4 max-w-3xl text-neutral-400 text-lg leading-relaxed">
-            AI-powered luxury fashion campaign direction with
-            editorial intelligence, cinematic coherence, and
-            multi-asset campaign orchestration.
+          <p
+            style={{
+              marginTop: 20,
+              fontSize: 18,
+              lineHeight: 1.7,
+              opacity: 0.7,
+              maxWidth: 900,
+            }}
+          >
+            AI-powered luxury fashion campaign direction
+            with editorial intelligence, cinematic
+            coherence, and campaign DNA orchestration.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-6">
-            <p className="text-sm uppercase tracking-[0.2em] text-neutral-500">
-              Editorial World
-            </p>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns:
+              "repeat(auto-fit, minmax(280px, 1fr))",
+            gap: 20,
+            marginBottom: 40,
+          }}
+        >
+          {editorialWorlds.map((world) => {
+            const active =
+              selectedWorld.id === world.id;
 
-            <h2 className="mt-3 text-2xl font-light">
-              Dark Aristocracy
-            </h2>
+            return (
+              <button
+                key={world.id}
+                onClick={() => setSelectedWorld(world)}
+                style={{
+                  padding: 24,
+                  borderRadius: 24,
+                  border: active
+                    ? "1px solid white"
+                    : "1px solid rgba(255,255,255,0.08)",
 
-            <p className="mt-4 text-sm leading-relaxed text-neutral-400">
-              Sculptural luxury portraiture with cinematic
-              darkness, emotional restraint, and museum-grade
-              couture atmosphere.
-            </p>
+                  background: world.accent,
+
+                  textAlign: "left",
+
+                  color: "white",
+
+                  cursor: "pointer",
+
+                  transition: "all 0.2s ease",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 28,
+                    fontWeight: 300,
+                    marginBottom: 14,
+                  }}
+                >
+                  {world.title}
+                </div>
+
+                <div
+                  style={{
+                    fontSize: 14,
+                    lineHeight: 1.7,
+                    opacity: 0.7,
+                  }}
+                >
+                  {world.subtitle}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns:
+              "repeat(auto-fit, minmax(320px, 1fr))",
+            gap: 20,
+          }}
+        >
+          <div
+            style={{
+              padding: 28,
+              borderRadius: 28,
+              background:
+                "rgba(255,255,255,0.03)",
+              border:
+                "1px solid rgba(255,255,255,0.08)",
+            }}
+          >
+            <div
+              style={{
+                fontSize: 12,
+                letterSpacing: 3,
+                textTransform: "uppercase",
+                opacity: 0.5,
+                marginBottom: 14,
+              }}
+            >
+              Selected Editorial World
+            </div>
+
+            <div
+              style={{
+                fontSize: 36,
+                fontWeight: 300,
+                marginBottom: 20,
+              }}
+            >
+              {selectedWorld.title}
+            </div>
+
+            <div
+              style={{
+                fontSize: 15,
+                lineHeight: 1.8,
+                opacity: 0.7,
+              }}
+            >
+              {selectedWorld.subtitle}
+            </div>
           </div>
 
-          <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-6">
-            <p className="text-sm uppercase tracking-[0.2em] text-neutral-500">
+          <div
+            style={{
+              padding: 28,
+              borderRadius: 28,
+              background:
+                "rgba(255,255,255,0.03)",
+              border:
+                "1px solid rgba(255,255,255,0.08)",
+            }}
+          >
+            <div
+              style={{
+                fontSize: 12,
+                letterSpacing: 3,
+                textTransform: "uppercase",
+                opacity: 0.5,
+                marginBottom: 20,
+              }}
+            >
               Campaign Outputs
-            </p>
+            </div>
 
-            <div className="mt-5 space-y-3">
-              <label className="flex items-center gap-3 text-sm text-neutral-300">
-                <input type="checkbox" defaultChecked />
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 14,
+              }}
+            >
+              <label>
+                <input type="checkbox" defaultChecked />{" "}
                 Hero Campaign
               </label>
 
-              <label className="flex items-center gap-3 text-sm text-neutral-300">
-                <input type="checkbox" defaultChecked />
+              <label>
+                <input type="checkbox" defaultChecked />{" "}
                 Instagram Post
               </label>
 
-              <label className="flex items-center gap-3 text-sm text-neutral-300">
-                <input type="checkbox" />
-                Story Asset
+              <label>
+                <input type="checkbox" /> Story Asset
               </label>
 
-              <label className="flex items-center gap-3 text-sm text-neutral-300">
-                <input type="checkbox" />
-                Reel
+              <label>
+                <input type="checkbox" /> Reel
               </label>
             </div>
           </div>
 
-          <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-6">
-            <p className="text-sm uppercase tracking-[0.2em] text-neutral-500">
+          <div
+            style={{
+              padding: 28,
+              borderRadius: 28,
+              background:
+                "rgba(255,255,255,0.03)",
+              border:
+                "1px solid rgba(255,255,255,0.08)",
+            }}
+          >
+            <div
+              style={{
+                fontSize: 12,
+                letterSpacing: 3,
+                textTransform: "uppercase",
+                opacity: 0.5,
+                marginBottom: 20,
+              }}
+            >
               Campaign DNA
-            </p>
+            </div>
 
-            <div className="mt-4 space-y-3 text-sm text-neutral-400">
-              <p>• Cinematic darkness</p>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 12,
+                opacity: 0.7,
+              }}
+            >
+              <div>• Cinematic coherence</div>
 
-              <p>• Sculptural lighting</p>
+              <div>• Editorial restraint</div>
 
-              <p>• Editorial restraint</p>
+              <div>• Luxury atmosphere</div>
 
-              <p>• Luxury negative space</p>
+              <div>• Campaign consistency</div>
 
-              <p>• Monochrome governance</p>
+              <div>• Fashion-house direction</div>
             </div>
           </div>
         </div>
 
-        <div className="mt-10 rounded-3xl border border-neutral-800 bg-neutral-950 p-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm uppercase tracking-[0.2em] text-neutral-500">
-                Generation
-              </p>
+        <div
+          style={{
+            marginTop: 40,
+            padding: 32,
+            borderRadius: 30,
+            background:
+              "rgba(255,255,255,0.03)",
 
-              <h2 className="mt-2 text-3xl font-light">
-                Build Luxury Campaign
-              </h2>
+            border:
+              "1px solid rgba(255,255,255,0.08)",
+
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <div>
+            <div
+              style={{
+                fontSize: 12,
+                letterSpacing: 3,
+                textTransform: "uppercase",
+                opacity: 0.5,
+                marginBottom: 10,
+              }}
+            >
+              Generation
             </div>
 
-            <button className="rounded-full border border-white px-8 py-3 text-sm uppercase tracking-[0.2em] transition hover:bg-white hover:text-black">
-              Generate
-            </button>
+            <div
+              style={{
+                fontSize: 36,
+                fontWeight: 300,
+              }}
+            >
+              Build Luxury Campaign
+            </div>
           </div>
+
+          <button
+            style={{
+              padding: "16px 34px",
+              borderRadius: 999,
+              border: "1px solid white",
+              background: "white",
+              color: "black",
+              fontSize: 13,
+              letterSpacing: 2,
+              textTransform: "uppercase",
+              cursor: "pointer",
+            }}
+          >
+            Generate
+          </button>
         </div>
       </div>
     </div>
