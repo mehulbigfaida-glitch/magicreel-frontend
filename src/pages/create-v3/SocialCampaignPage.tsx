@@ -133,7 +133,7 @@ export default function SocialCampaignPage() {
 
       const response =
         await fetch(
-          "http://localhost:5050/api/editorial/generate-campaign",
+  `${import.meta.env.VITE_API_BASE_URL}/api/editorial/generate-campaign`,
 
           {
             method: "POST",
