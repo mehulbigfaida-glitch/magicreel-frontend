@@ -121,60 +121,93 @@ export default function SocialCampaignPage() {
   }
 
   async function generateCampaign() {
-    try {
-      if (
-        !selectedWorld ||
-        !heroCloudinaryUrl
-      ) {
-        return;
-      }
-
-      setGenerating(true);
-
-      const response =
-        await fetch(
-  `${import.meta.env.VITE_API_BASE_URL}/api/editorial/generate-campaign`,
-
-          {
-            method: "POST",
-
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-
-            body: JSON.stringify({
-              editorialWorld:
-                selectedWorld.id,
-
-              heroImageUrl:
-                heroCloudinaryUrl,
-
-              logoImageUrl:
-                logoCloudinaryUrl,
-
-              outputs: [
-                "instagram-post",
-                "story",
-              ],
-            }),
-          }
-        );
-
-      const data =
-        await response.json();
-
-      if (data?.success) {
-        setGeneratedAssets(
-          data.assets || []
-        );
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setGenerating(false);
-    }
+  if (generating) {
+    return;
   }
+
+  try {
+    if (
+      !selectedWorld ||
+      !heroCloudinaryUrl
+    ) {
+      return;
+    }
+
+    setGenerating(true);
+
+    setGeneratedAssets([]);
+
+    console.log(
+      "Generating campaign:",
+      selectedWorld.id
+    );
+
+    const response =
+      await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/editorial/generate-campaign`,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+
+          body: JSON.stringify({
+            editorialWorld:
+              selectedWorld.id,
+
+            heroImageUrl:
+              heroCloudinaryUrl,
+
+            logoImageUrl:
+              logoCloudinaryUrl,
+
+            outputs: [
+              "instagram-post",
+              "story",
+            ],
+          }),
+        }
+      );
+
+    if (!response.ok) {
+      const errorText =
+        await response.text();
+
+      console.error(
+        "Campaign generation failed:",
+        errorText
+      );
+
+      throw new Error(
+        errorText ||
+          "Campaign generation failed"
+      );
+    }
+
+    const data =
+      await response.json();
+
+    console.log(
+      "Campaign success:",
+      data
+    );
+
+    if (data?.success) {
+      setGeneratedAssets(
+        data.assets || []
+      );
+    }
+  } catch (error) {
+    console.error(
+      "Generate campaign error:",
+      error
+    );
+  } finally {
+    setGenerating(false);
+  }
+}
 
   return (
     <div
