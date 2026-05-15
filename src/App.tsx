@@ -36,6 +36,7 @@ import SharePage from "./pages/SharePage";
 import ImageQualityPage from "./pages/docs/ImageQualityPage";
 import CreatePageV3 from "./v3/pages/CreatePageV3";
 import SocialCampaignPage from "./pages/create-v3/SocialCampaignPage";
+import CreateAIPage from "./pages/create-ai/CreateAIPage.tsx";
 
 /* =========================
    CONTEXT
@@ -193,6 +194,11 @@ function AppRoutes() {
 <Route
   path="/create/social-campaign"
   element={<SocialCampaignPage />}
+/>
+
+<Route
+  path="/create/ai"
+  element={<CreateAIPage />}
 />
 
       <Route path="/lookbook" element={<LookbookPage />} />
