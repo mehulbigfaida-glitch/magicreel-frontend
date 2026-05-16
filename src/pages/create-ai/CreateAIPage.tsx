@@ -1,12 +1,16 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useCreateAIStore } from "../../store/createAIStore";
 
 export default function CreateAIPage() {
+  
   const {
-    muses,
-    selectedMuse,
-    setSelectedMuse,
-  } = useCreateAIStore();
+  muses,
+  selectedMuse,
+  setSelectedMuse,
+} = useCreateAIStore();
+
+  const [hoveredMuse, setHoveredMuse] =
+  useState<string | null>(null);
 
   useEffect(() => {
     if (!selectedMuse && muses.length > 0) {
@@ -322,70 +326,190 @@ export default function CreateAIPage() {
             </div>
 
             {/* GRID */}
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns:
-                  "repeat(2,minmax(0,1fr))",
-                gap: 16,
-                marginBottom: 20,
-              }}
-            >
+<div
+  style={{
+    display: "grid",
+
+    gridTemplateColumns:
+      window.innerWidth < 768
+        ? "repeat(3,minmax(0,1fr))"
+        : "repeat(5,minmax(0,1fr))",
+
+    gap: 12,
+
+    marginBottom: 20,
+  }}
+>
+            
               {muses.map((muse) => {
-                const isSelected =
-                  selectedMuse?.id === muse.id;
 
-                return (
-                  <div
-                    key={muse.id}
-                    style={{
-                      cursor: "pointer",
-                    }}
-                    onClick={() =>
-                      setSelectedMuse(muse)
-                    }
-                  >
-                    <div
-                      style={{
-                        aspectRatio: "3 / 4",
-                        borderRadius: 24,
-                        overflow: "hidden",
-                        border: isSelected
-                          ? "2px solid #a855f7"
-                          : "1px solid rgba(255,255,255,0.08)",
-                        boxShadow: isSelected
-                          ? "0 0 24px rgba(168,85,247,0.25)"
-                          : "none",
-                      }}
-                    >
-                      <img
-                        src={muse.image}
-                        alt={muse.name}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                          objectPosition:
-                            "center top",
-                        }}
-                      />
-                    </div>
+const isSelected =
+selectedMuse?.id===muse.id;
 
-                    <div
-                      style={{
-                        textAlign: "center",
-                        marginTop: 12,
-                        fontSize: 15,
-                        color: isSelected
-                          ? "#d8b4fe"
-                          : "rgba(255,255,255,0.72)",
-                      }}
-                    >
-                      {muse.name}
-                    </div>
-                  </div>
-                );
-              })}
+const isHovered =
+hoveredMuse===muse.id;
+
+return (
+
+<div
+key={muse.id}
+
+onClick={()=>
+setSelectedMuse(muse)
+}
+
+onMouseEnter={()=>
+setHoveredMuse(
+muse.id
+)
+}
+
+onMouseLeave={()=>
+setHoveredMuse(null)
+}
+
+style={{
+position:"relative",
+cursor:"pointer"
+}}
+>
+
+<div
+style={{
+
+aspectRatio:"3/4",
+
+height:150,
+
+borderRadius:18,
+
+overflow:"hidden",
+
+transform:
+isSelected
+? "scale(1.05)"
+: "scale(1)",
+
+transition:
+"all .25s ease",
+
+border:
+isSelected
+? "2px solid #a855f7"
+: "1px solid rgba(255,255,255,.08)",
+
+boxShadow:
+isSelected
+? "0 0 24px rgba(168,85,247,.35)"
+: "none"
+
+}}
+>
+
+<img
+src={
+muse.placeholderImageUrl
+}
+
+alt={muse.id}
+
+style={{
+width:"100%",
+height:"100%",
+
+objectFit:"contain",
+
+objectPosition:"center top",
+
+display:"block",
+
+imageRendering:"-webkit-optimize-contrast",
+
+transform:"translateZ(0)",
+
+backfaceVisibility:"hidden",
+
+willChange:"transform"
+}}
+/>
+
+</div>
+
+{isHovered && (
+
+<div
+style={{
+
+position:"absolute",
+
+left:"50%",
+
+bottom:"112%",
+
+transform:"translateX(-50%)",
+
+width:180,
+
+aspectRatio:"3/4",
+
+padding:6,
+
+borderRadius:22,
+
+overflow:"hidden",
+
+background:
+"rgba(255,255,255,.94)",
+
+border:
+"1px solid rgba(255,255,255,.06)",
+
+boxShadow:
+"0 18px 50px rgba(0,0,0,.55)",
+
+zIndex:999
+
+}}
+>
+
+<img
+src={
+muse.placeholderImageUrl
+}
+
+style={{
+
+width:"100%",
+
+height:"100%",
+
+objectFit:"contain",
+
+borderRadius:18,
+
+display:"block",
+
+imageRendering:
+"-webkit-optimize-contrast",
+
+transform:
+"translateZ(0)",
+
+backfaceVisibility:
+"hidden"
+
+}}
+/>
+
+</div>
+
+)}
+
+</div>
+
+);
+
+})}
             </div>
 
             {/* BUTTONS */}
