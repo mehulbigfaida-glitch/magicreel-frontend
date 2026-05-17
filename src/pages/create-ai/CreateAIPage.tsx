@@ -927,7 +927,9 @@ flex:1,
 
 width:"100%",
 
-height:110,
+height:520,
+maxWidth:420,
+margin:"0 auto",
 
 borderRadius:22,
 
@@ -987,7 +989,7 @@ style={{
 
 width:"100%",
 
-height:"100%",
+height:110,
 
 objectFit:"contain"
 
