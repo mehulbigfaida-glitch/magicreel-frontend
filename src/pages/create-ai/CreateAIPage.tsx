@@ -132,21 +132,26 @@ console.log(
 data
 );
 
-if (!response.ok) {
-  throw new Error(
-    data?.error ||
-    "Generation failed"
-  );
-}
+if(
+!response.ok
+){
 
-console.log(
-  "[CREATE AI RESPONSE]",
-  data
+throw new Error(
+
+data?.message ||
+
+"Generation failed"
+
 );
 
+}
+
 setHeroUrl(
-  data?.data?.output ||
-  null
+
+data?.data?.output ||
+
+null
+
 );
 
 }
@@ -984,7 +989,7 @@ width:"100%",
 
 height:"100%",
 
-objectFit:"cover"
+objectFit:"contain"
 
 }}
 />
@@ -1003,7 +1008,9 @@ fontSize:16
 
 }}
 >
-✨ Hero will appear here
+✨ Your Hero Image will appear here
+
+Estimated time: 2–3 min
 </div>
 
 )}
