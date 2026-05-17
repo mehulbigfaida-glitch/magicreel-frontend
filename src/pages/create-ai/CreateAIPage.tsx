@@ -923,12 +923,12 @@ backfaceVisibility:
 <div
 style={{
 
-flex:1,
-
 width:"100%",
 
-height:520,
 maxWidth:420,
+
+minHeight:520,
+
 margin:"0 auto",
 
 borderRadius:22,
@@ -945,7 +945,9 @@ display:"flex",
 
 alignItems:"center",
 
-justifyContent:"center"
+justifyContent:"center",
+
+padding:20
 
 }}
 >
