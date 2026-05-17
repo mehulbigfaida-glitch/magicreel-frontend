@@ -115,7 +115,7 @@ body:JSON.stringify({
 
 garmentImageUrl,
 
-selectedMuse:
+museId:
 selectedMuse.id
 
 })
