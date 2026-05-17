@@ -1,22 +1,184 @@
-import { useEffect, useState } from "react";
+import {
+useEffect,
+useState,
+useRef
+} from "react";
 import { useCreateAIStore } from "../../store/createAIStore";
 
 export default function CreateAIPage() {
   
   const {
+
   muses,
+
   selectedMuse,
+
   setSelectedMuse,
-} = useCreateAIStore();
 
-  const [hoveredMuse, setHoveredMuse] =
-  useState<string | null>(null);
+  isGenerating,
 
-  useEffect(() => {
-    if (!selectedMuse && muses.length > 0) {
-      setSelectedMuse(muses[0]);
-    }
-  }, [muses, selectedMuse, setSelectedMuse]);
+  setGenerating,
+
+  heroUrl,
+
+  setHeroUrl
+
+}=useCreateAIStore()
+
+  const [hoveredMuse,setHoveredMuse]=
+useState<string | null>(null);
+
+const [
+garmentImageUrl,
+setGarmentImageUrl
+]=useState<string>("");
+
+const fileInputRef=
+useRef<HTMLInputElement>(null);
+
+useEffect(()=>{
+
+if(
+!selectedMuse &&
+muses.length>0
+){
+
+setSelectedMuse(
+muses[0]
+);
+
+}
+
+},[
+muses,
+selectedMuse,
+setSelectedMuse
+]);
+
+const handleGenerate =
+async()=>{
+
+if(!selectedMuse){
+
+alert(
+"Please select a Muse"
+);
+
+return;
+
+}
+
+if(!garmentImageUrl){
+
+alert(
+"Please upload garment"
+);
+
+return;
+
+}
+
+try{
+
+setGenerating(true);
+
+setHeroUrl(null);
+
+console.log(
+"[CREATE AI GENERATE]",
+{
+
+garment:
+garmentImageUrl,
+
+muse:
+selectedMuse.id
+
+}
+);
+
+const response =
+await fetch(
+
+`${import.meta.env.VITE_API_URL}/api/create-ai/generate`,
+
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":
+"application/json"
+},
+
+body:JSON.stringify({
+
+garmentImageUrl,
+
+selectedMuse:
+selectedMuse.id
+
+})
+
+}
+
+);
+
+const data =
+await response.json();
+
+console.log(
+"[CREATE AI RESPONSE]",
+data
+);
+
+if(
+!response.ok
+){
+
+throw new Error(
+
+data?.message ||
+
+"Generation failed"
+
+);
+
+}
+
+setHeroUrl(
+
+data.output ||
+
+data.heroUrl ||
+
+null
+
+);
+
+}
+
+catch(error:any){
+
+console.error(
+error
+);
+
+alert(
+"Generation failed"
+);
+
+}
+
+finally{
+
+setGenerating(
+false
+);
+
+}
+
+};
 
   return (
     <div
@@ -150,128 +312,268 @@ export default function CreateAIPage() {
             </div>
 
             {/* UPLOAD */}
-            <div
-              style={{
-                height: 300,
-                borderRadius: 26,
-                background:
-                  "linear-gradient(180deg,#1a1a1a,#101010)",
-                border:
-                  "1px dashed rgba(255,255,255,0.12)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                marginBottom: 18,
-              }}
-            >
-              <div
-                style={{
-                  textAlign: "center",
-                  color: "rgba(255,255,255,0.45)",
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: 22,
-                    marginBottom: 10,
-                  }}
-                >
-                  👕 Upload Garment
-                </div>
 
-                <div
-                  style={{
-                    fontSize: 14,
-                  }}
-                >
-                  PNG, JPG, WEBP
-                </div>
-              </div>
-            </div>
+<div
+onClick={()=>
+fileInputRef.current?.click()
+}
 
-            {/* CHANGE */}
-            <button
-              style={{
-                width: "100%",
-                height: 56,
-                borderRadius: 18,
-                border:
-                  "1px solid rgba(255,255,255,0.08)",
-                background: "#111",
-                color: "white",
-                cursor: "pointer",
-                marginBottom: 20,
-                fontSize: 15,
-              }}
-            >
-              ↻ Change Garment
-            </button>
+style={{
 
-            {/* DETECTED */}
-            <div
-              style={{
-                background: "#101010",
-                borderRadius: 22,
-                padding: 18,
-                border:
-                  "1px solid rgba(255,255,255,0.06)",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: 12,
-                  letterSpacing: "0.18em",
-                  color: "rgba(255,255,255,0.45)",
-                  marginBottom: 12,
-                }}
-              >
-                DETECTED
-              </div>
+height:300,
 
-              <div
-                style={{
-                  fontSize: 22,
-                  fontWeight: 500,
-                  marginBottom: 16,
-                }}
-              >
-                Oversized Resort Shirt
-              </div>
+borderRadius:26,
 
-              <div
-                style={{
-                  display: "flex",
-                  gap: 10,
-                  flexWrap: "wrap",
-                }}
-              >
-                {[
-                  "Relaxed",
-                  "Tucked",
-                  "Untucked",
-                  "Editorial",
-                ].map((item) => (
-                  <button
-                    key={item}
-                    style={{
-                      padding: "10px 16px",
-                      borderRadius: 999,
-                      background:
-                        item === "Relaxed"
-                          ? "linear-gradient(90deg,#7c3aed,#ec4899)"
-                          : "#171717",
-                      border:
-                        "1px solid rgba(255,255,255,0.06)",
-                      color: "white",
-                      fontSize: 13,
-                      cursor: "pointer",
-                    }}
-                  >
-                    {item}
-                  </button>
-                ))}
-              </div>
-            </div>
+background:
+"linear-gradient(180deg,#1a1a1a,#101010)",
+
+border:
+"1px dashed rgba(255,255,255,0.12)",
+
+display:"flex",
+
+alignItems:"center",
+
+justifyContent:"center",
+
+marginBottom:18,
+
+overflow:"hidden",
+
+cursor:"pointer"
+
+}}
+>
+
+<input
+
+ref={fileInputRef}
+
+type="file"
+
+accept="image/*"
+
+style={{
+display:"none"
+}}
+
+onChange={(e)=>{
+
+const file =
+e.target.files?.[0];
+
+if(!file) return;
+
+const url =
+URL.createObjectURL(
+file
+);
+
+setGarmentImageUrl(
+url
+);
+
+}}
+
+/>
+
+{garmentImageUrl ? (
+
+<img
+src={
+garmentImageUrl
+}
+
+style={{
+
+width:"100%",
+
+height:"100%",
+
+objectFit:"contain"
+
+}}
+/>
+
+) : (
+
+<div
+style={{
+
+textAlign:"center",
+
+color:
+"rgba(255,255,255,0.45)"
+
+}}
+>
+
+<div
+style={{
+fontSize:22,
+marginBottom:10
+}}
+>
+👕 Upload Garment
+</div>
+
+<div
+style={{
+fontSize:14
+}}
+>
+PNG, JPG, WEBP
+</div>
+
+</div>
+
+)}
+
+</div>
+
+
+{/* CHANGE */}
+
+<button
+
+onClick={()=>
+fileInputRef.current?.click()
+}
+
+style={{
+
+width:"100%",
+
+height:56,
+
+borderRadius:18,
+
+border:
+"1px solid rgba(255,255,255,0.08)",
+
+background:"#111",
+
+color:"white",
+
+cursor:"pointer",
+
+marginBottom:20,
+
+fontSize:15
+
+}}
+>
+
+{garmentImageUrl
+? "↻ Change Garment"
+: "Upload Garment"}
+
+</button>
+
+
+{/* DETECTED */}
+
+<div
+style={{
+
+background:"#101010",
+
+borderRadius:22,
+
+padding:18,
+
+border:
+"1px solid rgba(255,255,255,0.06)"
+
+}}
+>
+
+<div
+style={{
+
+fontSize:12,
+
+letterSpacing:"0.18em",
+
+color:
+"rgba(255,255,255,0.45)",
+
+marginBottom:12
+
+}}
+>
+DETECTED
+</div>
+
+<div
+style={{
+
+fontSize:22,
+
+fontWeight:500,
+
+marginBottom:16
+
+}}
+>
+Oversized Resort Shirt
+</div>
+
+<div
+style={{
+
+display:"flex",
+
+gap:10,
+
+flexWrap:"wrap"
+
+}}
+>
+
+{[
+"Relaxed",
+"Tucked",
+"Untucked",
+"Editorial"
+].map((item)=>(
+
+<button
+
+key={item}
+
+style={{
+
+padding:"10px 16px",
+
+borderRadius:999,
+
+background:
+item==="Relaxed"
+? "linear-gradient(90deg,#7c3aed,#ec4899)"
+:"#171717",
+
+border:
+"1px solid rgba(255,255,255,0.06)",
+
+color:"white",
+
+fontSize:13,
+
+cursor:"pointer"
+
+}}
+>
+
+{item}
+
+</button>
+
+))}
+
+</div>
+
+</div>
           </div>
 
           {/* MUSE */}
@@ -578,48 +880,163 @@ backfaceVisibility:
             }}
           >
             {/* HERO */}
-            <div
-              style={{
-                flex: 1,
-                width: "100%",
-                height: 110,
-                borderRadius: 22,
-                background:
-                  "linear-gradient(180deg,#1a1a1a,#101010)",
-                border:
-                  "1px dashed rgba(255,255,255,0.12)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "rgba(255,255,255,0.45)",
-                fontSize: 16,
-              }}
-            >
-              ✨ Hero will appear here
-            </div>
+
+<div
+style={{
+
+flex:1,
+
+width:"100%",
+
+height:110,
+
+borderRadius:22,
+
+overflow:"hidden",
+
+background:
+"linear-gradient(180deg,#1a1a1a,#101010)",
+
+border:
+"1px dashed rgba(255,255,255,.12)",
+
+display:"flex",
+
+alignItems:"center",
+
+justifyContent:"center"
+
+}}
+>
+
+{isGenerating ? (
+
+<div
+style={{
+textAlign:"center"
+}}
+>
+
+<div
+style={{
+fontSize:28,
+marginBottom:8
+}}
+>
+✨
+</div>
+
+<div
+style={{
+color:
+"rgba(255,255,255,.65)"
+}}
+>
+Creating fashion hero...
+</div>
+
+</div>
+
+)
+
+: heroUrl ? (
+
+<img
+src={heroUrl}
+
+style={{
+
+width:"100%",
+
+height:"100%",
+
+objectFit:"cover"
+
+}}
+/>
+
+)
+
+: (
+
+<div
+style={{
+
+color:
+"rgba(255,255,255,.45)",
+
+fontSize:16
+
+}}
+>
+✨ Hero will appear here
+</div>
+
+)}
+
+</div>
 
             {/* BUTTON */}
-            <button
-              style={{
-                width:
-                  window.innerWidth < 980
-                    ? "100%"
-                    : 240,
-                height: 110,
-                borderRadius: 24,
-                border: "none",
-                background:
-                  "linear-gradient(90deg,#7c3aed,#ec4899)",
-                color: "white",
-                fontSize: 22,
-                fontWeight: 700,
-                cursor: "pointer",
-                boxShadow:
-                  "0 10px 40px rgba(168,85,247,0.25)",
-              }}
-            >
-              ✨ Generate
-            </button>
+
+<button
+
+onClick={
+handleGenerate
+}
+
+disabled={
+isGenerating
+}
+
+style={{
+
+width:
+window.innerWidth < 980
+?"100%"
+:240,
+
+height:110,
+
+borderRadius:24,
+
+border:"none",
+
+background:
+isGenerating
+?"#111"
+:"linear-gradient(90deg,#7c3aed,#ec4899)",
+
+color:"white",
+
+fontSize:22,
+
+fontWeight:700,
+
+cursor:
+isGenerating
+?"not-allowed"
+:"pointer",
+
+opacity:
+isGenerating
+?.85
+:1,
+
+transition:
+".3s",
+
+boxShadow:
+"0 10px 40px rgba(168,85,247,.25)"
+
+}}
+
+>
+
+{isGenerating
+?"Creating..."
+:"✨ Generate"}
+
+</button>
           </div>
         </div>
 
