@@ -357,21 +357,62 @@ style={{
 display:"none"
 }}
 
-onChange={(e)=>{
+onChange={async(e)=>{
 
-const file =
+const file=
 e.target.files?.[0];
 
 if(!file) return;
 
-const url =
-URL.createObjectURL(
+try{
+
+const formData=
+new FormData();
+
+formData.append(
+"file",
 file
 );
 
-setGarmentImageUrl(
-url
+formData.append(
+"upload_preset",
+"magicreel"
 );
+
+const res=
+await fetch(
+
+"https://api.cloudinary.com/v1_1/duaqfspwa/image/upload",
+
+{
+
+method:"POST",
+
+body:formData
+
+}
+
+);
+
+const data=
+await res.json();
+
+setGarmentImageUrl(
+data.secure_url
+);
+
+}
+catch(error){
+
+console.error(
+error
+);
+
+alert(
+"Upload failed"
+);
+
+}
 
 }}
 
