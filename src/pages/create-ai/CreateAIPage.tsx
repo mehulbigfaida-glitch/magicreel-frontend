@@ -132,28 +132,21 @@ console.log(
 data
 );
 
-if(
-!response.ok
-){
-
-throw new Error(
-
-data?.message ||
-
-"Generation failed"
-
-);
-
+if (!response.ok) {
+  throw new Error(
+    data?.error ||
+    "Generation failed"
+  );
 }
 
+console.log(
+  "[CREATE AI RESPONSE]",
+  data
+);
+
 setHeroUrl(
-
-data.output ||
-
-data.heroUrl ||
-
-null
-
+  data?.data?.output ||
+  null
 );
 
 }
