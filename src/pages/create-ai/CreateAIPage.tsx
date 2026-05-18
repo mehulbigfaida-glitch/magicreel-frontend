@@ -33,6 +33,19 @@ garmentImageUrl,
 setGarmentImageUrl
 ]=useState<string>("");
 
+const [detectedGarment,setDetectedGarment] =
+useState({
+
+  category:"",
+
+  garmentName:"",
+
+  fit:"",
+
+  tuckState:""
+
+});
+
 const fileInputRef=
 useRef<HTMLInputElement>(null);
 
@@ -113,10 +126,26 @@ headers:{
 
 body:JSON.stringify({
 
-garmentImageUrl,
+  garmentImageUrl,
 
-museId:
-selectedMuse.id
+  museId:
+    selectedMuse.id,
+
+  // =================================
+  // Garment Intelligence V1
+  // =================================
+
+  category:
+    detectedGarment?.category ?? "",
+
+  garmentName:
+  detectedGarment?.garmentName ?? "",
+
+  fit:
+    detectedGarment?.fit ?? "",
+
+  tuckState:
+    detectedGarment?.tuckState ?? ""
 
 })
 
@@ -396,8 +425,30 @@ const data=
 await res.json();
 
 setGarmentImageUrl(
-data.secure_url
+  data.secure_url
 );
+
+
+// TEMP V1 TEST DATA
+// replace later with real detector output
+
+if(
+  data.secure_url
+){
+
+setDetectedGarment({
+
+  category:"dress",
+
+  garmentName:"Black Draped Dress",
+
+  fit:"regular",
+
+  tuckState:""
+
+});
+
+}
 
 }
 catch(error){
@@ -555,7 +606,7 @@ marginBottom:16
 
 }}
 >
-Oversized Resort Shirt
+{detectedGarment.garmentName || "No garment detected"}
 </div>
 
 <div
@@ -570,12 +621,14 @@ flexWrap:"wrap"
 }}
 >
 
-{[
-"Relaxed",
-"Tucked",
-"Untucked",
-"Editorial"
-].map((item)=>(
+{detectedGarment.garmentName &&
+
+[
+  detectedGarment.fit,
+  detectedGarment.tuckState
+]
+.filter(Boolean)
+.map((item)=>(
 
 <button
 
@@ -588,9 +641,7 @@ padding:"10px 16px",
 borderRadius:999,
 
 background:
-item==="Relaxed"
-? "linear-gradient(90deg,#7c3aed,#ec4899)"
-:"#171717",
+"linear-gradient(90deg,#7c3aed,#ec4899)",
 
 border:
 "1px solid rgba(255,255,255,0.06)",
@@ -602,13 +653,15 @@ fontSize:13,
 cursor:"pointer"
 
 }}
+
 >
 
 {item}
 
 </button>
 
-))}
+))
+}
 
 </div>
 
