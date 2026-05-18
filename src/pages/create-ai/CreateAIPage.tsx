@@ -918,7 +918,7 @@ backfaceVisibility:
                   : "row",
             }}
           >
-            {/* GENERATE HERO BAR */}
+{/* GENERATE HERO BAR */}
 
 <div
 style={{
@@ -977,7 +977,6 @@ opacity:.8
 Estimated generation time: 2–3 min
 </div>
 
-
 </div>
 
 <button
@@ -1013,6 +1012,9 @@ cursor:"pointer"
 
 </div>
 
+</div>
+</div>
+
 {/* GENERATED HERO */}
 
 {heroUrl && (
@@ -1020,7 +1022,7 @@ cursor:"pointer"
 <div
 style={{
 
-marginTop:30,
+marginTop:40,
 
 display:"flex",
 
@@ -1038,13 +1040,16 @@ style={{
 
 width:"100%",
 
-maxWidth:520,
+maxWidth:720,
 
 borderRadius:24,
 
 display:"block",
 
-objectFit:"contain"
+objectFit:"contain",
+
+boxShadow:
+"0 20px 80px rgba(0,0,0,.35)"
 
 }}
 />
@@ -1053,9 +1058,7 @@ objectFit:"contain"
 
 )}
           
-          </div>
-        </div>
-
+          
         {/* ACTIONS */}
         <div
           style={{
