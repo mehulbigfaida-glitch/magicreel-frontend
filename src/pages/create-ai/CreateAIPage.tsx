@@ -918,170 +918,141 @@ backfaceVisibility:
                   : "row",
             }}
           >
-            {/* HERO */}
+            {/* GENERATE HERO BAR */}
 
 <div
 style={{
 
 width:"100%",
 
-maxWidth:420,
+marginTop:24,
 
-minHeight:520,
+borderRadius:28,
 
-margin:"0 auto",
+padding:"32px 40px",
 
-borderRadius:22,
+background:"#070707",
 
-overflow:"hidden",
-
-background:
-"linear-gradient(180deg,#1a1a1a,#101010)",
-
-border:
-"1px dashed rgba(255,255,255,.12)",
+border:"1px solid rgba(255,255,255,.08)",
 
 display:"flex",
 
 alignItems:"center",
 
-justifyContent:"center",
+justifyContent:"space-between",
 
-padding:20
+gap:30
 
 }}
 >
 
-{isGenerating ? (
+<div>
 
 <div
 style={{
-textAlign:"center"
-}}
->
 
-<div
-style={{
-fontSize:28,
-marginBottom:8
+fontSize:14,
+fontWeight:700,
+
+letterSpacing:3,
+
+opacity:.55,
+
+marginBottom:12
+
 }}
 >
-✨
+GENERATE HERO
 </div>
 
 <div
 style={{
-color:
-"rgba(255,255,255,.65)"
+
+fontSize:16,
+
+opacity:.8
+
 }}
 >
-Creating fashion hero...
+Estimated generation time: 2–3 min
 </div>
 
+
 </div>
 
-)
+<button
+onClick={handleGenerate}
 
-: heroUrl ? (
+disabled={isGenerating}
+
+style={{
+
+padding:"20px 52px",
+
+borderRadius:999,
+
+border:"none",
+
+background:
+"linear-gradient(90deg,#7c3aed,#ec4899)",
+
+color:"#fff",
+
+fontWeight:700,
+
+cursor:"pointer"
+
+}}
+>
+
+{isGenerating
+? "GENERATING..."
+: "GENERATE"}
+
+</button>
+
+</div>
+
+{/* GENERATED HERO */}
+
+{heroUrl && (
+
+<div
+style={{
+
+marginTop:30,
+
+display:"flex",
+
+justifyContent:"center"
+
+}}
+>
 
 <img
 src={heroUrl}
+
+alt="Hero"
 
 style={{
 
 width:"100%",
 
-height:110,
+maxWidth:520,
+
+borderRadius:24,
+
+display:"block",
 
 objectFit:"contain"
 
 }}
 />
 
-)
-
-: (
-
-<div
-style={{
-
-color:
-"rgba(255,255,255,.45)",
-
-fontSize:16
-
-}}
->
-✨ Your Hero Image will appear here
-
-Estimated time: 2–3 min
 </div>
 
 )}
-
-</div>
-
-            {/* BUTTON */}
-
-<button
-
-onClick={
-handleGenerate
-}
-
-disabled={
-isGenerating
-}
-
-style={{
-
-width:
-window.innerWidth < 980
-?"100%"
-:240,
-
-height:110,
-
-borderRadius:24,
-
-border:"none",
-
-background:
-isGenerating
-?"#111"
-:"linear-gradient(90deg,#7c3aed,#ec4899)",
-
-color:"white",
-
-fontSize:22,
-
-fontWeight:700,
-
-cursor:
-isGenerating
-?"not-allowed"
-:"pointer",
-
-opacity:
-isGenerating
-?.85
-:1,
-
-transition:
-".3s",
-
-boxShadow:
-"0 10px 40px rgba(168,85,247,.25)"
-
-}}
-
->
-
-{isGenerating
-?"Creating..."
-:"✨ Generate"}
-
-</button>
+          
           </div>
         </div>
 
