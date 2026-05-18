@@ -438,11 +438,11 @@ if(
 
 setDetectedGarment({
 
-  category:"dress",
+  category:"",
 
-  garmentName:"Black Draped Dress",
+  garmentName:"",
 
-  fit:"regular",
+  fit:"",
 
   tuckState:""
 
