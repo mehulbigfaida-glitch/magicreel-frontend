@@ -35,7 +35,7 @@ placeholderImageUrl:
 "https://res.cloudinary.com/duaqfspwa/image/upload/v1778771846/PH_FS3_ptneis.png",
 
 processingImageUrl:
-"https://res.cloudinary.com/duaqfspwa/image/upload/v1778756480/FS3_xu8jyw.png"
+"https://res.cloudinary.com/duaqfspwa/image/upload/v1778600385/Shanaya_45_nvtswo.png"
 },
 
 
