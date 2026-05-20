@@ -37,6 +37,7 @@ import ImageQualityPage from "./pages/docs/ImageQualityPage";
 import CreatePageV3 from "./v3/pages/CreatePageV3";
 import SocialCampaignPage from "./pages/create-v3/SocialCampaignPage";
 import CreateAIPage from "./pages/create-ai/CreateAIPage.tsx";
+import CreateAIHero from "./pages/create-ai-hero/CreateAIHero";
 
 /* =========================
    CONTEXT
@@ -199,6 +200,11 @@ function AppRoutes() {
 <Route
   path="/create/ai"
   element={<CreateAIPage />}
+/>
+
+<Route
+   path="/create-ai-hero"
+   element={<CreateAIHero />}
 />
 
       <Route path="/lookbook" element={<LookbookPage />} />
