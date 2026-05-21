@@ -624,7 +624,10 @@ style={{
 
   padding:22,
 
+  minHeight:500,
+
   position:"relative",
+
   overflow:"visible"
 }}
 >
@@ -806,7 +809,7 @@ style={{
 
               <label
                 style={{
-                  height:220,
+                  height:300,
                   borderRadius:20,
                   border:
                     "1px dashed rgba(255,255,255,.1)",
@@ -870,7 +873,7 @@ style={{
 
               <label
                 style={{
-                  height:220,
+                  height:300,
                   borderRadius:20,
                   border:
                     "1px dashed rgba(255,255,255,.1)",
@@ -993,21 +996,21 @@ style={{
           </div>
 
 
-          {/* RIGHT */}
-
           <div
-            style={{
-              background:
-                "rgba(15,15,15,.96)",
+  style={{
+    background:
+      "rgba(15,15,15,.96)",
 
-              border:
-                "1px solid rgba(255,255,255,.08)",
+    border:
+      "1px solid rgba(255,255,255,.08)",
 
-              borderRadius:30,
+    borderRadius:30,
 
-              padding:22
-            }}
-          >
+    padding:22,
+
+    minHeight:500
+  }}
+>
 
             <div
               style={{
@@ -1027,14 +1030,15 @@ style={{
 style={{
 position:"absolute",
 
-top:80,
+top:45,
 left:"50%",
 
 transform:
 "translateX(-50%)",
 
-width:250,
-height:350,
+width:240,
+
+aspectRatio:"4/5",
 
 borderRadius:24,
 
@@ -1065,9 +1069,11 @@ style={{
 width:"100%",
 height:"100%",
 
-objectFit:"cover",
+objectFit:"none",
 
-borderRadius:24,
+objectPosition:"center top",
+
+display:"block",
 
 transform:"scale(1.02)"
 }}
@@ -1113,8 +1119,14 @@ onMouseLeave={()=>
 setHoveredMuse("")
 }
 
+
 style={{
-aspectRatio:"3/4",
+
+width:88,
+
+height:132,
+
+flexShrink:0,
 
 borderRadius:18,
 
@@ -1122,35 +1134,35 @@ overflow:"hidden",
 
 cursor:"pointer",
 
+background:"#111",
+
 border:
-
-selectedMuse===
-muse.id
-
+selectedMuse===muse.id
 ? "2px solid #a855f7"
-
 : "1px solid rgba(255,255,255,.08)",
 
 boxShadow:
-
-selectedMuse===
-muse.id
-
+selectedMuse===muse.id
 ? "0 0 30px rgba(168,85,247,.4)"
+: "none",
 
-: "none"
+transition:"all .25s ease"
+
 }}
 >
-
 <img
-src={
-muse.placeholderImageUrl
-}
+src={muse.placeholderImageUrl}
+alt={muse.id}
 
 style={{
 width:"100%",
 height:"100%",
-objectFit:"cover"
+
+objectFit:"cover",
+
+objectPosition:"center top",
+
+display:"block"
 }}
 />
 
