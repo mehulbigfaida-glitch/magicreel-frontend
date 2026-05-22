@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import "./CreateAIHero.css";
 import { API_BASE } from "../../config/api";
 import { useAuthStore } from "../../store/authStore";
 
@@ -1238,89 +1239,138 @@ fontSize:14
 
 )}
 
-
-{frontHeroImageUrl && (
-
 <div
 style={{
 marginTop:24,
 
-borderRadius:24,
+display:"grid",
 
+gridTemplateColumns:
+"repeat(auto-fit,minmax(420px,1fr))",
+
+gap:20
+}}
+>
+
+<div
+className={
+heroLoading
+? "hero-preview-card"
+: ""
+}
+style={{
+borderRadius:28,
 overflow:"hidden",
-
 border:
-"1px solid rgba(255,255,255,.08)"
+"1px solid rgba(255,255,255,.08)",
+background:
+"linear-gradient(180deg,#111,#1a1a1a)",
+minHeight:650
 }}
 >
 
 <div
 style={{
-padding:14,
-fontSize:14,
-opacity:.7
+padding:14
 }}
 >
-Generated Hero
+
+✨ Front Hero
+
 </div>
 
-<img
-src={
-frontHeroImageUrl
-}
+{frontHeroImageUrl ? (
 
+<img
+src={frontHeroImageUrl}
 style={{
-width:"100%",
-display:"block"
+width:"100%"
 }}
 />
+
+) : (
+
+<div
+style={{
+height:580,
+display:"flex",
+justifyContent:"center",
+alignItems:"center",
+flexDirection:"column",
+gap:18,
+textAlign:"center"
+}}
+>
+
 
 </div>
 
 )}
 
-
-{backHeroImageUrl && (
-
-<div
-style={{
-marginTop:24,
-
-borderRadius:24,
-
-overflow:"hidden",
-
-border:
-"1px solid rgba(255,255,255,.08)"
-}}
->
-
-<div
-style={{
-padding:14,
-fontSize:14,
-opacity:.7
-}}
->
-Back Hero
 </div>
 
-<img
-src={
-backHeroImageUrl
-}
 
+<div
+className={
+heroLoading
+? "hero-preview-card"
+: ""
+}
 style={{
-width:"100%",
-display:"block"
+borderRadius:28,
+overflow:"hidden",
+border:
+"1px solid rgba(255,255,255,.08)",
+background:
+"linear-gradient(180deg,#111,#1a1a1a)",
+minHeight:650
+}}
+>
+
+<div
+style={{
+padding:14
+}}
+>
+
+✨ Back Hero
+
+</div>
+
+{backHeroImageUrl ? (
+
+<img
+src={backHeroImageUrl}
+style={{
+width:"100%"
 }}
 />
+
+) : (
+
+<div
+style={{
+height:580,
+display:"flex",
+justifyContent:"center",
+alignItems:"center",
+flexDirection:"column",
+gap:18,
+textAlign:"center"
+}}
+>
 
 </div>
 
 )}
 
-      </div>
-    </div>
-  );
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+);
 }
