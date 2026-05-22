@@ -14,6 +14,13 @@ import {
 } from "../../magicreel/config/categoryPills";
 
 import {
+ShoppingBag,
+Share2,
+Megaphone,
+Clapperboard
+} from "lucide-react";
+
+import {
 MUSE_REGISTRY
 }
 from "../create-ai/museRegistry";
@@ -1242,16 +1249,15 @@ fontSize:14
 <div
 style={{
 marginTop:24,
-
 display:"grid",
-
 gridTemplateColumns:
 "repeat(auto-fit,minmax(420px,1fr))",
-
 gap:20
 }}
 >
 
+{/* FRONT HERO */}
+
 <div
 className={
 heroLoading
@@ -1269,45 +1275,57 @@ minHeight:650
 }}
 >
 
-<div
-style={{
-padding:14
-}}
->
-
+<div style={{padding:14}}>
 ✨ Front Hero
-
 </div>
 
 {frontHeroImageUrl ? (
 
+<>
+
+<div className="hero-image-actions">
+
+<button
+className="hero-icon-btn"
+onClick={()=>
+window.open(
+frontHeroImageUrl,
+"_blank"
+)
+}
+>
+
+⭳
+
+</button>
+
+</div>
+
 <img
 src={frontHeroImageUrl}
 style={{
-width:"100%"
+width:"100%",
+display:"block"
 }}
 />
+
+</>
 
 ) : (
 
 <div
 style={{
-height:580,
-display:"flex",
-justifyContent:"center",
-alignItems:"center",
-flexDirection:"column",
-gap:18,
-textAlign:"center"
+height:580
 }}
->
-
-
-</div>
+/>
 
 )}
 
 </div>
+
+
+
+{/* BACK HERO */}
 
 
 <div
@@ -1327,46 +1345,180 @@ minHeight:650
 }}
 >
 
-<div
-style={{
-padding:14
-}}
->
-
+<div style={{padding:14}}>
 ✨ Back Hero
-
 </div>
 
 {backHeroImageUrl ? (
 
+<>
+
+<div className="hero-image-actions">
+
+<button
+className="hero-icon-btn"
+
+onClick={()=>
+window.open(
+backHeroImageUrl,
+"_blank"
+)
+}
+>
+
+⭳
+
+</button>
+
+</div>
+
 <img
 src={backHeroImageUrl}
 style={{
-width:"100%"
+width:"100%",
+display:"block"
 }}
 />
+
+</>
 
 ) : (
 
 <div
 style={{
-height:580,
-display:"flex",
-justifyContent:"center",
-alignItems:"center",
-flexDirection:"column",
-gap:18,
-textAlign:"center"
+height:580
 }}
->
-
-</div>
+/>
 
 )}
 
 </div>
 
 </div>
+
+
+{/* CONTINUE WITH AI */}
+
+<div className="ai-destination-title">
+
+✨ Create Content From Your Hero
+
+</div>
+
+
+<div className="ai-pack-grid">
+
+{/* E-COM */}
+
+<div className="ai-pack-card">
+
+<div className="ai-pack-icon purple">
+<ShoppingBag size={26}/>
+</div>
+
+<div className="ai-pack-title">
+E-COM Pack
+</div>
+
+<div className="ai-pack-sub">
+Clean product shots
+for your online store
+</div>
+
+<button
+className="ai-pack-btn"
+disabled={!frontHeroImageUrl}
+>
+Generate Pack
+</button>
+
+</div>
+
+
+
+{/* SOCIAL */}
+
+<div className="ai-pack-card">
+
+<div className="ai-pack-icon pink">
+<Share2 size={26}/>
+</div>
+
+<div className="ai-pack-title">
+Social Pack
+</div>
+
+<div className="ai-pack-sub">
+Social media ready
+content for marketing
+</div>
+
+<button
+className="ai-pack-btn"
+disabled={!frontHeroImageUrl}
+>
+Generate Pack
+</button>
+
+</div>
+
+
+
+{/* CAMPAIGN */}
+
+<div className="ai-pack-card">
+
+<div className="ai-pack-icon orange">
+<Megaphone size={26}/>
+</div>
+
+<div className="ai-pack-title">
+Editorial Campaign
+</div>
+
+<div className="ai-pack-sub">
+Luxury campaign visuals
+</div>
+
+<button
+className="ai-pack-btn"
+disabled={!frontHeroImageUrl}
+>
+Generate Pack
+</button>
+
+</div>
+
+
+
+{/* REEL */}
+
+<div className="ai-pack-card">
+
+<div className="ai-pack-icon cyan">
+<Clapperboard size={26}/>
+</div>
+
+<div className="ai-pack-title">
+Reel Generator
+</div>
+
+<div className="ai-pack-sub">
+Short cinematic
+AI videos
+</div>
+
+<button
+className="ai-pack-btn"
+disabled={!frontHeroImageUrl}
+>
+Generate Pack
+</button>
+
+</div>
+
+</div>
+
 
 </div>
 
