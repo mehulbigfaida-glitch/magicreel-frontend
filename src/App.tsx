@@ -38,6 +38,7 @@ import CreatePageV3 from "./v3/pages/CreatePageV3";
 import SocialCampaignPage from "./pages/create-v3/SocialCampaignPage";
 import CreateAIPage from "./pages/create-ai/CreateAIPage.tsx";
 import CreateAIHero from "./pages/create-ai-hero/CreateAIHero";
+import EcomStudioPage from "./pages/create-ai-hero/EcomStudioPage";
 
 /* =========================
    CONTEXT
@@ -205,6 +206,11 @@ function AppRoutes() {
 <Route
    path="/create-ai-hero"
    element={<CreateAIHero />}
+/>
+
+<Route
+  path="/pack/ecom"
+  element={<EcomStudioPage />}
 />
 
       <Route path="/lookbook" element={<LookbookPage />} />
