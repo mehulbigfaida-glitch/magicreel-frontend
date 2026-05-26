@@ -2,46 +2,12 @@ import { useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./ecomStudio.css";
 import { API_BASE } from "../../config/api";
+import { LOOKBOOK_STYLES } from "./lookbook/lookbookStyles";
 
-type World = {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-};
-
-const ECOM_WORLDS: World[] = [
-{
-id:"marketplace",
-title:"Marketplace",
-description:"Clean, neutral backgrounds perfect for product listing",
-image:"https://res.cloudinary.com/duaqfspwa/image/upload/f_auto,q_auto,w_900,c_fill,ar_16:9/v1779531647/marketplace-v1_vnksmv.jpg"
-},
-{
-id:"product_studio",
-title:"Product Studio",
-description:"Premium studio setups for product showcase",
-image:"https://res.cloudinary.com/duaqfspwa/image/upload/f_auto,q_auto,w_900,c_fill,ar_16:9/v1779531647/product-studio-v1_ituix0.jpg"
-},
-{
-id:"lifestyle",
-title:"Lifestyle",
-description:"Real-life environments for brand storytelling",
-image:"https://res.cloudinary.com/duaqfspwa/image/upload/f_auto,q_auto,w_900,c_fill,ar_16:9/v1779531647/lifestyle-v1_bqi17r.jpg"
-},
-{
-id:"flat_catalog",
-title:"Flat Catalog",
-description:"Clean, flat lay style for catalog & e-commerce",
-image:"https://res.cloudinary.com/duaqfspwa/image/upload/f_auto,q_auto,w_900,c_fill,ar_16:9/v1779531647/flat-catalog-v1_ytyltb.jpg"
-},
-{
-id:"premium_brand",
-title:"Premium Brand",
-description:"High-end premium vibes for luxury branding",
-image:"https://res.cloudinary.com/duaqfspwa/image/upload/f_auto,q_auto,w_900,c_fill,ar_16:9/v1779531647/premium-brand-v1_qvkw1t.jpg"
-}
-];
+// import {
+// MALE_POSES,
+// FEMALE_POSES
+// } from "./lookbook/lookbookPoses";
 
 export default function EcomStudioPage(){
 
@@ -85,10 +51,10 @@ incomingBack
 );
 
 const[
-selectedWorld,
-setSelectedWorld
+selectedStyle,
+setSelectedStyle
 ]=useState(
-"marketplace"
+"pure_studio"
 );
 
 const[
@@ -143,7 +109,7 @@ localStorage.getItem(
 
 const res=
 await fetch(
-`${API_BASE}/api/p2m/ecom/generate-v1`,
+`${API_BASE}/api/p2m/lookbook-v1/generate`,
 {
 method:"POST",
 
@@ -166,8 +132,8 @@ backHero||
 
 undefined,
 
-preset:
-selectedWorld
+lookbookStyle:
+selectedStyle
 })
 }
 );
@@ -203,14 +169,12 @@ return (
 </div>
 
 <h1>
-E-COM Studio
+Lookbook Studio
 </h1>
 
 <p className="subtitle">
-Create conversion-ready e-commerce image packs
-using AI poses and curated presentation worlds.
+Create premium fashion lookbooks with AI poses and curated luxury styling.
 </p>
-
 
 <div className="hero-grid">
 
@@ -223,11 +187,9 @@ using AI poses and curated presentation worlds.
 </div>
 
 {fromHero && (
-
 <div className="linked-badge">
 ✓ Linked from Hero
 </div>
-
 )}
 
 <div
@@ -237,10 +199,7 @@ onClick={() => fileFrontRef.current?.click()}
 
 {frontHero ? (
 
-<img
-src={frontHero}
-alt=""
-/>
+<img src={frontHero} alt="" />
 
 ) : (
 
@@ -288,9 +247,6 @@ setFrontHero
 </div>
 
 
-
-{/* BACK */}
-
 <div className="hero-card">
 
 <div className="card-title">
@@ -306,10 +262,7 @@ fileBackRef.current?.click()
 
 {backHero ? (
 
-<img
-src={backHero}
-alt=""
-/>
+<img src={backHero} alt="" />
 
 ) : (
 
@@ -359,41 +312,39 @@ setBackHero
 </div>
 
 
-
 <div className="section-title">
-3. CHOOSE E-COM WORLD
+3. CHOOSE LOOKBOOK STYLE
 </div>
-
 
 <div className="world-grid">
 
-{ECOM_WORLDS.map((world)=>(
+{LOOKBOOK_STYLES.map((style)=>(
 
 <div
-key={world.id}
+key={style.id}
 className={`world-card ${
-selectedWorld===world.id
+selectedStyle===style.id
 ? "selected"
 : ""
 }`}
 onClick={() =>
-setSelectedWorld(world.id)
+setSelectedStyle(style.id)
 }
 >
 
 <img
-src={world.image}
+src={style.image}
 alt=""
 />
 
 <div className="world-content">
 
 <h3>
-{world.title}
+{style.title}
 </h3>
 
 <p>
-{world.description}
+{style.prompt}
 </p>
 
 </div>
@@ -404,27 +355,25 @@ alt=""
 
 </div>
 
-
 <div className="benefits">
 
 <div>
-4–5 High Quality E-COM Images
+6 Premium Lookbook Poses
 </div>
 
 <div>
-Different Poses & Angles
+Luxury E-Com Styling
 </div>
 
 <div>
-Consistent Look & Identity
+Consistent Identity
 </div>
 
 <div>
-Ready To Use For Store
+Ready For Shopify & Marketplace
 </div>
 
 </div>
-
 
 <button
 className="generate-btn"
@@ -434,7 +383,7 @@ onClick={handleGenerate}
 
 {loading
 ? "Generating..."
-: "Generate E-COM Pack (2 Credits)"}
+: "Generate Lookbook Pack (2 Credits)"}
 
 </button>
 
