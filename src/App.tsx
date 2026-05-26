@@ -39,6 +39,7 @@ import SocialCampaignPage from "./pages/create-v3/SocialCampaignPage";
 import CreateAIPage from "./pages/create-ai/CreateAIPage.tsx";
 import CreateAIHero from "./pages/create-ai-hero/CreateAIHero";
 import EcomStudioPage from "./pages/create-ai-hero/EcomStudioPage";
+import EcomOutputPage from "./pages/create-ai-hero/lookbook/EcomOutputPage";
 
 /* =========================
    CONTEXT
@@ -211,6 +212,11 @@ function AppRoutes() {
 <Route
   path="/pack/ecom"
   element={<EcomStudioPage />}
+/>
+
+<Route
+  path="/pack/ecom/output/:id"
+  element={<EcomOutputPage />}
 />
 
       <Route path="/lookbook" element={<LookbookPage />} />
