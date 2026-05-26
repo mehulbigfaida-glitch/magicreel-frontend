@@ -17,6 +17,7 @@ useState(true);
 const [poses,setPoses]=
 useState<any[]>([]);
 
+
 useEffect(()=>{
 
 async function load(){
@@ -78,6 +79,7 @@ p.poseId!=="back"
 [poses]
 );
 
+
 async function handleExportZip(){
 
 try{
@@ -122,7 +124,6 @@ images
 
 );
 
-
 if(!res.ok){
 
 console.error(
@@ -132,7 +133,6 @@ console.error(
 return;
 
 }
-
 
 const blob=
 await res.blob();
@@ -153,8 +153,7 @@ a.download=
 "magicreel-lookbook.zip";
 
 document.body.appendChild(
-a
-);
+a);
 
 a.click();
 
@@ -174,6 +173,35 @@ err
 }
 
 }
+
+
+async function handleShare(){
+
+try{
+
+const url=
+
+`${window.location.origin}/pack/ecom/output/${id}`;
+
+await navigator.clipboard.writeText(
+url
+);
+
+alert(
+"Link copied"
+);
+
+}catch(err){
+
+console.error(
+"SHARE ERROR:",
+err
+);
+
+}
+
+}
+
 
 if(loading){
 
@@ -230,9 +258,21 @@ Export ZIP
 
 </button>
 
+
 <button>
 
-Share Link
+Publish
+
+</button>
+
+
+<button
+onClick={
+handleShare
+}
+>
+
+Copy Page Link
 
 </button>
 
@@ -254,7 +294,6 @@ Generate 360° Reel
 </div>
 
 
-
 <section>
 
 <h2>
@@ -262,7 +301,6 @@ Generate 360° Reel
 Generated Looks
 
 </h2>
-
 
 <div className="look-grid">
 
@@ -296,7 +334,6 @@ Download
 </section>
 
 
-
 {heroImages.length>0&&(
 
 <section>
@@ -307,8 +344,8 @@ Hero Assets
 
 </h2>
 
-
 <div
+
 className={
 
 heroImages.length===1
@@ -355,7 +392,6 @@ Download
 </section>
 
 )}
-
 
 </div>
 
