@@ -78,6 +78,82 @@ p.poseId!=="back"
 [poses]
 );
 
+async function handleExportZip(){
+
+try{
+
+const images=
+poses.map(
+(p)=>p.imageUrl
+);
+
+const res=
+await fetch(
+
+`${API_BASE}/api/p2m/lookbook/export`,
+
+{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":
+"application/json"
+
+},
+
+body:
+JSON.stringify({
+
+images
+
+})
+
+}
+
+);
+
+const blob=
+await res.blob();
+
+const url=
+window.URL.createObjectURL(
+blob
+);
+
+const a=
+document.createElement(
+"a"
+);
+
+a.href=url;
+
+a.download=
+"magicreel-lookbook.zip";
+
+document.body.appendChild(
+a
+);
+
+a.click();
+
+a.remove();
+
+window.URL.revokeObjectURL(
+url
+);
+
+}catch(err){
+
+console.error(
+"ZIP ERROR:",
+err
+);
+
+}
+
+}
 
 if(loading){
 
@@ -124,7 +200,11 @@ Images Generated
 
 <div className="ecom-actions">
 
-<button>
+<button
+onClick={
+handleExportZip
+}
+>
 
 Export ZIP
 
