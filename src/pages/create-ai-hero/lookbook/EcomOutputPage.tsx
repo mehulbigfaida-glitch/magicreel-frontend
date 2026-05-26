@@ -87,10 +87,15 @@ poses.map(
 (p)=>p.imageUrl
 );
 
+const token=
+localStorage.getItem(
+"token"
+);
+
 const res=
 await fetch(
 
-`${API_BASE}/api/p2m/lookbook/export`,
+`${API_BASE}/api/p2m/lookbook-v1/export`,
 
 {
 
@@ -99,7 +104,10 @@ method:"POST",
 headers:{
 
 "Content-Type":
-"application/json"
+"application/json",
+
+Authorization:
+`Bearer ${token}`
 
 },
 
@@ -113,6 +121,18 @@ images
 }
 
 );
+
+
+if(!res.ok){
+
+console.error(
+"Export failed"
+);
+
+return;
+
+}
+
 
 const blob=
 await res.blob();
