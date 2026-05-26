@@ -202,6 +202,21 @@ err
 
 }
 
+function handle360Reel(){
+
+alert(
+
+`360° Reel Coming Soon
+
+Will support:
+
+• Front + Back Hero
+• Full rotational reel
+• Cost: 3 credits`
+
+);
+
+}
 
 if(loading){
 
@@ -272,22 +287,21 @@ handleShare
 }
 >
 
-Copy Page Link
+Copy Preview Link
 
 </button>
 
-
-{heroImages.length===2&&(
 
 <button
 className="primary"
+onClick={
+handle360Reel
+}
 >
 
-Generate 360° Reel
+360° Reel ✨
 
 </button>
-
-)}
 
 </div>
 
