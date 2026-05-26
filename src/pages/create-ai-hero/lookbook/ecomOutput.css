@@ -56,14 +56,19 @@ flex-wrap:wrap;
 
 .ecom-actions button{
 background:#111;
-border:1px solid #242424;
-padding:18px 34px;
+border:1px solid rgba(255,255,255,.08);
+padding:20px 42px;
 color:white;
-border-radius:20px;
+border-radius:999px;
 cursor:pointer;
-font-size:15px;
+font-size:16px;
 font-weight:600;
-transition:.3s;
+min-width:180px;
+
+box-shadow:
+0 0 0 1px rgba(255,255,255,.02);
+
+transition:.35s;
 }
 
 .ecom-actions button:hover{
@@ -95,16 +100,19 @@ margin-bottom:30px;
 display:grid;
 grid-template-columns:
 repeat(3,1fr);
-gap:30px;
+gap:34px;
+width:100%;
 }
 
 .look-card{
 position:relative;
 overflow:hidden;
-border-radius:28px;
+border-radius:32px;
 background:#111;
+
 box-shadow:
-0 0 0 1px rgba(255,255,255,.05);
+0 10px 50px rgba(0,0,0,.35);
+
 transition:.35s;
 }
 
