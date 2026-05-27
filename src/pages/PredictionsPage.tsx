@@ -1,20 +1,47 @@
 import { useEffect, useState } from "react";
 
 interface Prediction {
-  id: string;
-  type: string;
-  status: string;
-  mediaUrl?: string;
-  heroImageUrl?: string;
-  lookbookImages?: string[];
-  createdAt: string;
-  creditsUsed?: number;
+id:string;
+
+type:string;
+
+status:string;
+
+mediaUrl?:string;
+
+heroImageUrl?:string;
+
+lookbookImages?:string[];
+
+runId?:string;
+
+createdAt:string;
+
+creditsUsed?:number;
 }
 
 export default function PredictionsPage() {
   const [data, setData] = useState<Prediction[]>([]);
 
-  useEffect(() => {
+  const handlePredictionClick=(item:any)=>{
+
+if(
+item.type?.toLowerCase()==="lookbook"
+){
+
+window.location.href=
+
+`/pack/ecom/output/${
+item.runId || item.id
+}`;
+
+return;
+
+}
+
+};
+  
+useEffect(() => {
   const fetchPredictions = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -74,10 +101,14 @@ export default function PredictionsPage() {
         }}
       >
         {data.map((item) => {
-          const mediaUrl =
-            item.mediaUrl ||
-            item.heroImageUrl ||
-            (item.lookbookImages && item.lookbookImages[0]);
+          const mediaUrl=
+
+item.heroImageUrl ||
+
+item.mediaUrl ||
+
+(item.lookbookImages &&
+item.lookbookImages[0]);
 
           const isVideo =
   item.type === "reel" ||
@@ -85,14 +116,18 @@ export default function PredictionsPage() {
 
           return (
             <div
-              key={item.id}
-              style={{
-                position: "relative",
-                borderRadius: "12px",
-                overflow: "hidden",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-              }}
-            >
+  key={item.id}
+  onClick={() =>
+    handlePredictionClick(item)
+  }
+  style={{
+    cursor:"pointer",
+    position:"relative",
+    borderRadius:"12px",
+    overflow:"hidden",
+    boxShadow:"0 4px 12px rgba(0,0,0,0.1)",
+  }}
+>
               {/* IMAGE */}
               <div style={{ aspectRatio: "3 / 4", background: "#eee" }}>
                 {mediaUrl ? (
