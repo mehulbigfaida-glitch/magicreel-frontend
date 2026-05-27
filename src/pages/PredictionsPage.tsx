@@ -71,6 +71,11 @@ useEffect(() => {
         ? json
         : json?.data || [];
 
+console.log(
+"PREDICTIONS:",
+predictions
+);
+
       predictions.sort(
         (a, b) =>
           new Date(b.createdAt).getTime() -
