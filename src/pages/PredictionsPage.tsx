@@ -46,77 +46,89 @@ return;
 
 
 async function handleDownload(
-e:any,
-item:any
+  e:any,
+  item:any
 ){
 
-e.stopPropagation();
+  e.stopPropagation();
 
-const url=
+  // LOOKBOOK → OPEN PACK
+  if(
+    item.type?.toLowerCase() === "lookbook"
+  ){
+    window.location.href =
+      `/pack/ecom/output/${
+        item.runId || item.id
+      }`;
 
-item.heroImageUrl ||
+    return;
+  }
 
-item.mediaUrl ||
+  const url =
 
-(item.lookbookImages &&
-item.lookbookImages[0]);
+    item.heroImageUrl ||
 
-if(!url){
+    item.mediaUrl ||
 
-console.log(
-"No media"
-);
+    (item.lookbookImages &&
+    item.lookbookImages[0]);
 
-return;
+  if(!url){
+
+    console.log(
+      "No media"
+    );
+
+    return;
+
+  }
+
+  try{
+
+    const response =
+    await fetch(url);
+
+    const blob =
+    await response.blob();
+
+    const objectUrl =
+    window.URL.createObjectURL(
+      blob
+    );
+
+    const a =
+    document.createElement(
+      "a"
+    );
+
+    a.href =
+    objectUrl;
+
+    a.download =
+    `magicreel-${item.type}`;
+
+    document.body.appendChild(
+      a
+    );
+
+    a.click();
+
+    a.remove();
+
+    window.URL.revokeObjectURL(
+      objectUrl
+    );
+
+  }catch(err){
+
+    console.error(
+      "Download failed",
+      err
+    );
+
+  }
 
 }
-
-try{
-
-const response=
-await fetch(url);
-
-const blob=
-await response.blob();
-
-const objectUrl=
-window.URL.createObjectURL(
-blob
-);
-
-const a=
-document.createElement(
-"a"
-);
-
-a.href=
-objectUrl;
-
-a.download=
-`magicreel-${item.type}`;
-
-document.body.appendChild(
-a
-);
-
-a.click();
-
-a.remove();
-
-window.URL.revokeObjectURL(
-objectUrl);
-
-}catch(err){
-
-console.error(
-"Download failed",
-err
-);
-
-}
-
-}
-
 
 useEffect(()=>{
 
@@ -523,33 +535,16 @@ textTransform:
 
 
 <button
-
-onClick={(e)=>
-handleDownload(
-e,
-item
-)
-}
-
-style={{
-
-border:"none",
-
-padding:
-"4px 10px",
-
-borderRadius:
-"999px",
-
-cursor:
-"pointer"
-
-}}
-
+  onClick={(e)=>
+    handleDownload(
+      e,
+      item
+    )
+  }
 >
-
-Download
-
+  {item.type?.toLowerCase() === "lookbook"
+    ? "View Pack"
+    : "Download"}
 </button>
 
 </div>
