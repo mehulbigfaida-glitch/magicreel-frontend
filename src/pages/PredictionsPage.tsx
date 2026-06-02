@@ -161,6 +161,11 @@ Authorization:
 const json=
 await res.json();
 
+console.log(
+  "PREDICTIONS RESPONSE",
+  json
+);
+
 if(!res.ok){
 
 console.error(
