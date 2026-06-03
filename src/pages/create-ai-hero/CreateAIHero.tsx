@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./CreateAIHero.css";
 import { API_BASE } from "../../config/api";
 import { useAuthStore } from "../../store/authStore";
@@ -26,6 +27,7 @@ MUSE_REGISTRY
 from "../create-ai/museRegistry";
 
 export default function CreateAIHero() {
+  const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(
     window.innerWidth < 980
   );
@@ -1428,6 +1430,29 @@ for your online store
 <button
 className="ai-pack-btn"
 disabled={!frontHeroImageUrl}
+onClick={() =>
+
+navigate("/pack/ecom", {
+
+state: {
+
+heroImageUrl:
+frontHeroImageUrl,
+
+backHeroImageUrl:
+backHeroImageUrl,
+
+gender:
+selectedCategory,
+
+category:
+selectedSubType
+
+}
+
+})
+
+}
 >
 Generate Pack
 </button>

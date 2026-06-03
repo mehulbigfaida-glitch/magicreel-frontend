@@ -1,59 +1,30 @@
 export const LOOKBOOK_STYLES = [
 
 {
-id:"pure-studio",
-title:"Pure Studio",
-prompt:
-"clean premium studio backdrop with focus entirely on garment presentation",
-image:"https://placehold.co/800x500/111111/666666?text=Pure+Studio"
+  id: "studio",
+  title: "Studio",
+  prompt:
+    "clean premium studio backdrop with focus entirely on garment presentation",
+  image:
+    "https://placehold.co/800x500/111111/666666?text=Studio"
 },
 
 {
-id:"sunlit-minimal",
-title:"Sunlit Minimal",
-prompt:
-"warm natural sunlight with soft window shadows inspired by premium fashion campaigns",
-image:"https://placehold.co/800x500/111111/666666?text=Sunlit+Minimal"
+  id: "premium-fashion",
+  title: "Premium Fashion",
+  prompt:
+    "luxury fashion photography inspired by Zara, Massimo Dutti and premium fashion campaigns with subtle architectural backgrounds, refined styling and commercial fashion presentation",
+  image:
+    "https://placehold.co/800x500/111111/666666?text=Premium+Fashion"
 },
 
 {
-id:"warm-beige",
-title:"Warm Beige Luxury",
-prompt:
-"minimal warm luxury atmosphere with subtle tonal depth",
-image:"https://placehold.co/800x500/111111/666666?text=Warm+Beige"
-},
-
-{
-id:"concrete-soft",
-title:"Concrete Soft",
-prompt:
-"subtle textured fashion walls with premium editorial feeling",
-image:"https://placehold.co/800x500/111111/666666?text=Concrete+Soft"
-},
-
-{
-id:"vibrant-pop",
-title:"Vibrant Pop",
-prompt:
-"muted premium colors with stylish fashion energy",
-image:"https://placehold.co/800x500/111111/666666?text=Vibrant+Pop"
-},
-
-{
-id:"sunlit-editorial",
-title:"Sunlit Editorial",
-prompt:
-"luxury sunlight geometry with elevated fashion mood",
-image:"https://placehold.co/800x500/111111/666666?text=Sunlit+Editorial"
-},
-
-{
-id:"urban-minimal",
-title:"Urban Minimal",
-prompt:
-"subtle architectural depth inspired by luxury fashion spaces",
-image:"https://placehold.co/800x500/111111/666666?text=Urban+Minimal"
+  id: "color-pop",
+  title: "Color Pop",
+  prompt:
+    "vibrant contemporary fashion backdrop with modern commercial styling and premium social-commerce energy",
+  image:
+    "https://placehold.co/800x500/111111/666666?text=Color+Pop"
 }
 
 ];

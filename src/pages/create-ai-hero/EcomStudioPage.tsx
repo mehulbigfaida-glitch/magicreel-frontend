@@ -36,6 +36,12 @@ location.state?.backHeroImageUrl||
 params.get("back")||
 "";
 
+const incomingGender =
+location.state?.gender || "";
+
+const incomingCategory =
+location.state?.category || "";
+
 const[
 frontHero,
 setFrontHero
@@ -54,7 +60,7 @@ const[
 selectedStyle,
 setSelectedStyle
 ]=useState(
-"pure_studio"
+"studio"
 );
 
 const[
@@ -128,12 +134,17 @@ heroImageUrl:
 frontHero,
 
 backHeroImageUrl:
-backHero||
-
-undefined,
+backHero || undefined,
 
 lookbookStyle:
-selectedStyle
+selectedStyle,
+
+gender:
+incomingGender,
+
+category:
+incomingCategory
+
 })
 }
 );
