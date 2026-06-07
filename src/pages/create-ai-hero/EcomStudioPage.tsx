@@ -42,6 +42,13 @@ location.state?.gender || "";
 const incomingCategory =
 location.state?.category || "";
 
+console.log("ECOM LOCATION STATE", location.state);
+
+console.log("ECOM VALUES", {
+  incomingGender,
+  incomingCategory
+});
+
 const[
 frontHero,
 setFrontHero
