@@ -2,7 +2,6 @@ import { useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./ecomStudio.css";
 import { API_BASE } from "../../config/api";
-import { LOOKBOOK_STYLES } from "./lookbook/lookbookStyles";
 
 // import {
 // MALE_POSES,
@@ -63,12 +62,7 @@ setBackHero
 incomingBack
 );
 
-const[
-selectedStyle,
-setSelectedStyle
-]=useState(
-"studio"
-);
+const selectedStyle = "studio";
 
 const[
 loading,
@@ -197,7 +191,7 @@ Lookbook Studio
 </h1>
 
 <p className="subtitle">
-Create premium fashion lookbooks with AI poses and curated luxury styling.
+Create premium fashion lookbooks with AI-generated commercial fashion poses.
 </p>
 
 <div className="hero-grid">
@@ -336,48 +330,7 @@ setBackHero
 </div>
 
 
-<div className="section-title">
-3. CHOOSE LOOKBOOK STYLE
-</div>
-
-<div className="world-grid">
-
-{LOOKBOOK_STYLES.map((style)=>(
-
-<div
-key={style.id}
-className={`world-card ${
-selectedStyle===style.id
-? "selected"
-: ""
-}`}
-onClick={() =>
-setSelectedStyle(style.id)
-}
->
-
-<img
-src={style.image}
-alt=""
-/>
-
-<div className="world-content">
-
-<h3>
-{style.title}
-</h3>
-
-<p>
-{style.prompt}
-</p>
-
-</div>
-
-</div>
-
-))}
-
-</div>
+{/* LOOKBOOK STYLES TEMPORARILY HIDDEN */}
 
 <div className="benefits">
 
@@ -386,7 +339,7 @@ alt=""
 </div>
 
 <div>
-Luxury E-Com Styling
+Commercial Fashion Angles
 </div>
 
 <div>
