@@ -108,6 +108,12 @@ try{
 
 setLoading(true);
 
+console.log("LOOKBOOK REQUEST", {
+  incomingGender,
+  incomingCategory,
+  selectedStyle
+});
+
 const token=
 localStorage.getItem(
 "token"

@@ -1430,7 +1430,12 @@ for your online store
 <button
 className="ai-pack-btn"
 disabled={!frontHeroImageUrl}
-onClick={() =>
+onClick={() => {
+
+console.log("NAVIGATE TO ECOM", {
+  selectedCategory,
+  selectedSubType
+});
 
 navigate("/pack/ecom", {
 
@@ -1450,9 +1455,9 @@ selectedSubType
 
 }
 
-})
+});
 
-}
+}}
 >
 Generate Pack
 </button>
