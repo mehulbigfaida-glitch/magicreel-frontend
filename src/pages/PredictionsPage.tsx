@@ -277,14 +277,19 @@ gap:"20px"
 
 {data.map((item)=>{
 
-const mediaUrl=
+const originalUrl =
+  item.heroImageUrl ||
+  item.mediaUrl ||
+  (item.lookbookImages &&
+    item.lookbookImages[0]);
 
-item.heroImageUrl ||
-
-item.mediaUrl ||
-
-(item.lookbookImages &&
-item.lookbookImages[0]);
+const mediaUrl =
+  originalUrl?.includes("/upload/")
+    ? originalUrl.replace(
+        "/upload/",
+        "/upload/w_400,h_600,c_fill,q_auto,f_auto/"
+      )
+    : originalUrl;
 
 
 const isVideo=
