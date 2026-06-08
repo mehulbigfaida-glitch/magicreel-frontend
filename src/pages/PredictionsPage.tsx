@@ -287,7 +287,7 @@ const mediaUrl =
   originalUrl?.includes("/upload/")
     ? originalUrl.replace(
         "/upload/",
-        "/upload/w_400,h_600,c_fill,q_auto,f_auto/"
+        "/upload/w_250,h_375,c_fill,q_auto:eco,f_auto/"
       )
     : originalUrl;
 
