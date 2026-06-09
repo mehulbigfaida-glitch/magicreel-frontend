@@ -397,16 +397,23 @@ Authorization:
 
 if(res.ok){
 
-const d=
+const d =
 await res.json();
 
+console.log(
+"HERO POLL RESULT",
+d
+);
+
 if(
-
 d.status===
-
 "completed"
-
 ){
+
+console.log(
+"SETTING FRONT HERO",
+d.imageUrl?.substring(0,120)
+);
 
 setFrontHeroImageUrl(
 d.imageUrl
