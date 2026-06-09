@@ -120,6 +120,9 @@ localStorage.getItem(
 "token"
 );
 
+console.log("FRONT HERO TYPE:", typeof frontHero);
+console.log("FRONT HERO VALUE:", frontHero?.substring?.(0, 200));
+
 const res=
 await fetch(
 `${API_BASE}/api/p2m/lookbook-v1/generate`,
