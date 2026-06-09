@@ -202,19 +202,54 @@ err
 
 }
 
-function handle360Reel(){
+async function handleCarouselReel() {
 
-alert(
+try {
 
-`360° Reel Coming Soon
+  if (!id) {
+    alert("Lookbook not found");
+    return;
+  }
 
-Will support:
+  const response = await fetch(
+    `${import.meta.env.VITE_API_URL}/api/p2m/reel/carousel`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        lookbookId: id,
+      }),
+    }
+  );
 
-• Front + Back Hero
-• Full rotational reel
-• Cost: 3 credits`
+  const data = await response.json();
 
-);
+  if (!data.success) {
+    throw new Error(
+      data.error || "Reel generation failed"
+    );
+  }
+
+  window.open(
+    data.reelVideoUrl,
+    "_blank"
+  );
+
+} catch (err: any) {
+
+  console.error(
+    "CAROUSEL REEL ERROR:",
+    err
+  );
+
+  alert(
+    err.message ||
+    "Failed to generate reel"
+  );
+
+}
 
 }
 
@@ -295,11 +330,11 @@ Copy Preview Link
 <button
 className="primary"
 onClick={
-handle360Reel
+handleCarouselReel
 }
 >
 
-360° Reel ✨
+Carousel Reel ✨
 
 </button>
 

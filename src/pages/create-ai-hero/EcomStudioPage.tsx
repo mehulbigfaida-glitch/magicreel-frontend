@@ -359,7 +359,7 @@ onClick={handleGenerate}
 >
 
 {loading
-? "Generating..."
+? "Generating... (2–3 minutes)"
 : "Generate Lookbook Pack (2 Credits)"}
 
 </button>
