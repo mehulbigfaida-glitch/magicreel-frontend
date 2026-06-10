@@ -254,9 +254,13 @@ export default function EcomOutputPage() {
 
       }
 
-      navigate(
-        `/reel/${data.reelId}`
-      );
+      console.log(
+  "REEL NAVIGATION TEST",
+  data.reelId
+);
+
+window.location.href =
+  `/reel/${data.reelId}`;
 
     } catch (err: any) {
 
