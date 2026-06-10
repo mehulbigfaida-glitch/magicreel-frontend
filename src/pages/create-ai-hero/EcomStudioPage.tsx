@@ -214,8 +214,12 @@ Create premium fashion lookbooks with AI-generated commercial fashion poses.
 )}
 
 <div
-className="preview-large"
-onClick={() => fileFrontRef.current?.click()}
+  className="preview-large"
+  onClick={() => {
+    if (!fromHero) {
+      fileFrontRef.current?.click();
+    }
+  }}
 >
 
 {frontHero ? (
@@ -244,15 +248,17 @@ Required
 
 </div>
 
-<button
-onClick={() =>
-fileFrontRef.current?.click()
-}
->
-{frontHero
-? "Change Image"
-: "Upload Image"}
-</button>
+{!fromHero && (
+  <button
+    onClick={() =>
+      fileFrontRef.current?.click()
+    }
+  >
+    {frontHero
+      ? "Change Image"
+      : "Upload Image"}
+  </button>
+)}
 
 <input
 hidden

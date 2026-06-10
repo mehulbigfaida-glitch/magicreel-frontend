@@ -40,6 +40,7 @@ import CreateAIPage from "./pages/create-ai/CreateAIPage.tsx";
 import CreateAIHero from "./pages/create-ai-hero/CreateAIHero";
 import EcomStudioPage from "./pages/create-ai-hero/EcomStudioPage";
 import EcomOutputPage from "./pages/create-ai-hero/lookbook/EcomOutputPage";
+import ReelOutputPage from "./pages/reel/ReelOutputPage";
 
 /* =========================
    CONTEXT
@@ -237,6 +238,11 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+<Route
+  path="/reel/:renderId"
+  element={<ReelOutputPage />}
+/>
+
 
       <Route path="/reel/view" element={<ReelMobileView />} />
       <Route path="/share/:id" element={<SharePage />} />
