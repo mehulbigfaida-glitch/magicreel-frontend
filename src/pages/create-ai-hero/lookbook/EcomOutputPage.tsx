@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-  useParams,
-  useNavigate
+  useParams
 } from "react-router-dom";
 
 import "./ecomOutput.css";
@@ -14,9 +13,7 @@ export default function EcomOutputPage() {
 
   const { id } = useParams();
 
-  const navigate = useNavigate();
-
-  const [loading, setLoading] =
+    const [loading, setLoading] =
     useState(true);
 
   const [poses, setPoses] =

@@ -1,9 +1,83 @@
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+
+const API_BASE =
+  import.meta.env.VITE_API_BASE_URL ||
+  import.meta.env.VITE_API_URL;
 
 export default function ReelOutputPage() {
+
   const { renderId } = useParams();
 
+  const navigate = useNavigate();
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [videoUrl, setVideoUrl] =
+    useState("");
+
+  useEffect(() => {
+
+    async function loadReel() {
+
+      try {
+
+        const res =
+          await fetch(
+            `${API_BASE}/api/p2m/reel/${renderId}`
+          );
+
+        const data =
+          await res.json();
+
+        console.log(
+          "REEL DATA:",
+          data
+        );
+
+        setVideoUrl(
+          data.reelVideoUrl || ""
+        );
+
+      } catch (err) {
+
+        console.error(
+          "REEL LOAD ERROR:",
+          err
+        );
+
+      }
+
+      setLoading(false);
+
+    }
+
+    loadReel();
+
+  }, [renderId]);
+
+  if (loading) {
+
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "#000",
+          color: "#fff",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        Loading Reel...
+      </div>
+    );
+
+  }
+
   return (
+
     <div
       style={{
         minHeight: "100vh",
@@ -63,13 +137,32 @@ export default function ReelOutputPage() {
               flexWrap: "wrap",
             }}
           >
-            <button>Download Reel</button>
+            <button
+              onClick={() =>
+                window.open(
+                  videoUrl,
+                  "_blank"
+                )
+              }
+            >
+              Download Reel
+            </button>
 
-            <button>Publish</button>
+            <button>
+              Publish
+            </button>
 
-            <button>Copy Preview Link</button>
+            <button>
+              Copy Preview Link
+            </button>
 
-            <button>Back To Pack</button>
+            <button
+              onClick={() =>
+                navigate(-1)
+              }
+            >
+              Back To Pack
+            </button>
           </div>
         </div>
 
@@ -80,7 +173,9 @@ export default function ReelOutputPage() {
           }}
         >
           <video
+            src={videoUrl}
             controls
+            autoPlay
             style={{
               width: "100%",
               borderRadius: "20px",
@@ -99,5 +194,7 @@ export default function ReelOutputPage() {
         </div>
       </div>
     </div>
+
   );
+
 }
