@@ -122,7 +122,7 @@ export default function ReelOutputPage() {
           style={{
             textAlign: "center",
             marginTop: "30px",
-            marginBottom: "18px",
+            marginBottom: "12px",
           }}
         >
 
@@ -264,7 +264,7 @@ export default function ReelOutputPage() {
             maxWidth: "100%",
             margin: "0 auto",
 
-            padding: "18px",
+            padding: "10px",
 
             background: "#111",
 
