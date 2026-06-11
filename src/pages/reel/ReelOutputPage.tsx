@@ -91,6 +91,7 @@ export default function ReelOutputPage() {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          fontSize: "22px",
         }}
       >
         Loading Reel...
@@ -103,32 +104,34 @@ export default function ReelOutputPage() {
 
     <div
       style={{
-        minHeight: "100vh",
         background: "#000",
+        minHeight: "100vh",
         color: "#fff",
-        padding: "60px 24px",
+        padding: "40px 0 100px",
       }}
     >
+
       <div
         style={{
-          maxWidth: "1200px",
-          margin: "0 auto",
+          width: "min(1500px,95%)",
+          margin: "auto",
         }}
       >
 
         <div
           style={{
             textAlign: "center",
-            marginBottom: "24px",
+            marginTop: "30px",
+            marginBottom: "18px",
           }}
         >
 
           <div
             style={{
-              color: "#8b5cf6",
-              letterSpacing: "8px",
-              fontSize: "12px",
-              marginBottom: "20px",
+              fontSize: "11px",
+              letterSpacing: "6px",
+              color: "#b267ff",
+              marginBottom: "18px",
             }}
           >
             MAGICREEL AI STUDIO
@@ -136,9 +139,10 @@ export default function ReelOutputPage() {
 
           <h1
             style={{
-              fontSize: "56px",
+              fontSize: "64px",
               fontWeight: 800,
               margin: 0,
+              lineHeight: 1,
             }}
           >
             CAROUSEL REEL
@@ -146,8 +150,9 @@ export default function ReelOutputPage() {
 
           <p
             style={{
-              color: "#999",
-              marginTop: "15px",
+              marginTop: "14px",
+              fontSize: "18px",
+              color: "#8d8d8d",
             }}
           >
             Fashion Reel Generated
@@ -157,8 +162,8 @@ export default function ReelOutputPage() {
             style={{
               display: "flex",
               justifyContent: "center",
-              gap: "16px",
-              marginTop: "30px",
+              gap: "18px",
+              marginTop: "24px",
               flexWrap: "wrap",
             }}
           >
@@ -171,15 +176,18 @@ export default function ReelOutputPage() {
                 )
               }
               style={{
-                height: "52px",
-                padding: "0 28px",
-                borderRadius: "999px",
-                border:
-                  "1px solid rgba(255,255,255,0.08)",
                 background: "#111",
-                color: "#fff",
+                border:
+                  "1px solid rgba(255,255,255,.08)",
+                padding: "20px 42px",
+                color: "white",
+                borderRadius: "999px",
                 cursor: "pointer",
+                fontSize: "16px",
                 fontWeight: 600,
+                minWidth: "180px",
+                boxShadow:
+                  "0 0 0 1px rgba(255,255,255,.02)",
               }}
             >
               Download Reel
@@ -187,15 +195,18 @@ export default function ReelOutputPage() {
 
             <button
               style={{
-                height: "52px",
-                padding: "0 28px",
-                borderRadius: "999px",
-                border:
-                  "1px solid rgba(255,255,255,0.08)",
                 background: "#111",
-                color: "#fff",
+                border:
+                  "1px solid rgba(255,255,255,.08)",
+                padding: "20px 42px",
+                color: "white",
+                borderRadius: "999px",
                 cursor: "pointer",
+                fontSize: "16px",
                 fontWeight: 600,
+                minWidth: "180px",
+                boxShadow:
+                  "0 0 0 1px rgba(255,255,255,.02)",
               }}
             >
               Publish
@@ -206,15 +217,18 @@ export default function ReelOutputPage() {
                 handleCopyLink
               }
               style={{
-                height: "52px",
-                padding: "0 28px",
-                borderRadius: "999px",
-                border:
-                  "1px solid rgba(255,255,255,0.08)",
                 background: "#111",
-                color: "#fff",
+                border:
+                  "1px solid rgba(255,255,255,.08)",
+                padding: "20px 42px",
+                color: "white",
+                borderRadius: "999px",
                 cursor: "pointer",
+                fontSize: "16px",
                 fontWeight: 600,
+                minWidth: "180px",
+                boxShadow:
+                  "0 0 0 1px rgba(255,255,255,.02)",
               }}
             >
               Copy Preview Link
@@ -225,15 +239,16 @@ export default function ReelOutputPage() {
                 navigate(-1)
               }
               style={{
-                height: "52px",
-                padding: "0 28px",
-                borderRadius: "999px",
-                border: "none",
                 background:
-                  "linear-gradient(135deg,#7c3aed,#a855f7)",
-                color: "#fff",
+                  "linear-gradient(90deg,#6927ff,#d946ef)",
+                border: "none",
+                padding: "20px 42px",
+                color: "white",
+                borderRadius: "999px",
                 cursor: "pointer",
-                fontWeight: 700,
+                fontSize: "16px",
+                fontWeight: 600,
+                minWidth: "180px",
               }}
             >
               Back To Pack
@@ -245,19 +260,33 @@ export default function ReelOutputPage() {
 
         <div
           style={{
-            maxWidth: "420px",
-            margin: "24px auto 0",
+            width: "420px",
+            maxWidth: "100%",
+            margin: "0 auto",
+
+            padding: "18px",
+
+            background: "#111",
+
+            borderRadius: "32px",
+
+            boxShadow:
+              "0 10px 50px rgba(0,0,0,.35)",
+
+            border:
+              "1px solid rgba(255,255,255,.05)",
           }}
         >
 
           <video
             src={videoUrl}
             controls
+            autoPlay
+            muted
+            playsInline
             style={{
               width: "100%",
-              maxHeight: "80vh",
-              borderRadius: "20px",
-              objectFit: "contain",
+              borderRadius: "22px",
               display: "block",
             }}
           />
@@ -266,15 +295,17 @@ export default function ReelOutputPage() {
 
         <div
           style={{
-            marginTop: "30px",
+            marginTop: "24px",
             textAlign: "center",
             color: "#777",
+            fontSize: "13px",
           }}
         >
           Render ID: {renderId}
         </div>
 
       </div>
+
     </div>
 
   );
