@@ -71,15 +71,17 @@ const [poses, setPoses] =
     );
 
   const lookbookImages =
-    useMemo(
-      () =>
-        poses.filter(
-          (p) =>
-            p.poseId !== "hero" &&
-            p.poseId !== "back"
-        ),
-      [poses]
-    );
+  useMemo(
+    () =>
+      poses.filter(
+        (p) =>
+          p.poseId !== "hero" &&
+          p.poseId !== "back" &&
+          p.poseId !== "REEL" &&
+          p.imageUrl
+      ),
+    [poses]
+  );
 
   async function handleExportZip() {
 
