@@ -169,12 +169,45 @@ export default function ReelOutputPage() {
           >
 
             <button
-              onClick={() =>
-                window.open(
-                  videoUrl,
-                  "_blank"
-                )
-              }
+  onClick={async () => {
+
+    try {
+
+      const response =
+        await fetch(videoUrl);
+
+      const blob =
+        await response.blob();
+
+      const url =
+        window.URL.createObjectURL(blob);
+
+      const a =
+        document.createElement("a");
+
+      a.href = url;
+
+      a.download =
+        "magicreel-reel.mp4";
+
+      document.body.appendChild(a);
+
+      a.click();
+
+      a.remove();
+
+      window.URL.revokeObjectURL(url);
+
+    } catch (err) {
+
+      console.error(
+        "DOWNLOAD ERROR:",
+        err
+      );
+
+    }
+
+  }}
               style={{
                 background: "#111",
                 border:
