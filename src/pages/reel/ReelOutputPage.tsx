@@ -57,6 +57,29 @@ export default function ReelOutputPage() {
 
   }, [renderId]);
 
+  async function handleCopyLink() {
+
+    try {
+
+      await navigator.clipboard.writeText(
+        window.location.href
+      );
+
+      alert(
+        "Link copied"
+      );
+
+    } catch (err) {
+
+      console.error(
+        "COPY LINK ERROR:",
+        err
+      );
+
+    }
+
+  }
+
   if (loading) {
 
     return (
@@ -92,12 +115,14 @@ export default function ReelOutputPage() {
           margin: "0 auto",
         }}
       >
+
         <div
           style={{
             textAlign: "center",
-            marginBottom: "50px",
+            marginBottom: "24px",
           }}
         >
+
           <div
             style={{
               color: "#8b5cf6",
@@ -111,7 +136,7 @@ export default function ReelOutputPage() {
 
           <h1
             style={{
-              fontSize: "72px",
+              fontSize: "56px",
               fontWeight: 800,
               margin: 0,
             }}
@@ -137,6 +162,7 @@ export default function ReelOutputPage() {
               flexWrap: "wrap",
             }}
           >
+
             <button
               onClick={() =>
                 window.open(
@@ -144,15 +170,53 @@ export default function ReelOutputPage() {
                   "_blank"
                 )
               }
+              style={{
+                height: "52px",
+                padding: "0 28px",
+                borderRadius: "999px",
+                border:
+                  "1px solid rgba(255,255,255,0.08)",
+                background: "#111",
+                color: "#fff",
+                cursor: "pointer",
+                fontWeight: 600,
+              }}
             >
               Download Reel
             </button>
 
-            <button>
+            <button
+              style={{
+                height: "52px",
+                padding: "0 28px",
+                borderRadius: "999px",
+                border:
+                  "1px solid rgba(255,255,255,0.08)",
+                background: "#111",
+                color: "#fff",
+                cursor: "pointer",
+                fontWeight: 600,
+              }}
+            >
               Publish
             </button>
 
-            <button>
+            <button
+              onClick={
+                handleCopyLink
+              }
+              style={{
+                height: "52px",
+                padding: "0 28px",
+                borderRadius: "999px",
+                border:
+                  "1px solid rgba(255,255,255,0.08)",
+                background: "#111",
+                color: "#fff",
+                cursor: "pointer",
+                fontWeight: 600,
+              }}
+            >
               Copy Preview Link
             </button>
 
@@ -160,27 +224,44 @@ export default function ReelOutputPage() {
               onClick={() =>
                 navigate(-1)
               }
+              style={{
+                height: "52px",
+                padding: "0 28px",
+                borderRadius: "999px",
+                border: "none",
+                background:
+                  "linear-gradient(135deg,#7c3aed,#a855f7)",
+                color: "#fff",
+                cursor: "pointer",
+                fontWeight: 700,
+              }}
             >
               Back To Pack
             </button>
+
           </div>
+
         </div>
 
         <div
           style={{
-            maxWidth: "800px",
-            margin: "0 auto",
+            maxWidth: "420px",
+            margin: "24px auto 0",
           }}
         >
+
           <video
             src={videoUrl}
             controls
-            autoPlay
             style={{
               width: "100%",
+              maxHeight: "80vh",
               borderRadius: "20px",
+              objectFit: "contain",
+              display: "block",
             }}
           />
+
         </div>
 
         <div
@@ -192,6 +273,7 @@ export default function ReelOutputPage() {
         >
           Render ID: {renderId}
         </div>
+
       </div>
     </div>
 
