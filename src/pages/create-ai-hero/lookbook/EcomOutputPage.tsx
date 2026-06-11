@@ -14,10 +14,13 @@ export default function EcomOutputPage() {
   const { id } = useParams();
 
     const [loading, setLoading] =
-    useState(true);
+  useState(true);
 
-  const [poses, setPoses] =
-    useState<any[]>([]);
+const [generatingReel, setGeneratingReel] =
+  useState(false);
+
+const [poses, setPoses] =
+  useState<any[]>([]);
 
   useEffect(() => {
 
@@ -202,7 +205,9 @@ export default function EcomOutputPage() {
 
   async function handleCarouselReel() {
 
-    try {
+  try {
+
+    setGeneratingReel(true);
 
       if (!id) {
 
@@ -265,6 +270,8 @@ window.location.href =
         "CAROUSEL REEL ERROR:",
         err
       );
+
+    setGeneratingReel(false);
 
       alert(
         err.message ||
@@ -345,15 +352,22 @@ window.location.href =
             </button>
 
             <button
-              className="primary"
-              onClick={
-                handleCarouselReel
-              }
-            >
+  className="primary"
+  onClick={
+    handleCarouselReel
+  }
+  disabled={
+    generatingReel
+  }
+>
 
-              Carousel Reel ✨
+  {
+    generatingReel
+      ? "🎬 Rendering Reel..."
+      : "Carousel Reel ✨"
+  }
 
-            </button>
+</button>
 
           </div>
 
