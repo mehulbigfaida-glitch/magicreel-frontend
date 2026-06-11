@@ -25,6 +25,9 @@ export default function PredictionsPage(){
 const [data,setData]=
 useState<Prediction[]>([]);
 
+const [loading,setLoading]=
+useState(true);
+
 
 const handlePredictionClick=(item:any)=>{
 
@@ -216,7 +219,11 @@ setData(
 predictions
 );
 
+setLoading(false);
+
 }catch(err){
+
+setLoading(false);
 
 console.error(
 err
@@ -229,6 +236,50 @@ err
 fetchPredictions();
 
 },[]);
+
+if(loading){
+
+return(
+
+<div
+style={{
+
+minHeight:"70vh",
+
+display:"flex",
+
+flexDirection:"column",
+
+alignItems:"center",
+
+justifyContent:"center",
+
+gap:"16px"
+
+}}
+>
+
+<h2>
+
+Loading your creations...
+
+</h2>
+
+<p
+style={{
+opacity:.6
+}}
+>
+
+Please wait a moment
+
+</p>
+
+</div>
+
+);
+
+}
 
 
 return(
