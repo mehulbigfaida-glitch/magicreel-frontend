@@ -238,7 +238,7 @@ backImageUrl
 
 MUSE_REGISTRY[
 selectedMuse
-].processingImageUrl
+].processingBackImageUrl
 
 :undefined,
 
