@@ -277,7 +277,9 @@ setFrontHero
 <div className="hero-card">
 
 <div className="card-title">
-2. BACK HERO IMAGE (OPTIONAL)
+{backHero
+  ? "2. BACK HERO IMAGE ✓"
+  : "2. BACK HERO IMAGE (OPTIONAL)"}
 </div>
 
 <div
