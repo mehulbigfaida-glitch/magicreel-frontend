@@ -18,7 +18,6 @@ import {
 ShoppingBag,
 Share2,
 Megaphone,
-Clapperboard
 } from "lucide-react";
 
 import {
@@ -656,10 +655,22 @@ style={{
                 marginBottom: 22
               }}
             >
-              Upload
-              <br />
-              Garment
-            </div>
+  Upload
+  <br />
+  Garment
+</div>
+
+<div className="garment-upload-guide">
+
+   Upload garment images to create realistic AI fashion models.
+
+  <div>✓ PNG or JPEG</div>
+
+  <div>✓ Hanger / Mannequin only</div>
+
+  <div>✓ Front + Back recommended</div>
+
+</div>
 
             <div
               style={{
@@ -735,13 +746,11 @@ style={{
 
 
               <select
-                value={
-                  selectedSubType
-                }
+  value={
+    selectedSubType
+  }
 
-                disabled={
-                  !selectedCategory
-                }
+  disabled={false}
 
                 onChange={(e) => {
 
@@ -1280,7 +1289,7 @@ border:
 "1px solid rgba(255,255,255,.08)",
 background:
 "linear-gradient(180deg,#111,#1a1a1a)",
-minHeight:650
+minHeight:560
 }}
 >
 
@@ -1292,31 +1301,35 @@ minHeight:650
 
 <>
 
-<div className="hero-image-actions">
-
-<button
-className="hero-icon-btn"
-onClick={()=>
-window.open(
-frontHeroImageUrl,
-"_blank"
-)
-}
->
-
-⭳
-
-</button>
-
-</div>
-
 <img
-src={frontHeroImageUrl}
+src={frontHeroImageUrl ?? undefined}
 style={{
 width:"100%",
 display:"block"
 }}
 />
+
+<div className="hero-action-bar">
+
+<button
+className="hero-action-btn"
+onClick={() =>
+window.open(
+frontHeroImageUrl ?? undefined,
+"_blank"
+)
+}
+>
+Download Hero
+</button>
+
+<button
+className="hero-action-btn primary"
+>
+Publish Hero
+</button>
+
+</div>
 
 </>
 
@@ -1324,7 +1337,7 @@ display:"block"
 
 <div
 style={{
-height:580
+height:490
 }}
 />
 
@@ -1333,9 +1346,7 @@ height:580
 </div>
 
 
-
 {/* BACK HERO */}
-
 
 <div
 className={
@@ -1350,7 +1361,7 @@ border:
 "1px solid rgba(255,255,255,.08)",
 background:
 "linear-gradient(180deg,#111,#1a1a1a)",
-minHeight:650
+minHeight:560
 }}
 >
 
@@ -1362,32 +1373,29 @@ minHeight:650
 
 <>
 
-<div className="hero-image-actions">
-
-<button
-className="hero-icon-btn"
-
-onClick={()=>
-window.open(
-backHeroImageUrl,
-"_blank"
-)
-}
->
-
-⭳
-
-</button>
-
-</div>
-
 <img
-src={backHeroImageUrl}
+src={backHeroImageUrl ?? undefined}
 style={{
 width:"100%",
 display:"block"
 }}
 />
+
+<div className="hero-action-bar">
+
+<button
+className="hero-action-btn"
+onClick={() =>
+window.open(
+backHeroImageUrl ?? undefined,
+"_blank"
+)
+}
+>
+Download Back Hero
+</button>
+
+</div>
 
 </>
 
@@ -1395,7 +1403,7 @@ display:"block"
 
 <div
 style={{
-height:580
+height:490
 }}
 />
 
@@ -1405,6 +1413,79 @@ height:580
 
 </div>
 
+{/* 360° REEL */}
+
+<div className="reel-section">
+
+  <div className="reel-left">
+
+    <div className="reel-icon">
+      🎬
+    </div>
+
+    <div className="reel-info">
+
+      <div className="reel-title">
+        360° Reel
+      </div>
+
+      <div className="reel-subtitle">
+        Uses Front Hero + Back Hero
+      </div>
+
+      <div className="reel-meta">
+
+        <span>⏱ 5 Seconds</span>
+
+        <span>⚡ 3 Credits</span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div className="reel-right">
+
+    {!backHeroImageUrl && (
+
+      <div className="reel-warning">
+
+        For best results, generate a Back Hero first.
+
+        <div className="reel-warning-small">
+          You can still continue with Front Hero only.
+        </div>
+
+      </div>
+
+    )}
+
+    <div className="reel-actions">
+
+      <button
+        className="reel-primary-btn"
+        disabled={!frontHeroImageUrl}
+      >
+        Generate Reel
+      </button>
+
+      {!backHeroImageUrl && (
+
+        <button
+          className="reel-secondary-btn"
+          disabled={!frontHeroImageUrl}
+        >
+          Continue With Front Hero Only
+        </button>
+
+      )}
+
+    </div>
+
+  </div>
+
+</div>
 
 {/* CONTINUE WITH AI */}
 
@@ -1426,12 +1507,13 @@ height:580
 </div>
 
 <div className="ai-pack-title">
-E-COM Pack
+E-COM Lookbook
 </div>
 
 <div className="ai-pack-sub">
-Clean product shots
-for your online store
+Generate marketplace-ready product photos,
+6 different model poses with clean backgrounds
+for Amazon, Shopify and online stores.
 </div>
 
 <button
@@ -1486,8 +1568,9 @@ Social Pack
 </div>
 
 <div className="ai-pack-sub">
-Social media ready
-content for marketing
+Create engaging social media creatives,
+stories and promotional content designed
+to boost reach and engagement.
 </div>
 
 <button
@@ -1514,35 +1597,9 @@ Editorial Campaign
 </div>
 
 <div className="ai-pack-sub">
-Luxury campaign visuals
-</div>
-
-<button
-className="ai-pack-btn"
-disabled={!frontHeroImageUrl}
->
-Generate Pack
-</button>
-
-</div>
-
-
-
-{/* REEL */}
-
-<div className="ai-pack-card">
-
-<div className="ai-pack-icon cyan">
-<Clapperboard size={26}/>
-</div>
-
-<div className="ai-pack-title">
-Reel Generator
-</div>
-
-<div className="ai-pack-sub">
-Short cinematic
-AI videos
+Transform your garment into premium
+fashion campaigns with magazine-style
+editorial storytelling and luxury visuals.
 </div>
 
 <button
