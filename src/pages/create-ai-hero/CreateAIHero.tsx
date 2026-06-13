@@ -96,6 +96,44 @@ setHeroError
 ]=useState<string|null>(null);
 
 
+const downloadImage = async (
+  imageUrl: string,
+  filename: string
+) => {
+  try {
+
+    const response =
+      await fetch(imageUrl);
+
+    const blob =
+      await response.blob();
+
+    const url =
+      window.URL.createObjectURL(blob);
+
+    const link =
+      document.createElement("a");
+
+    link.href = url;
+    link.download = filename;
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
+
+    window.URL.revokeObjectURL(url);
+
+  } catch (error) {
+
+    console.error(
+      "Download failed",
+      error
+    );
+
+  }
+};
 
   useEffect(() => {
     const handleResize = () =>
@@ -1314,9 +1352,10 @@ display:"block"
 <button
 className="hero-action-btn"
 onClick={() =>
-window.open(
-frontHeroImageUrl ?? undefined,
-"_blank"
+frontHeroImageUrl &&
+downloadImage(
+  frontHeroImageUrl,
+  "magicreel-front-hero.jpg"
 )
 }
 >
@@ -1386,9 +1425,10 @@ display:"block"
 <button
 className="hero-action-btn"
 onClick={() =>
-window.open(
-backHeroImageUrl ?? undefined,
-"_blank"
+backHeroImageUrl &&
+downloadImage(
+  backHeroImageUrl,
+  "magicreel-back-hero.jpg"
 )
 }
 >
