@@ -95,6 +95,20 @@ heroError,
 setHeroError
 ]=useState<string|null>(null);
 
+const [
+reelRunId,
+setReelRunId
+]=useState<string|null>(null);
+
+const [
+reelVideoUrl,
+setReelVideoUrl
+]=useState<string|null>(null);
+
+const [
+reelLoading,
+setReelLoading
+]=useState(false);
 
 const downloadImage = async (
   imageUrl: string,
@@ -335,6 +349,70 @@ err.message
 setHeroLoading(false);
 
 }
+
+};
+
+const generate360Reel = async () => {
+
+  if (!frontHeroImageUrl) return;
+
+  try {
+
+    setReelLoading(true);
+    setReelVideoUrl(null);
+
+    const token =
+      localStorage.getItem("token");
+
+    const res = await fetch(
+      `${API_BASE}/api/p2m/reels360/generate`,
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+          Authorization:
+            `Bearer ${token}`
+        },
+
+        body: JSON.stringify({
+
+          heroImageUrl:
+            frontHeroImageUrl,
+
+          backHeroImageUrl:
+            backHeroImageUrl
+
+        })
+
+      }
+    );
+
+    const data =
+      await res.json();
+
+    if (!res.ok) {
+
+      throw new Error(
+        data.error ||
+        "360 Reel failed"
+      );
+
+    }
+
+    setReelRunId(
+      data.runId
+    );
+
+  } catch (err: any) {
+
+    alert(
+      err.message
+    );
+
+    setReelLoading(false);
+
+  }
 
 };
 
@@ -1475,7 +1553,7 @@ height:490
 
       <div className="reel-meta">
 
-        <span>⏱ 5 Seconds</span>
+        <span>⏱ 6 Seconds</span>
 
         <span>⚡ 3 Credits</span>
 
@@ -1504,11 +1582,22 @@ height:490
     <div className="reel-actions">
 
       <button
-        className="reel-primary-btn"
-        disabled={!frontHeroImageUrl}
-      >
-        Generate Reel
-      </button>
+  className="reel-primary-btn"
+  disabled={
+    !frontHeroImageUrl ||
+    reelLoading
+  }
+
+  onClick={
+    generate360Reel
+  }
+>
+  {
+    reelLoading
+      ? "Generating..."
+      : "Generate Reel"
+  }
+</button>
 
       {!backHeroImageUrl && (
 
