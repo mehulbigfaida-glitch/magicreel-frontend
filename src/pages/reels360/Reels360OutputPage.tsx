@@ -7,7 +7,7 @@ const API_BASE =
 
 export default function ReelOutputPage() {
 
-  const { renderId } = useParams();
+  const { runId } = useParams();
 
   const navigate = useNavigate();
 
@@ -19,44 +19,93 @@ export default function ReelOutputPage() {
 
   useEffect(() => {
 
-    async function loadReel() {
+  if (!runId) return;
 
-      try {
+  const startedAt =
+    Date.now();
 
-        const res =
-          await fetch(
-            `${API_BASE}/api/p2m/reel/${renderId}`
+  const interval =
+    window.setInterval(
+      async () => {
+
+        try {
+
+          if (
+            Date.now() - startedAt >
+            600000
+          ) {
+
+            clearInterval(
+              interval
+            );
+
+            setLoading(false);
+
+            return;
+          }
+
+          const res =
+            await fetch(
+`${API_BASE}/api/p2m/reels360/status/${runId}`
+            );
+
+          const data =
+            await res.json();
+
+          console.log(
+            "360 STATUS",
+            data
           );
 
-        const data =
-          await res.json();
+          if (
+            data.status ===
+            "completed"
+          ) {
 
-        console.log(
-          "REEL DATA:",
-          data
-        );
+            setVideoUrl(
+              data.videoUrl
+            );
 
-        setVideoUrl(
-          data.reelVideoUrl || ""
-        );
+            setLoading(false);
 
-      } catch (err) {
+            clearInterval(
+              interval
+            );
 
-        console.error(
-          "REEL LOAD ERROR:",
-          err
-        );
+          }
 
-      }
+          if (
+            data.status ===
+            "failed"
+          ) {
 
-      setLoading(false);
+            setLoading(false);
 
-    }
+            clearInterval(
+              interval
+            );
 
-    loadReel();
+          }
 
-  }, [renderId]);
+        } catch (err) {
 
+          console.warn(
+            "POLL ERROR",
+            err
+          );
+
+        }
+
+      },
+      5000
+    );
+
+  return () =>
+    clearInterval(
+      interval
+    );
+
+}, [runId]);
   async function handleCopyLink() {
 
     try {
@@ -94,7 +143,7 @@ export default function ReelOutputPage() {
           fontSize: "22px",
         }}
       >
-        Loading Reel...
+        Generating 360° Reel...
       </div>
     );
 
@@ -334,7 +383,7 @@ export default function ReelOutputPage() {
             fontSize: "13px",
           }}
         >
-          Render ID: {renderId}
+          Run ID: {runId}
         </div>
 
       </div>
