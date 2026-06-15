@@ -44,10 +44,21 @@ export default function ReelOutputPage() {
             return;
           }
 
-          const res =
-            await fetch(
-`${API_BASE}/api/p2m/reels360/status/${runId}`
-            );
+          const token =
+  localStorage.getItem(
+    "token"
+  );
+
+const res =
+  await fetch(
+`${API_BASE}/api/p2m/reels360/status/${runId}`,
+    {
+      headers: {
+        Authorization:
+          `Bearer ${token}`
+      }
+    }
+  );
 
           const data =
             await res.json();
