@@ -41,7 +41,7 @@ import CreateAIHero from "./pages/create-ai-hero/CreateAIHero";
 import EcomStudioPage from "./pages/create-ai-hero/EcomStudioPage";
 import EcomOutputPage from "./pages/create-ai-hero/lookbook/EcomOutputPage";
 import ReelOutputPage from "./pages/reel/ReelOutputPage";
-
+import Reels360OutputPage from "./pages/reels360/Reels360OutputPage";
 /* =========================
    CONTEXT
 ========================= */
@@ -243,6 +243,10 @@ function AppRoutes() {
   element={<ReelOutputPage />}
 />
 
+<Route
+  path="/reels360/:runId"
+  element={<Reels360OutputPage />}
+/>
 
       <Route path="/reel/view" element={<ReelMobileView />} />
       <Route path="/share/:id" element={<SharePage />} />
