@@ -334,22 +334,19 @@ const originalUrl =
   (item.lookbookImages &&
     item.lookbookImages[0]);
 
+const isVideo =
+  item.type === "reel" ||
+  originalUrl?.toLowerCase().includes(".mp4");
+
 const mediaUrl =
-  originalUrl?.includes("/upload/")
-    ? originalUrl.replace(
-        "/upload/",
-        "/upload/w_250,h_375,c_fill,q_auto:eco,f_auto/"
-      )
-    : originalUrl;
-
-
-const isVideo=
-
-item.type==="reel" ||
-
-mediaUrl
-?.toLowerCase()
-.includes(".mp4");
+  isVideo
+    ? originalUrl
+    : originalUrl?.includes("/upload/")
+      ? originalUrl.replace(
+          "/upload/",
+          "/upload/w_250,h_375,c_fill,q_auto:eco,f_auto/"
+        )
+      : originalUrl;
 
 
 return(
