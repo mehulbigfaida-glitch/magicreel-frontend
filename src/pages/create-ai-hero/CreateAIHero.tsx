@@ -409,6 +409,8 @@ window.open(
   "_blank"
 );
 
+setReelLoading(false);
+
   
   
   } catch (err: any) {
