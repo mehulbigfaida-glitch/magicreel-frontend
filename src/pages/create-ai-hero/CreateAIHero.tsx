@@ -389,21 +389,28 @@ const generate360Reel = async () => {
     );
 
     const data =
-      await res.json();
+  await res.json();
 
-    if (!res.ok) {
+if (!res.ok) {
 
-      throw new Error(
-        data.error ||
-        "360 Reel failed"
-      );
+  throw new Error(
+    data.error ||
+    "360 Reel failed"
+  );
 
-    }
+}
 
-    setReelRunId(
-      data.runId
-    );
+setReelRunId(
+  data.runId
+);
 
+window.open(
+  `/reels360/${data.runId}`,
+  "_blank"
+);
+
+  
+  
   } catch (err: any) {
 
     alert(
