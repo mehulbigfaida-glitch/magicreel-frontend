@@ -96,16 +96,6 @@ setHeroError
 ]=useState<string|null>(null);
 
 const [
-reelRunId,
-setReelRunId
-]=useState<string|null>(null);
-
-const [
-reelVideoUrl,
-setReelVideoUrl
-]=useState<string|null>(null);
-
-const [
 reelLoading,
 setReelLoading
 ]=useState(false);
@@ -359,8 +349,7 @@ const generate360Reel = async () => {
   try {
 
     setReelLoading(true);
-    setReelVideoUrl(null);
-
+    
     const token =
       localStorage.getItem("token");
 
@@ -399,10 +388,6 @@ if (!res.ok) {
   );
 
 }
-
-setReelRunId(
-  data.runId
-);
 
 window.open(
   `/reels360/${data.runId}`,
