@@ -35,6 +35,9 @@ useState(
   const [previewUrl, setPreviewUrl] =
   useState(assetUrl);
 
+const [aiImageUrl, setAiImageUrl] =
+  useState(assetUrl);
+
 const [
   showAssetPicker,
   setShowAssetPicker
@@ -73,18 +76,20 @@ const [
 
             body: JSON.stringify({
 
-              imageUrl: previewUrl,
+  imageUrl: aiImageUrl,
 
-              platform:
-                "instagram",
+  assetType,
 
-              garmentType:
-                "fashion",
+  platform:
+    "instagram",
 
-              tone:
-                "luxury"
+  garmentType:
+    "fashion",
 
-            })
+  tone:
+    "luxury"
+
+})
 
           }
 
@@ -384,15 +389,19 @@ async function handlePublish() {
   onClose={() =>
     setShowAssetPicker(false)
   }
-  onSelect={(url,type)=>{
+  onSelect={(url,type,heroUrl)=>{
 
-    setPreviewUrl(url);
+  setPreviewUrl(url);
 
-    setAssetType(type);
+  setAssetType(type);
 
-    setShowAssetPicker(false);
+  setAiImageUrl(
+    heroUrl || url
+  );
 
-  }}
+  setShowAssetPicker(false);
+
+}}
 />
     </div>
 

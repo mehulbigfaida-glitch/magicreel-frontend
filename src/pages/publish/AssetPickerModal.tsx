@@ -12,10 +12,12 @@ interface Prediction {
 interface Props {
   open: boolean;
   onClose: () => void;
+
   onSelect: (
-  url:string,
-  type:string
-)=>void;
+    url:string,
+    type:string,
+    heroUrl?:string
+  )=>void;
 }
 
 export default function AssetPickerModal({
@@ -124,7 +126,8 @@ export default function AssetPickerModal({
     url,
     isVideo
       ? "video"
-      : "image"
+      : "image",
+    item.heroImageUrl || url
   )
 }
               >
