@@ -18,8 +18,10 @@ export default function PublishPage() {
   const assetUrl =
   params.get("assetUrl") || "";
 
-const assetType =
-  params.get("type") || "image";
+const [assetType, setAssetType] =
+useState(
+  params.get("type") || "image"
+);
 
   const [caption, setCaption] =
     useState("");
@@ -382,9 +384,11 @@ async function handlePublish() {
   onClose={() =>
     setShowAssetPicker(false)
   }
-  onSelect={(url) => {
+  onSelect={(url,type)=>{
 
     setPreviewUrl(url);
+
+    setAssetType(type);
 
     setShowAssetPicker(false);
 
