@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+
 import {
   useParams
 } from "react-router-dom";
@@ -12,8 +13,8 @@ const API_BASE =
 export default function EcomOutputPage() {
 
   const { id } = useParams();
-
-    const [loading, setLoading] =
+  
+  const [loading, setLoading] =
   useState(true);
 
 const [generatingReel, setGeneratingReel] =
@@ -205,6 +206,48 @@ const [poses, setPoses] =
 
   }
 
+function handlePublish() {
+
+  console.log("PUBLISH CLICKED");
+
+  console.log(
+    "HERO IMAGES:",
+    heroImages
+  );
+
+  console.log(
+    "FIRST HERO:",
+    heroImages[0]
+  );
+
+  const hero =
+    heroImages[0]?.imageUrl;
+
+  console.log(
+    "HERO URL:",
+    hero
+  );
+
+  if (!hero) {
+
+    alert(
+      "No hero image found"
+    );
+
+    return;
+
+  }
+
+  const publishUrl =
+  `/publish?assetUrl=${encodeURIComponent(hero)}&type=image`;
+
+window.open(
+  publishUrl,
+  "_blank"
+);
+
+}
+
   async function handleCarouselReel() {
 
   try {
@@ -337,11 +380,11 @@ window.location.href =
 
             </button>
 
-            <button>
-
-              Publish
-
-            </button>
+            <button
+  onClick={handlePublish}
+>
+  Publish
+</button>
 
             <button
               onClick={

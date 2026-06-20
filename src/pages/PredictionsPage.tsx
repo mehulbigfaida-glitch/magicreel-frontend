@@ -77,14 +77,8 @@ async function handleDownload(
     item.lookbookImages[0]);
 
   if(!url){
-
-    console.log(
-      "No media"
-    );
-
-    return;
-
-  }
+  return;
+}
 
   try{
 
@@ -147,10 +141,6 @@ localStorage.getItem(
 
 if(!token){
 
-console.log(
-"No token"
-);
-
 return;
 
 }
@@ -175,11 +165,6 @@ Authorization:
 
 const json=
 await res.json();
-
-console.log(
-  "PREDICTIONS RESPONSE",
-  json
-);
 
 if(!res.ok){
 

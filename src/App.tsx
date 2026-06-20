@@ -42,6 +42,8 @@ import EcomStudioPage from "./pages/create-ai-hero/EcomStudioPage";
 import EcomOutputPage from "./pages/create-ai-hero/lookbook/EcomOutputPage";
 import ReelOutputPage from "./pages/reel/ReelOutputPage";
 import Reels360OutputPage from "./pages/reels360/Reels360OutputPage";
+import PublishPage from "./pages/publish/PublishPage";
+
 /* =========================
    CONTEXT
 ========================= */
@@ -173,6 +175,7 @@ function GlobalHeader() {
 
 function AppRoutes() {
   return (
+        
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/create" element={<CreatePage />} />
@@ -219,6 +222,20 @@ function AppRoutes() {
   path="/pack/ecom/output/:id"
   element={<EcomOutputPage />}
 />
+
+<Route
+  path="/publish"
+  element={
+    <ProtectedRoute>
+      <PublishPage />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/test"
+  element={<div>TEST ROUTE WORKS</div>}
+/>npm run dev
+
 
       <Route path="/lookbook" element={<LookbookPage />} />
       <Route path="/cinematic" element={<CinematicPage />} />
