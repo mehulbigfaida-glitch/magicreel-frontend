@@ -23,7 +23,9 @@ export default function PublishPage() {
 
 const [assetType, setAssetType] =
 useState(
-  params.get("type") || "image"
+  params.get("assetType") ||
+  params.get("type") ||
+  "image"
 );
 
   const [caption, setCaption] =
