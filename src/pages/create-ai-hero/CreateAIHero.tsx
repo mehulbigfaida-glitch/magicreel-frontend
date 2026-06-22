@@ -1439,13 +1439,18 @@ Download Hero
   onClick={() => {
     if (!frontHeroImageUrl) return;
 
-    navigate(
-      `/publish?assetUrl=${encodeURIComponent(
-        frontHeroImageUrl
-      )}&assetType=hero&heroImageUrl=${encodeURIComponent(
-        frontHeroImageUrl
-      )}`
-    );
+    const publishUrl =
+  `/publish?assetUrl=${encodeURIComponent(
+    frontHeroImageUrl
+  )}&assetType=hero&heroImageUrl=${encodeURIComponent(
+    frontHeroImageUrl
+  )}`;
+
+window.open(
+  publishUrl,
+  "_blank",
+  "noopener,noreferrer"
+);
   }}
 >
   Publish Hero
