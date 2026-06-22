@@ -147,22 +147,37 @@ async function handlePublish() {
 
     setPublishing(true);
 
+    const publishAssetType =
+      assetType === "video" ||
+      assetType === "reel"
+        ? "video"
+        : "image";
+
+    console.log(
+      "PUBLISH DEBUG",
+      {
+        assetType,
+        publishAssetType,
+        previewUrl,
+      }
+    );
+
     const token =
-  localStorage.getItem("token");
+      localStorage.getItem("token");
 
-  const response =
-  await fetch(
-    `${API_BASE}/api/publish/publish`,
-    {
-      method: "POST",
+    const response =
+      await fetch(
+        `${API_BASE}/api/publish/publish`,
+        {
+          method: "POST",
 
-      headers: {
-        "Content-Type":
-          "application/json",
+          headers: {
+            "Content-Type":
+              "application/json",
 
-        Authorization:
-          `Bearer ${token}`
-      },
+            Authorization:
+              `Bearer ${token}`,
+          },
 
           body: JSON.stringify({
 
@@ -172,16 +187,14 @@ async function handlePublish() {
               previewUrl,
 
             assetType:
-              assetType === "video"
-                ? "video"
-                : "image",
+              publishAssetType,
 
             caption:
               caption +
               "\n\n" +
-              hashtags
+              hashtags,
 
-          })
+          }),
 
         }
       );
