@@ -105,13 +105,14 @@ export default function AssetPickerModal({
           }}
         >
           {assets.map((item) => {
-            
-            let thumbnailUrl = "";
-            let selectedUrl = "";
-            let assetType:
-              | "image"
-              | "video" = "image";
 
+  let thumbnailUrl = "";
+  let selectedUrl = "";
+  let assetType:
+    | "image"
+    | "video" = "image";
+
+  
             // -----------------------
             // REEL
             // -----------------------
@@ -190,22 +191,49 @@ export default function AssetPickerModal({
                 }
               >
                 <img
-                  src={
-                    thumbnailUrl
-                  }
-                  alt={
-                    item.type
-                  }
-                  style={{
-                    width: "100%",
-                    aspectRatio:
-                      "4 / 5",
-                    objectFit:
-                      "cover",
-                    display:
-                      "block",
-                  }}
-                />
+  src={thumbnailUrl}
+  alt={item.type}
+  onError={(e) => {
+
+    const target =
+      e.currentTarget;
+
+    target.onerror = null;
+
+    target.style.background =
+      "#f3f4f6";
+
+    target.style.objectFit =
+      "contain";
+
+    target.src =
+      "data:image/svg+xml;charset=UTF-8," +
+      encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg"
+             width="300"
+             height="450">
+          <rect width="100%"
+                height="100%"
+                fill="#f3f4f6"/>
+          <text x="50%"
+                y="50%"
+                text-anchor="middle"
+                dominant-baseline="middle"
+                font-size="22"
+                fill="#666">
+            Reel
+          </text>
+        </svg>
+      `);
+
+  }}
+  style={{
+    width: "100%",
+    aspectRatio: "4 / 5",
+    objectFit: "cover",
+    display: "block",
+  }}
+/>
 
                 <div
                   style={{
