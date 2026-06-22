@@ -263,23 +263,19 @@ window.open(
         return;
 
       }
-
       const response =
-        await fetch(
-          `${import.meta.env.VITE_API_URL}/api/p2m/reel/carousel`,
-          {
-            method: "POST",
-
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-
-            body: JSON.stringify({
-              lookbookId: id,
-            }),
-          }
-        );
+  await fetch(
+    `${API_BASE}/api/p2m/reel/carousel`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        lookbookId: id,
+      }),
+    }
+  );
 
       const data =
         await response.json();

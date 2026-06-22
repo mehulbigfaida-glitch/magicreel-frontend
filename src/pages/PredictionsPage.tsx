@@ -68,13 +68,14 @@ async function handleDownload(
   }
 
   const url =
-
-    item.heroImageUrl ||
-
-    item.mediaUrl ||
-
-    (item.lookbookImages &&
-    item.lookbookImages[0]);
+  item.type?.toLowerCase() === "reel"
+    ? (item.mediaUrl || item.heroImageUrl)
+    : (
+        item.heroImageUrl ||
+        item.mediaUrl ||
+        (item.lookbookImages &&
+          item.lookbookImages[0])
+      );
 
   if(!url){
   return;
@@ -314,10 +315,14 @@ gap:"20px"
 {data.map((item)=>{
 
 const originalUrl =
-  item.heroImageUrl ||
-  item.mediaUrl ||
-  (item.lookbookImages &&
-    item.lookbookImages[0]);
+  item.type?.toLowerCase() === "reel"
+    ? (item.mediaUrl || item.heroImageUrl)
+    : (
+        item.heroImageUrl ||
+        item.mediaUrl ||
+        (item.lookbookImages &&
+          item.lookbookImages[0])
+      );
 
 const isVideo =
   item.type === "reel" ||

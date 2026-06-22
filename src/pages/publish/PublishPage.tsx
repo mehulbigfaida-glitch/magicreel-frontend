@@ -18,6 +18,9 @@ export default function PublishPage() {
   const assetUrl =
   params.get("assetUrl") || "";
 
+  const heroImageUrl =
+  params.get("heroImageUrl") || "";
+
 const [assetType, setAssetType] =
 useState(
   params.get("type") || "image"
@@ -36,7 +39,9 @@ useState(
   useState(assetUrl);
 
 const [aiImageUrl, setAiImageUrl] =
-  useState(assetUrl);
+  useState(
+    heroImageUrl || assetUrl
+  );
 
 const [
   showAssetPicker,
@@ -53,11 +58,12 @@ const [
 
   async function handleGenerateAI() {
 
+    
     try {
 
       setLoadingAI(true);
 
-       
+      
       const response =
         await fetch(
 
@@ -229,20 +235,26 @@ async function handlePublish() {
         <div className="publish-preview">
 
           {
-            assetType === "video"
-            ? (
-              <video
-                src={previewUrl}
-                controls
-              />
-            )
-            : (
-              <img
-                src={previewUrl}
-                alt="Publish Preview"
-              />
-            )
-          }
+  assetType === "video" ||
+  assetType === "reel"
+  ? (
+    <video
+      src={previewUrl}
+      controls
+      playsInline
+      style={{
+        width: "100%",
+        borderRadius: "12px",
+      }}
+    />
+  )
+  : (
+    <img
+      src={previewUrl}
+      alt="Publish Preview"
+    />
+  )
+}
 
         </div>
 

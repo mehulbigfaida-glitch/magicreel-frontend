@@ -17,6 +17,9 @@ export default function ReelOutputPage() {
   const [videoUrl, setVideoUrl] =
     useState("");
 
+  const [heroImageUrl, setHeroImageUrl] =
+  useState("");
+
   useEffect(() => {
 
     async function loadReel() {
@@ -40,6 +43,10 @@ export default function ReelOutputPage() {
           data.reelVideoUrl || ""
         );
 
+        setHeroImageUrl(
+        data.heroImageUrl || ""
+        );
+
       } catch (err) {
 
         console.error(
@@ -56,6 +63,28 @@ export default function ReelOutputPage() {
     loadReel();
 
   }, [renderId]);
+
+function handlePublish() {
+
+  if (!videoUrl) {
+
+    alert(
+      "Reel not found"
+    );
+
+    return;
+
+  }
+
+  const publishUrl =
+    `/publish?assetUrl=${encodeURIComponent(videoUrl)}&type=reel&heroImageUrl=${encodeURIComponent(heroImageUrl)}`;
+
+  window.open(
+    publishUrl,
+    "_blank"
+  );
+
+}
 
   async function handleCopyLink() {
 
@@ -227,23 +256,24 @@ export default function ReelOutputPage() {
             </button>
 
             <button
-              style={{
-                background: "#111",
-                border:
-                  "1px solid rgba(255,255,255,.08)",
-                padding: "20px 42px",
-                color: "white",
-                borderRadius: "999px",
-                cursor: "pointer",
-                fontSize: "16px",
-                fontWeight: 600,
-                minWidth: "180px",
-                boxShadow:
-                  "0 0 0 1px rgba(255,255,255,.02)",
-              }}
-            >
-              Publish
-            </button>
+  onClick={handlePublish}
+  style={{
+    background: "#111",
+    border:
+      "1px solid rgba(255,255,255,.08)",
+    padding: "20px 42px",
+    color: "white",
+    borderRadius: "999px",
+    cursor: "pointer",
+    fontSize: "16px",
+    fontWeight: 600,
+    minWidth: "180px",
+    boxShadow:
+      "0 0 0 1px rgba(255,255,255,.02)",
+  }}
+>
+  Publish
+</button>
 
             <button
               onClick={
