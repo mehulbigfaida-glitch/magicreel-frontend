@@ -10,7 +10,7 @@ export default function HomePage() {
     const token = localStorage.getItem("token");
 
     if (token) {
-      navigate("/create-v2");
+      navigate("/create-ai-hero");
     } else {
       navigate("/login");
     }
