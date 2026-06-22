@@ -128,6 +128,53 @@ async function handleDownload(
 
 }
 
+function handlePublish(
+  e:any,
+  item:any
+){
+
+  e.stopPropagation();
+
+  if(
+    item.type?.toLowerCase() === "lookbook"
+  ){
+    return;
+  }
+
+  const assetUrl =
+    item.type?.toLowerCase() === "reel"
+      ? item.mediaUrl
+      : (
+          item.heroImageUrl ||
+          item.mediaUrl
+        );
+
+  const heroImageUrl =
+    item.heroImageUrl ||
+    item.mediaUrl ||
+    "";
+
+  if(!assetUrl){
+    return;
+  }
+
+  const publishUrl =
+    `/publish?assetUrl=${encodeURIComponent(
+      assetUrl
+    )}&assetType=${encodeURIComponent(
+      item.type.toLowerCase()
+    )}&heroImageUrl=${encodeURIComponent(
+      heroImageUrl
+    )}`;
+
+  window.open(
+    publishUrl,
+    "_blank",
+    "noopener,noreferrer"
+  );
+
+}
+
 useEffect(()=>{
 
 const fetchPredictions=
@@ -589,6 +636,19 @@ textTransform:
     ? "View Pack"
     : "Download"}
 </button>
+
+{item.type?.toLowerCase() !== "lookbook" && (
+  <button
+    onClick={(e)=>
+      handlePublish(
+        e,
+        item
+      )
+    }
+  >
+    Publish
+  </button>
+)}
 
 </div>
 
