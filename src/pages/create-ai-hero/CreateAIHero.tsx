@@ -1435,9 +1435,20 @@ Download Hero
 </button>
 
 <button
-className="hero-action-btn primary"
+  className="hero-action-btn primary"
+  onClick={() => {
+    if (!frontHeroImageUrl) return;
+
+    navigate(
+      `/publish?assetUrl=${encodeURIComponent(
+        frontHeroImageUrl
+      )}&assetType=hero&heroImageUrl=${encodeURIComponent(
+        frontHeroImageUrl
+      )}`
+    );
+  }}
 >
-Publish Hero
+  Publish Hero
 </button>
 
 </div>
