@@ -12,7 +12,7 @@ import { useAuthStore } from "./store/authStore";
 /* =========================
    PAGES
 ========================= */
-
+import CampaignOutputPage from "./pages/campaign/CampaignOutputPage";
 import HomePage from "./pages/HomePage";
 import CreatePage from "./pages/CreatePage";
 import ViewPage from "./pages/ViewPage";
@@ -43,6 +43,8 @@ import EcomOutputPage from "./pages/create-ai-hero/lookbook/EcomOutputPage";
 import ReelOutputPage from "./pages/reel/ReelOutputPage";
 import Reels360OutputPage from "./pages/reels360/Reels360OutputPage";
 import PublishPage from "./pages/publish/PublishPage";
+import CampaignV2Page
+from "./pages/CampaignV2Page";
 
 /* =========================
    CONTEXT
@@ -231,11 +233,20 @@ function AppRoutes() {
     </ProtectedRoute>
   }
 />
-<Route
-  path="/test"
-  element={<div>TEST ROUTE WORKS</div>}
-/>npm run dev
 
+<Route
+  path="/campaign-engine"
+  element={<CampaignV2Page />}
+/>
+
+<Route
+  path="/campaign/:id"
+  element={
+    <ProtectedRoute>
+      <CampaignOutputPage />
+    </ProtectedRoute>
+  }
+/>
 
       <Route path="/lookbook" element={<LookbookPage />} />
       <Route path="/cinematic" element={<CinematicPage />} />

@@ -13,6 +13,8 @@ interface Props {
   open: boolean;
   onClose: () => void;
 
+  allowVideos?: boolean;
+
   onSelect: (
     url: string,
     type: string,
@@ -24,6 +26,7 @@ export default function AssetPickerModal({
   open,
   onClose,
   onSelect,
+  allowVideos = true,
 }: Props) {
   const [assets, setAssets] =
     useState<Prediction[]>([]);
@@ -112,6 +115,13 @@ export default function AssetPickerModal({
     | "image"
     | "video" = "image";
 
+    if (
+  item.type?.toLowerCase() ===
+    "reel" &&
+  !allowVideos
+) {
+  return null;
+}
   
             // -----------------------
             // REEL
@@ -182,13 +192,12 @@ export default function AssetPickerModal({
                     "#fff",
                 }}
                 onClick={() =>
-                  onSelect(
-                    selectedUrl,
-                    assetType,
-                    item.heroImageUrl ||
-                      thumbnailUrl
-                  )
-                }
+  onSelect(
+    selectedUrl,
+    assetType,
+    item.heroImageUrl || thumbnailUrl
+  )
+}
               >
                 <img
   src={thumbnailUrl}

@@ -196,7 +196,7 @@ return;
 const res=
 await fetch(
 
-"https://magicreel-backend-production.up.railway.app/api/predictions",
+`${import.meta.env.VITE_API_BASE_URL}/api/predictions`,
 
 {
 
