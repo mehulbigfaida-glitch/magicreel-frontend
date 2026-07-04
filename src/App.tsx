@@ -45,6 +45,7 @@ import Reels360OutputPage from "./pages/reels360/Reels360OutputPage";
 import PublishPage from "./pages/publish/PublishPage";
 import CampaignV2Page
 from "./pages/CampaignV2Page";
+import CampaignGeneratingPage from "./pages/campaign/CampaignGeneratingPage";
 
 /* =========================
    CONTEXT
@@ -240,6 +241,15 @@ function AppRoutes() {
 />
 
 <Route
+  path="/campaign/generating"
+  element={
+    <ProtectedRoute>
+      <CampaignGeneratingPage />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
   path="/campaign/:id"
   element={
     <ProtectedRoute>
@@ -296,6 +306,8 @@ function AppRoutes() {
         path="/docs/image-quality"
         element={<ImageQualityPage />}
       />
+
+
     </Routes>
   );
 }

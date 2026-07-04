@@ -705,3 +705,97 @@ REPLACE BUTTON
     display:none;
 
 }
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+
+@media (max-width: 1200px) {
+
+    .campaign-body{
+        grid-template-columns:1fr;
+    }
+
+    .campaign-right{
+        order:2;
+    }
+
+    .campaign-left{
+        order:1;
+    }
+
+}
+
+@media (max-width: 768px){
+
+    .campaign-container{
+        width:100%;
+        padding:16px;
+    }
+
+    .campaign-header{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:20px;
+    }
+
+    .campaign-title-area h1{
+        font-size:28px;
+    }
+
+    .campaign-card{
+        padding:18px;
+    }
+
+    .campaign-card-header{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .campaign-button{
+        width:100%;
+    }
+
+    .campaign-thumbnail-strip{
+        justify-content:center;
+    }
+
+    .campaign-thumbnail{
+        width:100px;
+        height:130px;
+    }
+
+}
+
+@media (max-width:480px){
+
+    .campaign-container{
+        padding:12px;
+    }
+
+    .campaign-title-area h1{
+        font-size:24px;
+    }
+
+    .campaign-upload-box{
+        min-height:180px;
+    }
+
+    .campaign-upload-title{
+        font-size:18px;
+    }
+
+    .campaign-card{
+        border-radius:14px;
+        padding:14px;
+    }
+
+    .campaign-input{
+        height:44px;
+    }
+
+    .campaign-textarea{
+        min-height:120px;
+    }
+
+}

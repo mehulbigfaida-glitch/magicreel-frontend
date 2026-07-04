@@ -15,9 +15,9 @@ import {
   X,
 } from "lucide-react";
 
-import AssetPickerModal from "../pages/publish/AssetPickerModal";
 import { uploadToCloudinary } from "../api/cloudinary";
 import "./CampaignV2Page.css";
+import CampaignHeroPickerModal from "./campaign/CampaignHeroPickerModal";
 
 type Asset = {
   id: string;
@@ -142,12 +142,19 @@ export default function CampaignV2Page() {
   const generateCampaign = async () => {
   if (!canGenerate) return;
 
+  const outputWindow = window.open(
+    "/campaign/generating",
+    "_blank"
+  );
+
   try {
     setLoading(true);
 
     const response = await generateCampaignApi({
       heroImageUrl,
-      supportingHeroUrls: supportingAssets.map((asset) => asset.url),
+      supportingHeroUrls: supportingAssets.map(
+        (asset) => asset.url
+      ),
       logoUrl,
       headline,
       subheadline,
@@ -156,21 +163,35 @@ export default function CampaignV2Page() {
 
     console.log(response);
 
-console.log(
-  "About to navigate to:",
-  `/campaign/${response.data.campaignId}`
-);
+    const campaignId = response.data.campaignId;
 
-window.location.href =
-  `/campaign/${response.data.campaignId}`;
+if (
+  outputWindow &&
+  !outputWindow.closed
+) {
+  outputWindow.location.replace(
+    `/campaign/${campaignId}`
+  );
+}
 
-    // TODO:
-    // In the next step we'll display the generated campaign
-    // using response.data.imageUrl, response.data.vision, etc.
   } catch (error) {
-    console.error("Campaign generation failed:", error);
+
+    console.error(
+      "Campaign generation failed:",
+      error
+    );
+
+    if (
+      outputWindow &&
+      !outputWindow.closed
+    ) {
+      outputWindow.close();
+    }
+
   } finally {
+
     setLoading(false);
+
   }
 };
 
@@ -464,7 +485,7 @@ window.location.href =
 
         </div>
 
-        <AssetPickerModal
+        <CampaignHeroPickerModal
   open={assetModalOpen}
   onClose={() => setAssetModalOpen(false)}
   onSelect={onAssetsSelected}
