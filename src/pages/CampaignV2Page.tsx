@@ -1,11 +1,12 @@
-// PART 1
 // CampaignV2Page.tsx
 
 import { useCallback, useMemo, useState } from "react";
 // import { useNavigate } from "react-router-dom";
+
 import {
   generateCampaign as generateCampaignApi,
 } from "../services/campaignService";
+
 import {
   Upload,
   ImagePlus,
@@ -16,7 +17,9 @@ import {
 } from "lucide-react";
 
 import { uploadToCloudinary } from "../api/cloudinary";
+
 import "./CampaignV2Page.css";
+
 import CampaignHeroPickerModal from "./campaign/CampaignHeroPickerModal";
 
 type Asset = {
@@ -27,31 +30,87 @@ type Asset = {
 };
 
 export default function CampaignV2Page() {
+
   // const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
 
-  const [assetModalOpen, setAssetModalOpen] = useState(false);
+const [campaignReady, setCampaignReady] =
+  useState(false);
 
-  const [heroUploading, setHeroUploading] = useState(false);
-  const [logoUploading, setLogoUploading] = useState(false);
+const [generatedCampaignId, setGeneratedCampaignId] =
+  useState("");
 
-  const [heroImageUrl, setHeroImageUrl] = useState("");
-  const [logoUrl, setLogoUrl] = useState("");
+const [popupBlocked, setPopupBlocked] =
+  useState(false);
 
-  const [supportingAssets, setSupportingAssets] = useState<Asset[]>([]);
+const [assetModalOpen, setAssetModalOpen] =
+  useState(false);
 
-  const [headline, setHeadline] = useState("");
-  const [subheadline, setSubheadline] = useState("");
-  const [cta, setCta] = useState("");
-  
+/**
+ * Upload states
+ */
+
+const [heroUploading, setHeroUploading] =
+  useState(false);
+
+const [logoUploading, setLogoUploading] =
+  useState(false);
+
+/**
+ * Preview render states
+ */
+
+const [heroImageLoaded, setHeroImageLoaded] =
+  useState(false);
+
+const [logoImageLoaded, setLogoImageLoaded] =
+  useState(false);
+
+/**
+ * Images
+ */
+
+const [heroImageUrl, setHeroImageUrl] =
+  useState("");
+
+const [logoUrl, setLogoUrl] =
+  useState("");
+
+/**
+ * Supporting Assets
+ */
+
+const [
+  supportingAssets,
+  setSupportingAssets,
+] = useState<Asset[]>([]);
+
+/**
+ * Campaign Copy
+ */
+
+const [headline, setHeadline] =
+  useState("");
+
+const [subheadline, setSubheadline] =
+  useState("");
+
+const [cta, setCta] =
+  useState("");
+  /**
+   * Validation
+   */
+
   const canGenerate = useMemo(() => {
+
     return (
       heroImageUrl.length > 0 &&
       headline.trim().length > 0 &&
       cta.trim().length > 0 &&
       !loading
     );
+
   }, [
     heroImageUrl,
     headline,
@@ -59,120 +118,225 @@ export default function CampaignV2Page() {
     loading,
   ]);
 
+  /**
+   * Upload Hero
+   */
+
   const uploadHero = useCallback(
+
     async (file: File) => {
+
       setHeroUploading(true);
+      setHeroImageLoaded(false);
 
       try {
-        const url = await uploadToCloudinary(file);
+
+        const url =
+          await uploadToCloudinary(file);
 
         setHeroImageUrl(url);
-      } finally {
+
+      } catch (err) {
+
         setHeroUploading(false);
+
+        throw err;
+
       }
+
     },
+
     []
+
   );
+
+  /**
+   * Upload Logo
+   */
 
   const uploadLogo = useCallback(
+
     async (file: File) => {
+
       setLogoUploading(true);
+      setLogoImageLoaded(false);
 
       try {
-        const url = await uploadToCloudinary(file);
+
+        const url =
+          await uploadToCloudinary(file);
 
         setLogoUrl(url);
-      } finally {
+
+      } catch (err) {
+
         setLogoUploading(false);
+
+        throw err;
+
       }
+
     },
+
     []
+
   );
+
+  /**
+   * Hero Change
+   */
 
   const onHeroChange = async (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const file = e.target.files?.[0];
+
+    if (loading) return;
+
+    const file =
+      e.target.files?.[0];
 
     if (!file) return;
 
     await uploadHero(file);
+
   };
+
+  /**
+   * Logo Change
+   */
 
   const onLogoChange = async (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const file = e.target.files?.[0];
+
+    if (loading) return;
+
+    const file =
+      e.target.files?.[0];
 
     if (!file) return;
 
     await uploadLogo(file);
+
   };
 
-  const removeAsset = (id: string) => {
-    setSupportingAssets((prev) =>
-      prev.filter((a) => a.id !== id)
+  /**
+   * Remove Asset
+   */
+
+  const removeAsset = (
+    id: string
+  ) => {
+
+    if (loading) return;
+
+    setSupportingAssets(prev =>
+      prev.filter(
+        asset => asset.id !== id
+      )
     );
+
   };
+
+  /**
+   * Asset Picker
+   */
 
   const openAssetPicker = () => {
+
+    if (loading) return;
+
     setAssetModalOpen(true);
+
   };
 
   const onAssetsSelected = (
-  url: string,
-  _type: string,
-  _heroUrl?: string
-) => {
-  setSupportingAssets((prev) => {
-    if (prev.length >= 4) return prev;
+    url: string,
+    _type: string,
+    _heroUrl?: string
+  ) => {
 
-    return [
-      ...prev,
-      {
-        id: crypto.randomUUID(),
-        url,
-      },
-    ];
-  });
+    if (loading) {
 
-  setAssetModalOpen(false);
-};
+      setAssetModalOpen(false);
 
-  const generateCampaign = async () => {
-  if (!canGenerate) return;
+      return;
 
-  const outputWindow = window.open(
-    "/campaign/generating",
-    "_blank"
-  );
+    }
 
-  try {
-    setLoading(true);
+    setSupportingAssets(prev => {
 
-    const response = await generateCampaignApi({
-      heroImageUrl,
-      supportingHeroUrls: supportingAssets.map(
-        (asset) => asset.url
-      ),
-      logoUrl,
-      headline,
-      subheadline,
-      cta,
+      if (prev.length >= 4)
+        return prev;
+
+      return [
+
+        ...prev,
+
+        {
+          id: crypto.randomUUID(),
+          url,
+        },
+
+      ];
+
     });
 
-    console.log(response);
+    setAssetModalOpen(false);
 
-    const campaignId = response.data.campaignId;
+  };
 
-if (
-  outputWindow &&
-  !outputWindow.closed
-) {
-  outputWindow.location.replace(
-    `/campaign/${campaignId}`
-  );
-}
+  /**
+   * Generate Campaign
+   */
+
+  const generateCampaign = async () => {
+
+  if (!canGenerate)
+    return;
+
+  try {
+
+    setLoading(true);
+
+    setCampaignReady(false);
+    setPopupBlocked(false);
+    setGeneratedCampaignId("");
+
+    const response =
+      await generateCampaignApi({
+
+        heroImageUrl,
+
+        supportingHeroUrls:
+          supportingAssets.map(
+            asset => asset.url
+          ),
+
+        logoUrl,
+
+        headline,
+
+        subheadline,
+
+        cta,
+
+      });
+
+    const campaignId =
+      response.data.campaignId;
+
+    setGeneratedCampaignId(campaignId);
+    setCampaignReady(true);
+
+    const newTab = window.open(
+      `/campaign/${campaignId}`,
+      "_blank"
+    );
+
+    if (!newTab) {
+      setPopupBlocked(true);
+    }
 
   } catch (error) {
 
@@ -181,50 +345,53 @@ if (
       error
     );
 
-    if (
-      outputWindow &&
-      !outputWindow.closed
-    ) {
-      outputWindow.close();
-    }
-
   } finally {
 
     setLoading(false);
 
   }
+
 };
 
   return (
-  <div className="campaign-page">
-    <div className="campaign-container">
+
+    <div className="campaign-page">
+
+      <div className="campaign-container">
 
         <div className="campaign-header">
 
-    <div className="campaign-title-area">
+          <div className="campaign-title-area">
 
-        <div className="campaign-badge">
-            <Sparkles size={18}/>
-            <span>Campaign Studio</span>
+            <div className="campaign-badge">
+              <Sparkles size={18} />
+              <span>Campaign Studio</span>
+            </div>
+
+            <h1>Create Campaign</h1>
+
+            <p>
+              Upload your Hero image, supporting assets and campaign copy
+              to generate a complete AI marketing campaign.
+            </p>
+
+          </div>
+
         </div>
-
-        <h1>Create Campaign</h1>
-
-        <p>
-            Upload your Hero image, supporting assets and campaign copy
-            to generate a complete marketing campaign.
-        </p>
-
-    </div>
-
-    
-</div>
 
         <div className="campaign-body">
 
-    <div className="campaign-left">
+          {/* ===========================
+              LEFT COLUMN
+          ============================ */}
 
-        <div className="campaign-card">
+          <div className="campaign-left">
+
+            {/* ===========================
+                MASTER HERO
+            ============================ */}
+
+            <div className="campaign-card">
 
               <h2 className="mb-6 text-xl font-semibold text-white">
                 Master Hero
@@ -232,46 +399,133 @@ if (
 
               {heroImageUrl ? (
 
-    <>
-    <div className="campaign-hero-preview">
+                <>
 
-        <img
-            src={heroImageUrl}
-            alt="Master Hero"
-            className="campaign-hero-image"
-        />
+                  <div
+                    className="campaign-hero-preview"
+                    style={{
+                      position: "relative",
+                      overflow: "hidden",
+                    }}
+                  >
 
-    </div>
+                    <img
+                      src={heroImageUrl}
+                      alt="Master Hero"
+                      className="campaign-hero-image"
+                      style={{
+                        opacity: heroImageLoaded ? 1 : 0,
+                        transition: "opacity .35s ease",
+                      }}
+                      onLoad={() => {
+                        setHeroImageLoaded(true);
+                        setHeroUploading(false);
+                      }}
+                      onError={() => {
+                        setHeroUploading(false);
+                      }}
+                    />
 
-    <label className="campaign-replace-button">
+                    {(heroUploading || !heroImageLoaded) && (
 
-        Replace Hero
+                      <div
+                        style={{
+                          position: "absolute",
+                          inset: 0,
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          background: "rgba(12,14,18,.82)",
+                          backdropFilter: "blur(8px)",
+                          zIndex: 10,
+                          gap: 14,
+                        }}
+                      >
 
-        <input
-            hidden
-            type="file"
-            accept="image/*"
-            onChange={onHeroChange}
-        />
+                        <Loader2
+                          size={34}
+                          className="animate-spin text-violet-400"
+                        />
 
-    </label>
-</>
+                        <div
+                          style={{
+                            color: "#fff",
+                            fontWeight: 600,
+                          }}
+                        >
+                          Preparing Hero Preview
+                        </div>
 
-) : (
+                        <div
+                          style={{
+                            color: "#98a2b3",
+                            fontSize: 13,
+                          }}
+                        >
+                          Rendering high quality preview...
+                        </div>
+
+                      </div>
+
+                    )}
+
+                  </div>
+
+                  <label
+                    className="campaign-replace-button"
+                    style={{
+                      pointerEvents: loading ? "none" : "auto",
+                      opacity: loading ? .5 : 1,
+                    }}
+                  >
+
+                    Replace Hero
+
+                    <input
+                      hidden
+                      type="file"
+                      accept="image/*"
+                      onChange={onHeroChange}
+                      disabled={loading}
+                    />
+
+                  </label>
+
+                </>
+
+              ) : (
+
                 <label className="campaign-upload-box">
 
                   {heroUploading ? (
-                    <Loader2 className="h-10 w-10 animate-spin text-violet-400" />
+
+                    <Loader2
+                      className="h-10 w-10 animate-spin text-violet-400"
+                    />
+
                   ) : (
-                    <Upload className="h-12 w-12 text-violet-400" />
+
+                    <Upload
+                      className="h-12 w-12 text-violet-400"
+                    />
+
                   )}
 
                   <div className="campaign-upload-title">
-                    Upload Master Hero
+
+                    {heroUploading
+                      ? "Uploading Hero..."
+                      : "Upload Master Hero"}
+
                   </div>
 
                   <div className="campaign-upload-subtitle">
-                    JPG, PNG or WEBP
+
+                    {heroUploading
+                      ? "Preparing preview..."
+                      : "JPG, PNG or WEBP"}
+
                   </div>
 
                   <input
@@ -279,12 +533,18 @@ if (
                     type="file"
                     accept="image/*"
                     onChange={onHeroChange}
+                    disabled={loading}
                   />
 
                 </label>
+
               )}
 
             </div>
+
+            {/* ===========================
+                SUPPORTING ASSETS
+            ============================ */}
 
             <div className="campaign-card">
 
@@ -304,41 +564,59 @@ if (
 
                 <button
                   onClick={openAssetPicker}
+                  disabled={loading}
                   className="campaign-button"
                 >
+
                   <ImagePlus className="mr-2 h-4 w-4" />
+
                   Select Assets
+
                 </button>
 
               </div>
 
               <div className="campaign-thumbnail-strip">
+
                 {supportingAssets.length === 0 && (
+
                   <div className="campaign-empty-assets">
                     No supporting assets selected • Maximum 4 assets
                   </div>
+
                 )}
 
-                {supportingAssets.map((asset) => (
+                {supportingAssets.map(asset => (
+
                   <div
                     key={asset.id}
                     className="campaign-thumbnail"
                   >
+
                     <img
                       src={asset.thumbnailUrl || asset.url}
                       className="campaign-thumbnail-image"
                     />
 
                     <button
-                      onClick={() => removeAsset(asset.id)}
                       className="campaign-remove-button"
+                      disabled={loading}
+                      onClick={() => removeAsset(asset.id)}
                     >
                       <X size={12} />
                     </button>
+
                   </div>
+
                 ))}
+
               </div>
+
             </div>
+
+            {/* ===========================
+                BRAND LOGO
+            ============================ */}
 
             <div className="campaign-card">
 
@@ -348,42 +626,135 @@ if (
 
               {logoUrl ? (
 
-    <>
-    <div className="campaign-logo-preview">
+                <>
 
-        <img
-            src={logoUrl}
-            alt="Brand Logo"
-            className="campaign-logo-image"
-        />
+                  <div
+                    className="campaign-logo-preview"
+                    style={{
+                      position: "relative",
+                      overflow: "hidden",
+                    }}
+                  >
 
-    </div>
+                    <img
+                      src={logoUrl}
+                      alt="Brand Logo"
+                      className="campaign-logo-image"
+                      style={{
+                        opacity: logoImageLoaded ? 1 : 0,
+                        transition: "opacity .35s ease",
+                      }}
+                      onLoad={() => {
+                        setLogoImageLoaded(true);
+                        setLogoUploading(false);
+                      }}
+                      onError={() => {
+                        setLogoUploading(false);
+                      }}
+                    />
 
-    <label className="campaign-replace-button">
+                    {(logoUploading || !logoImageLoaded) && (
 
-        Replace Logo
+                      <div
+                        style={{
+                          position: "absolute",
+                          inset: 0,
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          gap: 14,
+                          background: "rgba(12,14,18,.82)",
+                          backdropFilter: "blur(8px)",
+                          zIndex: 10,
+                        }}
+                      >
 
-        <input
-            hidden
-            type="file"
-            accept="image/*"
-            onChange={onLogoChange}
-        />
+                        <Loader2
+                          size={30}
+                          className="animate-spin text-violet-400"
+                        />
 
-    </label>
-</>
+                        <div
+                          style={{
+                            color: "#ffffff",
+                            fontWeight: 600,
+                          }}
+                        >
+                          Preparing Logo Preview
+                        </div>
 
-) : (
+                        <div
+                          style={{
+                            color: "#98a2b3",
+                            fontSize: 13,
+                          }}
+                        >
+                          Rendering high quality preview...
+                        </div>
+
+                      </div>
+
+                    )}
+
+                  </div>
+
+                  <label
+                    className="campaign-replace-button"
+                    style={{
+                      pointerEvents: loading ? "none" : "auto",
+                      opacity: loading ? .5 : 1,
+                    }}
+                  >
+
+                    Replace Logo
+
+                    <input
+                      hidden
+                      type="file"
+                      accept="image/*"
+                      onChange={onLogoChange}
+                      disabled={loading}
+                    />
+
+                  </label>
+
+                </>
+
+              ) : (
+
                 <label className="flex cursor-pointer flex-col items-center justify-center rounded-3xl border-2 border-dashed border-zinc-700 py-14 transition hover:border-violet-500">
 
                   {logoUploading ? (
+
                     <Loader2 className="h-9 w-9 animate-spin text-violet-400" />
+
                   ) : (
+
                     <Upload className="h-10 w-10 text-violet-400" />
+
                   )}
 
                   <div className="mt-4 text-lg font-semibold text-white">
-                    Upload Brand Logo
+
+                    {logoUploading
+                      ? "Uploading Logo..."
+                      : "Upload Brand Logo"}
+
+                  </div>
+
+                  <div
+                    style={{
+                      marginTop: 8,
+                      color: "#9ca3af",
+                      fontSize: 14,
+                    }}
+                  >
+
+                    {logoUploading
+                      ? "Preparing preview..."
+                      : "PNG recommended"}
+
                   </div>
 
                   <input
@@ -391,18 +762,22 @@ if (
                     type="file"
                     accept="image/*"
                     onChange={onLogoChange}
+                    disabled={loading}
                   />
 
                 </label>
+
               )}
 
             </div>
 
           </div>
 
-          <div className="campaign-right">
+          {/* ===========================
+              RIGHT COLUMN
+          ============================ */}
 
-    
+          <div className="campaign-right">
 
             <div className="campaign-card">
 
@@ -412,70 +787,316 @@ if (
 
               <div className="campaign-form">
 
-    <div className="campaign-field">
+                <div className="campaign-field">
 
-        <label className="campaign-label">
-            Headline
-        </label>
+                  <label className="campaign-label">
+                    Headline
+                  </label>
 
-        <input
-            value={headline}
-            onChange={(e) => setHeadline(e.target.value)}
-            className="campaign-input"
-            placeholder="Summer Collection Starts Here"
-        />
+                  <input
+                    value={headline}
+                    onChange={(e) => setHeadline(e.target.value)}
+                    className="campaign-input"
+                    placeholder="Summer Collection Starts Here"
+                    disabled={loading}
+                  />
 
-    </div>
+                </div>
 
-    <div className="campaign-field">
+                <div className="campaign-field">
 
-        <label className="campaign-label">
-            Subheadline
-        </label>
+                  <label className="campaign-label">
+                    Subheadline
+                  </label>
 
-        <textarea
-            rows={5}
-            value={subheadline}
-            onChange={(e) => setSubheadline(e.target.value)}
-            className="campaign-textarea"
-            placeholder="Discover timeless fashion designed for every occasion."
-        />
+                  <textarea
+                    rows={5}
+                    value={subheadline}
+                    onChange={(e) => setSubheadline(e.target.value)}
+                    className="campaign-textarea"
+                    placeholder="Discover timeless fashion designed for every occasion."
+                    disabled={loading}
+                  />
 
-    </div>
+                </div>
 
-    <div className="campaign-field">
+                <div className="campaign-field">
 
-        <label className="campaign-label">
-            CTA
-        </label>
+                  <label className="campaign-label">
+                    CTA
+                  </label>
 
-        <input
-            value={cta}
-            onChange={(e) => setCta(e.target.value)}
-            className="campaign-input"
-            placeholder="Shop Now"
-        />
+                  <input
+                    value={cta}
+                    onChange={(e) => setCta(e.target.value)}
+                    className="campaign-input"
+                    placeholder="Shop Now"
+                    disabled={loading}
+                  />
 
-    </div>
+                </div>
 
-                <button
-                  onClick={generateCampaign}
-                  disabled={!canGenerate}
-                  className="campaign-button"
-                  style={{ width: "100%" }}
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Generating Campaign...
-                    </>
-                  ) : (
-                    <>
-                      Generate Campaign
-                      <ChevronRight className="ml-2 h-5 w-5" />
-                    </>
+                <div style={{ width: "100%" }}>
+
+                  <button
+                    onClick={generateCampaign}
+                    disabled={!canGenerate || loading}
+                    className="campaign-button"
+                    style={{ width: "100%" }}
+                  >
+
+                    {loading ? (
+
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Generating Campaign...
+                      </>
+
+                    ) : (
+
+                      <>
+                        Generate Campaign
+                        <ChevronRight className="ml-2 h-5 w-5" />
+                      </>
+
+                    )}
+
+                  </button>
+
+                  {loading && (
+
+                    <div
+                      style={{
+                        marginTop: 18,
+                        padding: 22,
+                        borderRadius: 18,
+                        border: "1px solid #313847",
+                        background:
+                          "linear-gradient(180deg,#1b1f27,#171a20)",
+                      }}
+                    >
+
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 12,
+                          marginBottom: 18,
+                        }}
+                      >
+
+                        <Loader2
+                          className="animate-spin text-violet-400"
+                          size={24}
+                        />
+
+                        <div>
+
+                          <div
+                            style={{
+                              color: "#fff",
+                              fontWeight: 700,
+                              fontSize: 17,
+                            }}
+                          >
+                            AI Campaign Generation
+                          </div>
+
+                          <div
+                            style={{
+                              color: "#9ca3af",
+                              fontSize: 13,
+                            }}
+                          >
+                            Estimated completion time 3–5 minutes
+                          </div>
+
+                        </div>
+
+                      </div>
+
+                      <div
+                        style={{
+                          display: "grid",
+                          gap: 14,
+                        }}
+                      >
+
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 10,
+                          }}
+                        >
+                          <Loader2
+                            size={16}
+                            className="animate-spin text-violet-400"
+                          />
+                          <span style={{ color: "#d1d5db" }}>
+                            Analysing Master Hero
+                          </span>
+                        </div>
+
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 10,
+                          }}
+                        >
+                          <Loader2
+                            size={16}
+                            className="animate-spin text-violet-400"
+                          />
+                          <span style={{ color: "#d1d5db" }}>
+                            Understanding supporting assets
+                          </span>
+                        </div>
+
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 10,
+                          }}
+                        >
+                          <Loader2
+                            size={16}
+                            className="animate-spin text-violet-400"
+                          />
+                          <span style={{ color: "#d1d5db" }}>
+                            Detecting brand identity
+                          </span>
+                        </div>
+
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 10,
+                          }}
+                        >
+                          <Loader2
+                            size={16}
+                            className="animate-spin text-violet-400"
+                          />
+                          <span style={{ color: "#d1d5db" }}>
+                            Building premium campaign layouts
+                          </span>
+                        </div>
+
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 10,
+                          }}
+                        >
+                          <Loader2
+                            size={16}
+                            className="animate-spin text-violet-400"
+                          />
+                          <span style={{ color: "#d1d5db" }}>
+                            Rendering high-resolution creatives
+                          </span>
+                        </div>
+
+                      </div>
+
+                      <div
+                        style={{
+                          marginTop: 22,
+                          paddingTop: 18,
+                          borderTop: "1px solid #2d3441",
+                          color: "#98a2b3",
+                          fontSize: 13,
+                          lineHeight: 1.7,
+                        }}
+                      >
+                        Your campaign will automatically open in a
+                        new tab as soon as generation is completed.
+
+                        <br />
+                        <br />
+
+                        You may keep this page open while MagicReel
+                        finishes generating your campaign.
+                      </div>
+
+                    </div>
+
                   )}
-                </button>
+
+{campaignReady && popupBlocked && (
+
+  <div
+    style={{
+      marginTop: 18,
+      padding: 20,
+      borderRadius: 18,
+      background: "#182028",
+      border: "1px solid #2d5b8a",
+    }}
+  >
+
+    <div
+      style={{
+        color: "#ffffff",
+        fontWeight: 700,
+        fontSize: 18,
+        marginBottom: 8,
+      }}
+    >
+      ✅ Campaign Generated Successfully
+    </div>
+
+    <div
+      style={{
+        color: "#b7c0cc",
+        lineHeight: 1.7,
+        marginBottom: 20,
+      }}
+    >
+      Your browser blocked the automatic opening of
+      the campaign in a new tab.
+    </div>
+
+    <button
+      className="campaign-button"
+      style={{
+        width: "100%",
+        marginBottom: 12,
+      }}
+      onClick={() =>
+        window.open(
+          `/campaign/${generatedCampaignId}`,
+          "_blank"
+        )
+      }
+    >
+      Open Campaign
+    </button>
+
+    <button
+      className="campaign-button"
+      style={{
+        width: "100%",
+      }}
+      onClick={() =>
+        navigator.clipboard.writeText(
+          `${window.location.origin}/campaign/${generatedCampaignId}`
+        )
+      }
+    >
+      Copy Campaign Link
+    </button>
+
+  </div>
+
+)}
+
+                </div>
 
               </div>
 
@@ -486,12 +1107,15 @@ if (
         </div>
 
         <CampaignHeroPickerModal
-  open={assetModalOpen}
-  onClose={() => setAssetModalOpen(false)}
-  onSelect={onAssetsSelected}
-/>
+          open={assetModalOpen}
+          onClose={() => setAssetModalOpen(false)}
+          onSelect={onAssetsSelected}
+        />
 
       </div>
-  </div>
+
+    </div>
+
   );
+
 }
