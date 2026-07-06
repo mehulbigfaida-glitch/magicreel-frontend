@@ -14,7 +14,7 @@ const Login: React.FC = () => {
   const setAuth = useAuthStore((s) => s.setAuth);
 
   const redirectTo =
-    new URLSearchParams(location.search).get("redirect") || "/create-v2";
+  new URLSearchParams(location.search).get("redirect") || "/create-ai-hero";
 
   const handleLogin = async () => {
     setError("");
