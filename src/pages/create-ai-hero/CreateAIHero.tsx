@@ -4,6 +4,7 @@ import "./CreateAIHero.css";
 import { API_BASE } from "../../config/api";
 import { useAuthStore } from "../../store/authStore";
 import FeatureLockedModal from "../../components/FeatureLockedModal";
+import { UploadCloud } from "lucide-react";
 import {
   GARMENTS,
   type GarmentCategory,
@@ -862,7 +863,7 @@ style={{
     selectedSubType
   }
 
-  disabled={false}
+  disabled={!selectedCategory}
 
                 onChange={(e) => {
 
@@ -893,11 +894,22 @@ style={{
                 }}
 
                 style={{
-                  height:46,
-                  borderRadius:12,
-                  background:"#111",
-                  color:"white"
-                }}
+  height:46,
+  borderRadius:12,
+  background:"#111",
+  color:"white",
+
+  opacity:
+    selectedCategory ? 1 : 0.45,
+
+  cursor:
+    selectedCategory
+      ? "pointer"
+      : "not-allowed",
+
+  transition:
+    "all .25s ease"
+}}
               >
 
                 <option value="">
@@ -947,25 +959,36 @@ style={{
             >
 
               <label
-                style={{
-                  height:300,
-                  borderRadius:20,
-                  border:
-                    "1px dashed rgba(255,255,255,.1)",
+  style={{
+    height: 300,
+    borderRadius: 20,
+    border: "1px dashed rgba(255,255,255,.1)",
+    background: "#111",
 
-                  background:"#111",
+    cursor:
+      selectedSubType
+        ? "pointer"
+        : "not-allowed",
 
-                  cursor:"pointer",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
 
-                  display:"flex",
+    opacity:
+      selectedSubType
+        ? 1
+        : 0.45,
 
-                  justifyContent:"center",
+    pointerEvents:
+      selectedSubType
+        ? "auto"
+        : "none",
 
-                  alignItems:"center",
-
-                  overflow:"hidden"
-                }}
-              >
+    transition:
+      "all .25s ease"
+  }}
+>
 
                 <input
                   hidden
@@ -983,53 +1006,132 @@ style={{
                   }
                 />
 
-                {productImageUrl ?
+                {frontUploading ? (
 
-                <img
-                  src={
-                    productImageUrl
-                  }
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 16,
+      color: "#fff",
+    }}
+  >
+    <div className="mr-spinner" />
 
-                  style={{
-  width:"100%",
-  height:"100%",
-  objectFit:"contain",
-  padding:"8px",
-  background:"#111"
-}}
-                />
+    <div
+      style={{
+        fontSize: 22,
+        fontWeight: 600,
+      }}
+    >
+      Uploading Front Garment...
+    </div>
 
-                :
+  </div>
 
-                <div>
-                  Upload Front
-                </div>
+) : productImageUrl ? (
 
-                }
+  <img
+    src={productImageUrl}
+    style={{
+      width: "100%",
+      height: "100%",
+      objectFit: "contain",
+      padding: "8px",
+      background: "#111",
+    }}
+  />
+
+) : (
+
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      textAlign: "center",
+      gap: 12,
+    }}
+  >
+    <UploadCloud
+      size={56}
+      color="#A855F7"
+      strokeWidth={1.8}
+    />
+
+    <div
+      style={{
+        fontSize: 30,
+        fontWeight: 700,
+        color: "#fff",
+      }}
+    >
+      Upload Front Garment
+    </div>
+
+    <div
+      style={{
+        fontSize: 18,
+        color: "#9CA3AF",
+      }}
+    >
+      PNG, JPG or WEBP
+    </div>
+
+    <div
+      style={{
+        marginTop: 6,
+        padding: "8px 18px",
+        borderRadius: 999,
+        background: "rgba(168,85,247,.15)",
+        color: "#C084FC",
+        fontSize: 15,
+        fontWeight: 600,
+      }}
+    >
+      Front View
+    </div>
+  </div>
+
+)}
 
               </label>
 
 
               <label
-                style={{
-                  height:300,
-                  borderRadius:20,
-                  border:
-                    "1px dashed rgba(255,255,255,.1)",
+  style={{
+    height: 300,
+    borderRadius: 20,
+    border: "1px dashed rgba(255,255,255,.1)",
 
-                  background:"#111",
+    background: "#111",
 
-                  cursor:"pointer",
+    cursor: selectedSubType
+      ? "pointer"
+      : "not-allowed",
 
-                  display:"flex",
+    display: "flex",
 
-                  justifyContent:"center",
+    justifyContent: "center",
 
-                  alignItems:"center",
+    alignItems: "center",
 
-                  overflow:"hidden"
-                }}
-              >
+    overflow: "hidden",
+
+    opacity: selectedSubType
+      ? 1
+      : 0.45,
+
+    pointerEvents: selectedSubType
+      ? "auto"
+      : "none",
+
+    transition: "all .25s ease"
+  }}
+>
 
                 <input
                   hidden
@@ -1047,29 +1149,106 @@ style={{
                   }
                 />
 
-                {backImageUrl ?
+                {backUploading ? (
 
-                <img
-                  src={
-                    backImageUrl
-                  }
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 16,
+      color: "#fff",
+    }}
+  >
+    <div className="mr-spinner" />
 
-                  style={{
-  width:"100%",
-  height:"100%",
-  objectFit:"contain",
-  padding:"8px",
-  background:"#111"
-}}
-                />
+    <div
+      style={{
+        fontSize: 22,
+        fontWeight: 600,
+      }}
+    >
+      Uploading Back Garment...
+    </div>
 
-                :
+    <div
+      style={{
+        fontSize: 16,
+        color: "#9CA3AF",
+      }}
+    >
+      Please wait...
+    </div>
 
-                <div>
-                  Upload Back
-                </div>
+  </div>
 
-                }
+) : backImageUrl ? (
+
+  <img
+    src={backImageUrl}
+    style={{
+      width: "100%",
+      height: "100%",
+      objectFit: "contain",
+      padding: "8px",
+      background: "#111",
+    }}
+  />
+
+) : (
+
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      textAlign: "center",
+      gap: 12,
+    }}
+  >
+    <UploadCloud
+      size={56}
+      color="#A855F7"
+      strokeWidth={1.8}
+    />
+
+    <div
+      style={{
+        fontSize: 30,
+        fontWeight: 700,
+        color: "#fff",
+      }}
+    >
+      Upload Back Garment
+    </div>
+
+    <div
+      style={{
+        fontSize: 18,
+        color: "#9CA3AF",
+      }}
+    >
+      PNG, JPG or WEBP
+    </div>
+
+    <div
+      style={{
+        marginTop: 6,
+        padding: "8px 18px",
+        borderRadius: 999,
+        background: "rgba(168,85,247,.15)",
+        color: "#C084FC",
+        fontSize: 15,
+        fontWeight: 600,
+      }}
+    >
+      Back View (Recommended)
+    </div>
+  </div>
+
+)}
 
               </label>
 
@@ -1147,7 +1326,16 @@ style={{
 
     padding:22,
 
-    minHeight:500
+    minHeight:500,
+
+    opacity:
+      productImageUrl ? 1 : 0.45,
+
+    pointerEvents:
+      productImageUrl ? "auto" : "none",
+
+    transition:
+      "all .25s ease"
   }}
 >
 
@@ -1159,8 +1347,23 @@ style={{
               }}
             >
               Select
-              <br/>
-              Muse
+<br/>
+Muse
+
+{!productImageUrl && (
+
+  <div
+    style={{
+      marginTop:12,
+      fontSize:13,
+      color:"rgba(255,255,255,.55)",
+      fontWeight:400
+    }}
+  >
+    Upload Front Garment first
+  </div>
+
+)}
             </div>
 
 {hoveredMuse && (
@@ -1612,7 +1815,7 @@ minHeight:560
 >
 
 <div style={{padding:14}}>
-✨ Back Hero
+✨ Back Hero (Only if Back Garment Uploaded)
 </div>
 
 {backHeroImageUrl ? (
