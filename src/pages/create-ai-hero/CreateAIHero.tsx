@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./CreateAIHero.css";
 import { API_BASE } from "../../config/api";
 import { useAuthStore } from "../../store/authStore";
-
+import FeatureLockedModal from "../../components/FeatureLockedModal";
 import {
   GARMENTS,
   type GarmentCategory,
@@ -51,6 +51,8 @@ export default function CreateAIHero() {
 
   const [backUploading, setBackUploading] =
     useState(false);
+
+  const [lockedFeature, setLockedFeature] = useState<string | null>(null);
 
 const [
 selectedMuse,
@@ -868,6 +870,7 @@ style={{
                     e.target
                       .value as GarmentSubType;
 
+                
                   setSelectedSubType(
                     subtype
                   );
@@ -1312,7 +1315,123 @@ display:"block"
 
         </div>
 
+{/* ===== MORE MUSE OPTIONS ===== */}
 
+<div
+  style={{
+    marginTop: 26,
+    marginBottom: 28,
+    padding: 22,
+    borderRadius: 22,
+    background: "rgba(255,255,255,0.03)",
+    border: "1px solid rgba(255,255,255,0.08)",
+  }}
+>
+  <div
+    style={{
+      fontSize: 12,
+      letterSpacing: "0.18em",
+      color: "rgba(255,255,255,0.45)",
+      marginBottom: 18,
+    }}
+  >
+    MORE MUSE OPTIONS
+  </div>
+
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+      gap: 16,
+    }}
+  >
+    {/* Explore Avatars */}
+
+<div
+  onClick={() => setLockedFeature("Explore Avatars")}
+  style={{
+    cursor: "pointer",
+    borderRadius: 18,
+    border: "1px solid rgba(255,255,255,.08)",
+    background: "rgba(255,255,255,.03)",
+    padding: 20,
+    transition: "all .25s ease",
+    textAlign: "center",
+  }}
+>
+  <div
+    style={{
+      fontSize: 36,
+      marginBottom: 16,
+    }}
+  >
+    ✨
+  </div>
+
+  <div
+    style={{
+      fontSize: 18,
+      fontWeight: 600,
+      marginBottom: 8,
+    }}
+  >
+    Explore Avatars
+  </div>
+
+  <div
+    style={{
+      fontSize: 13,
+      color: "rgba(255,255,255,.55)",
+    }}
+  >
+    Coming Soon
+  </div>
+</div>
+
+    {/* Upload My Avatar */}
+
+<div
+  onClick={() => setLockedFeature("Upload My Avatar")}
+  style={{
+    cursor: "pointer",
+    borderRadius: 18,
+    border: "1px solid rgba(255,255,255,.08)",
+    background: "rgba(255,255,255,.03)",
+    padding: 20,
+    transition: "all .25s ease",
+    textAlign: "center",
+  }}
+>
+  <div
+    style={{
+      fontSize: 36,
+      marginBottom: 16,
+    }}
+  >
+    ⬆️
+  </div>
+
+  <div
+    style={{
+      fontSize: 18,
+      fontWeight: 600,
+      marginBottom: 8,
+    }}
+  >
+    Upload My Avatar
+  </div>
+
+  <div
+    style={{
+      fontSize: 13,
+      color: "rgba(255,255,255,.55)",
+    }}
+  >
+    Coming Soon
+  </div>
+</div>
+  </div>
+</div>
         <div
 
 onClick={
@@ -1698,26 +1817,27 @@ Generate Pack
 
 <div className="ai-pack-card">
 
-<div className="ai-pack-icon pink">
-<Share2 size={26}/>
-</div>
+  <div className="ai-pack-icon pink">
+    <Share2 size={26}/>
+  </div>
 
-<div className="ai-pack-title">
-Social Pack
-</div>
+  <div className="ai-pack-title">
+    Campaign Page
+  </div>
 
-<div className="ai-pack-sub">
-Create engaging social media creatives,
-stories and promotional content designed
-to boost reach and engagement.
-</div>
+  <div className="ai-pack-sub">
+    Create promotional offers, festival greetings,
+    invitations and marketing creatives using
+    your AI Hero image.
+  </div>
 
-<button
-className="ai-pack-btn"
-disabled={!frontHeroImageUrl}
->
-Generate Pack
-</button>
+  <button
+    className="ai-pack-btn"
+    disabled={!frontHeroImageUrl}
+    onClick={() => navigate("/campaign-engine")}
+  >
+    Create Campaign
+  </button>
 
 </div>
 
@@ -1727,36 +1847,42 @@ Generate Pack
 
 <div className="ai-pack-card">
 
-<div className="ai-pack-icon orange">
-<Megaphone size={26}/>
+  <div className="ai-pack-icon orange">
+    <Megaphone size={26}/>
+  </div>
+
+  <div className="ai-pack-title">
+    Editorial Studio
+  </div>
+
+  <div className="ai-pack-sub">
+    Transform your garment into luxury fashion
+    campaigns using premium editorial worlds
+    and cinematic storytelling.
+  </div>
+
+  <button
+    className="ai-pack-btn"
+    disabled={!frontHeroImageUrl}
+    onClick={() => navigate("/create/social-campaign")}
+  >
+    Create Editorial
+  </button>
+
 </div>
 
-<div className="ai-pack-title">
-Editorial Campaign
 </div>
 
-<div className="ai-pack-sub">
-Transform your garment into premium
-fashion campaigns with magazine-style
-editorial storytelling and luxury visuals.
-</div>
-
-<button
-className="ai-pack-btn"
-disabled={!frontHeroImageUrl}
->
-Generate Pack
-</button>
-
-</div>
-
-</div>
-
-
+<FeatureLockedModal
+  open={lockedFeature !== null}
+  title="Upgrade Required"
+  description="This feature is available on higher plans. Upgrade your subscription to unlock premium AI content packs."
+  featureName={lockedFeature ?? undefined}
+  onClose={() => setLockedFeature(null)}
+/>
 </div>
 
 </div>
 
 );
 }
-{/* temp restore marker */}
