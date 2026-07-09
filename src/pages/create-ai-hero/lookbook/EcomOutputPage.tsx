@@ -37,11 +37,6 @@ const [poses, setPoses] =
         const data =
           await res.json();
 
-        console.log(
-          "LOOKBOOK:",
-          data
-        );
-
         setPoses(
           data.poses || []
         );

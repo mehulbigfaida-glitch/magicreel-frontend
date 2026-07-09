@@ -41,13 +41,6 @@ location.state?.gender || "";
 const incomingCategory =
 location.state?.category || "";
 
-console.log("ECOM LOCATION STATE", location.state);
-
-console.log("ECOM VALUES", {
-  incomingGender,
-  incomingCategory
-});
-
 const[
 frontHero,
 setFrontHero
@@ -109,19 +102,10 @@ try{
 
 setLoading(true);
 
-console.log("LOOKBOOK REQUEST", {
-  incomingGender,
-  incomingCategory,
-  selectedStyle
-});
-
 const token=
 localStorage.getItem(
 "token"
 );
-
-console.log("FRONT HERO TYPE:", typeof frontHero);
-console.log("FRONT HERO VALUE:", frontHero?.substring?.(0, 200));
 
 const res=
 await fetch(
@@ -159,13 +143,22 @@ incomingCategory
 }
 );
 
-const data=
-await res.json();
+const data = await res.json();
+
+if (!res.ok) {
+
+  console.error(data);
+
+  alert(
+    data.error || "Lookbook generation failed"
+  );
+
+  return;
+}
 
 navigate(
-`/pack/ecom/output/${data.runId}`
+  `/pack/ecom/output/${data.runId}`
 );
-
 }
 catch{
 
