@@ -4,9 +4,8 @@ import {
   Routes,
   Route,
   useLocation,
-  useNavigate,
 } from "react-router-dom";
-
+import AppHeader from "./components/layout/navigation/AppHeader";
 import { useAuthStore } from "./store/authStore";
 
 /* =========================
@@ -62,13 +61,6 @@ import "./App.css";
 
 function GlobalHeader() {
   const location = useLocation();
-  const navigate = useNavigate();
-
-  const isSharePage = location.pathname.startsWith("/s/");
-
-  const user = isSharePage
-  ? null
-  : useAuthStore((state) => state.user);
 
   const hideHeaderRoutes = [
     "/create-v2",
@@ -81,99 +73,7 @@ function GlobalHeader() {
     return null;
   }
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-    window.location.reload();
-  };
-
-  const lockAdvancedPacks =
-    user?.plan === "FREE" ||
-    user?.plan === "BASIC";
-
-  return (
-    <header className="mr-global-header">
-      <div className="mr-header-left">
-        <a href="/" className="mr-logo-link">
-          MagicReel
-        </a>
-
-        <nav className="mr-main-nav">
-          <div className="mr-create-menu">
-            <span className="mr-create-trigger">
-              Create ▾
-            </span>
-
-            <div className="mr-create-dropdown">
-              <a href="/create-v2" className="mr-create-item">
-                <div className="mr-create-item-title">
-                  E-Commerce Pack
-                </div>
-              </a>
-
-              {lockAdvancedPacks ? (
-                <div
-                  className="mr-create-item locked"
-                  onClick={() => navigate("/plans")}
-                >
-                  🔒 Social Pack
-                </div>
-              ) : (
-                <a href="/social-pack" className="mr-create-item">
-                  Social Pack
-                </a>
-              )}
-
-              {lockAdvancedPacks ? (
-                <div
-                  className="mr-create-item locked"
-                  onClick={() => navigate("/plans")}
-                >
-                  🔒 Cinematic Pack
-                </div>
-              ) : (
-                <a href="/cinematic" className="mr-create-item">
-                  Cinematic Pack
-                </a>
-              )}
-            </div>
-          </div>
-
-          <a href="/predictions">Creations</a>
-
-<a href="/social-media">Social Media</a>
-
-<a href="/plans">Plans</a>
-        </nav>
-      </div>
-
-      {/* ✅ SAFE HEADER RENDER */}
-      {user && user.email ? (
-        <div className="mr-header-right">
-          <span className="mr-credits">
-            {user.creditsAvailable ?? 0} Credits
-          </span>
-
-          <div className="mr-profile-menu">
-            <div className="mr-user-circle">
-              {user.email?.charAt(0)?.toUpperCase() || "U"}
-            </div>
-
-            <div className="mr-profile-dropdown">
-              <a href="/dashboard">Dashboard</a>
-              <button onClick={handleLogout}>
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="mr-header-right">
-          <span className="mr-credits">...</span>
-        </div>
-      )}
-    </header>
-  );
+  return <AppHeader />;
 }
 
 /* =========================

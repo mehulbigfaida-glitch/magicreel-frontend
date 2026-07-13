@@ -1,0 +1,123 @@
+.mr-header-account {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* ---------------- Credits ---------------- */
+
+.mr-credits-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 8px 14px;
+
+  border: 1px solid #2d3442;
+  border-radius: 999px;
+
+  background: #171a22;
+
+  color: #f3f4f6;
+  font-size: 13px;
+  font-weight: 600;
+
+  transition: all .18s ease;
+
+  cursor: default;
+}
+
+.mr-credits-pill svg {
+  width: 16px;
+  height: 16px;
+}
+
+.mr-credits-pill:hover {
+  border-color: #4f46e5;
+  background: #1d2130;
+}
+
+/* ---------------- Plan ---------------- */
+
+.mr-plan-pill {
+  padding: 7px 12px;
+
+  border-radius: 999px;
+
+  background: #312e81;
+
+  color: white;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  letter-spacing: .5px;
+
+  text-transform: uppercase;
+}
+
+/* ---------------- Profile ---------------- */
+
+.mr-profile-wrapper {
+  position: relative;
+}
+
+.mr-profile-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 6px;
+
+  border: none;
+  background: transparent;
+
+  cursor: pointer;
+
+  border-radius: 12px;
+
+  transition: background .18s ease;
+}
+
+.mr-profile-button:hover {
+  background: rgba(255,255,255,.05);
+}
+
+.mr-avatar {
+  width: 38px;
+  height: 38px;
+
+  border-radius: 50%;
+
+  background: #2b3242;
+
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  flex-shrink: 0;
+}
+
+.mr-profile-name {
+  color: white;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  white-space: nowrap;
+}
+
+.mr-profile-chevron {
+  color: #9ca3af;
+
+  transition: transform .18s ease;
+}
+
+.mr-profile-chevron.open {
+  transform: rotate(180deg);
+}

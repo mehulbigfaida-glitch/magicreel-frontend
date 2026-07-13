@@ -1,0 +1,44 @@
+.mr-header {
+  height: 72px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 32px;
+
+  padding: 0 32px;
+
+  background: #0f1117;
+
+  border-bottom: 1px solid #23262f;
+}
+
+.mr-logo {
+  flex-shrink: 0;
+
+  color: white;
+
+  text-decoration: none;
+
+  font-size: 22px;
+  font-weight: 700;
+
+  letter-spacing: -.02em;
+}
+
+/* Navigation occupies remaining space */
+
+.mr-desktop-nav {
+  flex: 1;
+
+  display: flex;
+  align-items: center;
+
+  gap: 28px;
+}
+
+/* Right side */
+
+.mr-header-account {
+  flex-shrink: 0;
+}

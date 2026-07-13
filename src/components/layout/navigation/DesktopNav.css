@@ -1,0 +1,89 @@
+.mr-desktop-nav {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  flex: 1;
+}
+
+/* ---------- Navigation Links ---------- */
+
+.mr-nav-link,
+.mr-nav-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  height: 42px;
+
+  padding: 0;
+
+  background: transparent !important;
+  border: none !important;
+  outline: none;
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  box-shadow: none;
+
+  color: #B8BEC9 !important;
+
+  text-decoration: none;
+
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+
+  cursor: pointer;
+
+  transition:
+    color .18s ease,
+    opacity .18s ease;
+}
+
+.mr-nav-link:visited {
+  color: #B8BEC9;
+}
+
+.mr-nav-link:hover,
+.mr-nav-button:hover {
+  color: #FFFFFF !important;
+}
+
+.mr-nav-link.active,
+.mr-nav-button.active {
+  color: #FFFFFF !important;
+}
+
+/* ---------- Dropdown ---------- */
+
+.mr-nav-dropdown {
+  position: relative;
+}
+
+.mr-nav-chevron {
+  font-size: 11px;
+
+  color: #8B95A7;
+
+  transition: transform .18s ease;
+}
+
+.mr-nav-button:hover .mr-nav-chevron {
+  color: white;
+}
+
+/* ---------- Focus ---------- */
+
+.mr-nav-link:focus,
+.mr-nav-button:focus {
+  outline: none;
+}
+
+.mr-nav-link:focus-visible,
+.mr-nav-button:focus-visible {
+  outline: 2px solid #4F46E5;
+  outline-offset: 3px;
+  border-radius: 6px;
+}
