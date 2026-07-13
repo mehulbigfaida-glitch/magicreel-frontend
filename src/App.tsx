@@ -46,6 +46,7 @@ import PublishPage from "./pages/publish/PublishPage";
 import CampaignV2Page
 from "./pages/CampaignV2Page";
 import CampaignGeneratingPage from "./pages/campaign/CampaignGeneratingPage";
+import SocialMediaPage from "./pages/social-media/SocialMediaPage";
 
 /* =========================
    CONTEXT
@@ -139,7 +140,10 @@ function GlobalHeader() {
           </div>
 
           <a href="/predictions">Creations</a>
-          <a href="/plans">Plans</a>
+
+<a href="/social-media">Social Media</a>
+
+<a href="/plans">Plans</a>
         </nav>
       </div>
 
@@ -256,6 +260,11 @@ function AppRoutes() {
       <CampaignOutputPage />
     </ProtectedRoute>
   }
+/>
+
+<Route
+  path="/social-media"
+  element={<SocialMediaPage />}
 />
 
       <Route path="/lookbook" element={<LookbookPage />} />

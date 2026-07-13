@@ -1,0 +1,339 @@
+.social-page{
+    min-height:100vh;
+    padding:70px 40px 90px;
+    background:
+        radial-gradient(circle at top,#1a1f3b 0%,#101218 35%,#09090b 100%);
+    color:#f8f8f8;
+}
+
+/* HERO */
+
+.social-hero{
+    max-width:900px;
+    margin:0 auto 70px;
+    text-align:center;
+}
+
+.social-hero h1{
+    font-size:56px;
+    font-weight:800;
+    letter-spacing:-1px;
+    margin-bottom:20px;
+}
+
+.social-hero p{
+    font-size:20px;
+    line-height:1.8;
+    color:#b9bcc6;
+}
+
+/* INSTAGRAM */
+
+.instagram-section{
+    max-width:1200px;
+    margin:0 auto 70px;
+}
+
+.instagram-card{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:42px;
+
+    border-radius:30px;
+
+    background:rgba(255,255,255,.05);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    backdrop-filter:blur(24px);
+
+    transition:.35s;
+}
+
+.instagram-card:hover{
+
+    transform:translateY(-6px);
+
+    border-color:#7c5cff;
+
+    box-shadow:
+        0 25px 60px rgba(93,71,255,.22);
+
+}
+
+.instagram-left{
+
+    display:flex;
+    align-items:center;
+    gap:28px;
+
+}
+
+.platform-logo{
+
+    width:84px;
+    height:84px;
+
+    border-radius:50%;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:34px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #6d5dfb,
+            #a855f7
+        );
+
+    box-shadow:
+        0 10px 40px rgba(109,93,251,.45);
+
+}
+
+.platform-logo.small{
+
+    width:58px;
+    height:58px;
+
+    font-size:22px;
+
+    margin-bottom:22px;
+}
+
+.instagram-left h2{
+
+    font-size:34px;
+
+    margin-bottom:10px;
+
+}
+
+.instagram-left p{
+
+    color:#b7bcc7;
+
+    font-size:17px;
+
+    line-height:1.7;
+
+}
+
+.instagram-right{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:flex-end;
+
+    gap:20px;
+
+}
+
+/* STATUS */
+
+.status{
+
+    padding:10px 18px;
+
+    border-radius:999px;
+
+    font-weight:700;
+
+    font-size:15px;
+
+}
+
+.status.disconnected{
+
+    background:#2b2114;
+
+    color:#ffbf47;
+
+}
+
+.status.connected{
+
+    background:#0f2f20;
+
+    color:#6cff9b;
+
+}
+
+/* BUTTON */
+
+.connect-btn{
+
+    border:none;
+
+    padding:16px 34px;
+
+    border-radius:14px;
+
+    cursor:pointer;
+
+    color:white;
+
+    font-size:16px;
+
+    font-weight:700;
+
+    background:
+        linear-gradient(
+            135deg,
+            #6d5dfb,
+            #8b5cf6
+        );
+
+    transition:.3s;
+
+}
+
+.connect-btn:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 18px 40px rgba(109,93,251,.45);
+
+}
+
+/* PLATFORM GRID */
+
+.platform-grid{
+
+    max-width:1200px;
+
+    margin:0 auto;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(2,1fr);
+
+    gap:26px;
+
+}
+
+.platform-card{
+
+    padding:34px;
+
+    border-radius:24px;
+
+    background:rgba(255,255,255,.04);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    backdrop-filter:blur(18px);
+
+    transition:.3s;
+
+}
+
+.platform-card:hover{
+
+    transform:translateY(-5px);
+
+    border-color:#6d5dfb;
+
+    box-shadow:
+        0 15px 40px rgba(109,93,251,.18);
+
+}
+
+.platform-card h3{
+
+    font-size:24px;
+
+    margin-bottom:10px;
+
+}
+
+.platform-card p{
+
+    color:#9da3af;
+
+    line-height:1.6;
+
+}
+
+/* MOBILE */
+
+@media(max-width:900px){
+
+.instagram-card{
+
+    flex-direction:column;
+
+    align-items:flex-start;
+
+    gap:40px;
+
+}
+
+.instagram-right{
+
+    width:100%;
+
+    align-items:flex-start;
+
+}
+
+.platform-grid{
+
+    grid-template-columns:1fr;
+
+}
+
+.social-hero h1{
+
+    font-size:42px;
+
+}
+
+.social-hero p{
+
+    font-size:18px;
+
+}
+
+}
+
+@media(max-width:640px){
+
+.social-page{
+
+    padding:40px 22px 70px;
+
+}
+
+.platform-logo{
+
+    width:70px;
+    height:70px;
+
+}
+
+.instagram-left{
+
+    flex-direction:column;
+
+    align-items:flex-start;
+
+}
+
+.instagram-left h2{
+
+    font-size:28px;
+
+}
+
+}

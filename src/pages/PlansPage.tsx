@@ -202,8 +202,17 @@ export default function PlansPage() {
           fetchUser();
 
           setTimeout(() => {
-            window.location.href = "/create-v2";
-          }, 1200);
+  // 🔥 store post-payment context
+  sessionStorage.setItem(
+    "creditsAdded",
+    JSON.stringify({
+      plan,
+      amount: orderData.amount, // in paise
+    })
+  );
+
+  window.location.href = "/create-v2";
+}, 1200);
         },
 
         theme: {

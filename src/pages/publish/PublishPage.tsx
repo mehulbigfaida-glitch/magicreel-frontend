@@ -5,7 +5,8 @@ from "./AssetPickerModal";
 import "./PublishPage.css";
 import PublishToolbar
 from "./PublishToolbar";
-
+import FeatureLockedModal from "../../components/FeatureLockedModal";
+import StatusModal from "../../components/StatusModal";
 const API_BASE =
   import.meta.env.VITE_API_BASE_URL ||
   import.meta.env.VITE_API_URL ||
@@ -53,10 +54,30 @@ const [
   const [publishing, setPublishing] =
   useState(false);
 
-  const [platform, setPlatform] =
-  useState<"instagram" | "facebook">(
-    "instagram"
-  );
+  const [platforms, setPlatforms] = useState({
+  instagram: true,
+  facebook: false,
+});
+
+const [
+  showUpgradeModal,
+  setShowUpgradeModal
+] = useState(false);
+
+const [
+  showStatusModal,
+  setShowStatusModal
+] = useState(false);
+
+const [
+  statusTitle,
+  setStatusTitle
+] = useState("");
+
+const [
+  statusDescription,
+  setStatusDescription
+] = useState("");
 
   async function handleGenerateAI() {
 
@@ -149,47 +170,54 @@ async function handlePublish() {
 
     setPublishing(true);
 
+    const selectedPlatforms: ("instagram" | "facebook")[] = [];
+
+    if (platforms.instagram) {
+      selectedPlatforms.push("instagram");
+    }
+
+    if (platforms.facebook) {
+      selectedPlatforms.push("facebook");
+    }
+
+    if (selectedPlatforms.length === 0) {
+      throw new Error("Please select at least one platform.");
+    }
+
     const publishAssetType =
       assetType === "video" ||
       assetType === "reel"
         ? "video"
         : "image";
 
-    console.log(
-      "PUBLISH DEBUG",
-      {
-        assetType,
-        publishAssetType,
-        previewUrl,
-      }
-    );
+    console.log("PUBLISH DEBUG", {
+      assetType,
+      publishAssetType,
+      previewUrl,
+      selectedPlatforms,
+    });
 
-    const token =
-      localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
-    const response =
-      await fetch(
+    for (const platform of selectedPlatforms) {
+
+      const response = await fetch(
         `${API_BASE}/api/publish/publish`,
         {
           method: "POST",
 
           headers: {
-            "Content-Type":
-              "application/json",
-
-            Authorization:
-              `Bearer ${token}`,
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
 
           body: JSON.stringify({
 
             platform,
 
-            assetUrl:
-              previewUrl,
+            assetUrl: previewUrl,
 
-            assetType:
-              publishAssetType,
+            assetType: publishAssetType,
 
             caption:
               caption +
@@ -201,21 +229,29 @@ async function handlePublish() {
         }
       );
 
-    const data =
-      await response.json();
+      const data = await response.json();
 
-    if (!data.success) {
+      if (!data.success) {
 
-      throw new Error(
-        data.error ||
-        "Publish failed"
-      );
+  if (data.error === "PLAN_NOT_ALLOWED") {
+    setShowUpgradeModal(true);
+    return;
+  }
+
+  throw new Error(
+    `${platform}: ${data.error || "Publish failed"}`
+  );
+}
 
     }
 
-    alert(
-      "🎉 Published Successfully"
-    );
+    setStatusTitle("Published Successfully");
+
+setStatusDescription(
+  `Your content has been published to ${selectedPlatforms.join(" & ")}.`
+);
+
+setShowStatusModal(true);
 
   } catch (err: any) {
 
@@ -224,10 +260,16 @@ async function handlePublish() {
       err
     );
 
-    alert(
-      err.message ||
-      "Publish failed"
-    );
+    if (
+  err?.message?.includes("PLAN_NOT_ALLOWED")
+) {
+  setShowUpgradeModal(true);
+} else {
+  alert(
+    err.message ||
+    "Publish failed"
+  );
+}
 
   } finally {
 
@@ -284,14 +326,13 @@ async function handlePublish() {
   <label>
 
     <input
-      type="radio"
-      checked={
-        platform === "instagram"
-      }
-      onChange={() =>
-        setPlatform(
-          "instagram"
-        )
+      type="checkbox"
+      checked={platforms.instagram}
+      onChange={(e) =>
+        setPlatforms({
+          ...platforms,
+          instagram: e.target.checked,
+        })
       }
     />
 
@@ -302,14 +343,13 @@ async function handlePublish() {
   <label>
 
     <input
-      type="radio"
-      checked={
-        platform === "facebook"
-      }
-      onChange={() =>
-        setPlatform(
-          "facebook"
-        )
+      type="checkbox"
+      checked={platforms.facebook}
+      onChange={(e) =>
+        setPlatforms({
+          ...platforms,
+          facebook: e.target.checked,
+        })
       }
     />
 
@@ -430,8 +470,27 @@ async function handlePublish() {
 
 }}
 />
-    </div>
 
-  );
+<FeatureLockedModal
+  open={showUpgradeModal}
+  title="Upgrade Required"
+  description="Social Publishing is available on the PRO plan and above."
+  featureName="Social Publishing"
+  onClose={() =>
+    setShowUpgradeModal(false)
+  }
+/>
+
+<StatusModal
+  open={showStatusModal}
+  type="success"
+  title={statusTitle}
+  description={statusDescription}
+  onClose={() => setShowStatusModal(false)}
+/>
+
+</div>
+
+   );
 
 }

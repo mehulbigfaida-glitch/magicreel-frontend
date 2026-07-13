@@ -14,13 +14,14 @@
     "@supabase/supabase-js": "^2.89.0",
     "@tensorflow/tfjs": "^4.22.0",
     "axios": "^1.13.2",
-    "lucide-react": "^1.16.0",
+    "lucide-react": "^1.24.0",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "react-router-dom": "^7.10.1",
     "react-zoom-pan-pinch": "^3.7.0",
     "replicate": "^1.4.0",
+    "simple-icons": "^16.25.0",
     "zustand": "^5.0.9"
   },
   "devDependencies": {

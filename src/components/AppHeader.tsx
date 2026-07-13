@@ -7,7 +7,7 @@ export default function AppHeader() {
   const location = useLocation();
 
   // ✅ read BOTH user + loading
-  const { user } = useAuthStore();
+  const user = useAuthStore((state) => state.user);
   const [helpOpen, setHelpOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
@@ -36,6 +36,13 @@ export default function AppHeader() {
           Dashboard
         </Link>
 
+        <Link
+         to="/social-media"
+         className={isActive("/social-media") ? "active" : ""}
+    >
+         Social Media
+         </Link>
+                
         <Link
           to="/plans"
           className={isActive("/plans") ? "active" : ""}
