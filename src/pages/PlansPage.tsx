@@ -65,10 +65,14 @@ const loadRazorpayScript = (): Promise<boolean> => {
 };
 
 export default function PlansPage() {
-  const BACKEND_URL = import.meta.env.VITE_API_BASE;
+  const BACKEND_URL = import.meta.env.VITE_API_BASE_URL;
 
   const [payments, setPayments] = useState<any[]>([]);
   const [userInfo, setUserInfo] = useState<any>(null);
+
+useEffect(() => {
+  console.log("Payments State:", payments);
+}, [payments]);
 
   // ✅ FETCH PAYMENTS
   const fetchPayments = async () => {
@@ -80,6 +84,10 @@ export default function PlansPage() {
       });
 
       const data = await res.json();
+      
+      console.log("Payments API:", data);
+      console.log("Payments array:", data.data);
+
       if (data.success) setPayments(data.data);
     } catch (err) {
       console.error("Failed to fetch payments", err);
@@ -96,6 +104,9 @@ export default function PlansPage() {
       });
 
       const data = await res.json();
+
+      console.log("USER API RESPONSE:", data);
+      
       if (data.user) setUserInfo(data.user);
     } catch (err) {
       console.error("Failed to fetch user", err);
@@ -110,7 +121,7 @@ export default function PlansPage() {
   const handleUpgrade = async (planName: string) => {
     try {
       if (planName === "FREE") {
-        window.location.href = "/create-v2";
+        window.location.href = "/create-ai-hero";
         return;
       }
 
@@ -211,7 +222,7 @@ export default function PlansPage() {
     })
   );
 
-  window.location.href = "/create-v2";
+  window.location.href = "/create-ai-hero";
 }, 1200);
         },
 
@@ -318,7 +329,7 @@ export default function PlansPage() {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "1fr 1fr 1fr 1fr",
+                gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr",
                 padding: "14px 20px",
                 background: "#111827",
                 color: "#9ca3af",
@@ -328,6 +339,7 @@ export default function PlansPage() {
               <span>Amount</span>
               <span>Status</span>
               <span>Date</span>
+              <span>Invoice</span>
             </div>
 
             {payments.map((p) => (
@@ -335,18 +347,43 @@ export default function PlansPage() {
                 key={p.id}
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "1fr 1fr 1fr 1fr",
+                  gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr",
                   padding: "16px 20px",
                   borderTop: "1px solid #1f2937",
                   color: "white",
                 }}
               >
                 <span>{p.plan}</span>
-                <span>₹{p.amount / 100}</span>
-                <span style={{ color: "#22c55e" }}>{p.status}</span>
-                <span style={{ color: "#9ca3af" }}>
-                  {new Date(p.createdAt).toLocaleDateString()}
-                </span>
+
+<span>₹{p.amount / 100}</span>
+
+<span style={{ color: "#22c55e" }}>
+  {p.status}
+</span>
+
+<span style={{ color: "#9ca3af" }}>
+  {new Date(p.createdAt).toLocaleDateString()}
+</span>
+
+<span>
+  {p.invoiceUrl ? (
+    <button
+      onClick={() => window.open(p.invoiceUrl, "_blank", "noopener,noreferrer")}
+      style={{
+        background: "#2563eb",
+        color: "#fff",
+        border: "none",
+        padding: "6px 12px",
+        borderRadius: "6px",
+        cursor: "pointer",
+      }}
+    >
+      Download
+    </button>
+  ) : (
+    <span style={{ color: "#6b7280" }}>—</span>
+  )}
+</span>
               </div>
             ))}
           </div>
