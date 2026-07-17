@@ -19,6 +19,8 @@ import TryOnDemo from "./pages/TryOnDemo";
 import PlansPage from "./pages/PlansPage";
 import Login from "./pages/Login";
 import SignupV2Page from "./pages/SignupV2Page";
+import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import OnboardingWizard from "./pages/onboarding/OnboardingWizard";
 import CreateV2Page from "./pages/create-v2/CreateV2Page";
 import SocialPackPage from "./pages/create-v2/SocialPackPage";
@@ -173,8 +175,10 @@ function AppRoutes() {
       <Route path="/tryon-demo" element={<TryOnDemo />} />
 
       <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<SignupV2Page />} />
-      <Route
+<Route path="/signup" element={<SignupV2Page />} />
+<Route path="/forgot-password" element={<ForgotPasswordPage />} />
+<Route path="/reset-password" element={<ResetPasswordPage />} />
+<Route
   path="/onboarding"
   element={
     <ProtectedRoute>

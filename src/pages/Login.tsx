@@ -71,9 +71,24 @@ const Login: React.FC = () => {
 
         {error && <div style={errorStyle}>{error}</div>}
 
-        <button onClick={handleLogin} style={buttonStyle}>
-          Login
-        </button>
+<div
+  style={{
+    display: "flex",
+    justifyContent: "flex-end",
+    marginBottom: 12,
+  }}
+>
+  <span
+    style={linkStyle}
+    onClick={() => navigate("/forgot-password")}
+  >
+    Forgot Password?
+  </span>
+</div>
+
+<button onClick={handleLogin} style={buttonStyle}>
+  Login
+</button>
 
         {/* 🔥 Signup Redirect */}
         <div style={footerStyle}>
