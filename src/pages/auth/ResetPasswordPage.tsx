@@ -1,85 +1,120 @@
 import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { API_BASE } from "../../config/api";
+import "./AuthPages.css";
 
 export default function ResetPasswordPage() {
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
 
   const token = searchParams.get("token") || "";
 
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false);
+
   async function handleSubmit(e: React.FormEvent) {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (password !== confirmPassword) {
-    alert("Passwords do not match.");
-    return;
-  }
-
-  try {
-    const res = await fetch(`${API_BASE}/api/auth/reset-password`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        token,
-        password,
-      }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || "Password reset failed");
+    if (password !== confirmPassword) {
+      setIsError(true);
+      setMessage("Passwords do not match.");
+      return;
     }
 
-    alert("Password reset successful.");
-  } catch (err: any) {
-    alert(err.message);
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/reset-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token,
+          password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Password reset failed.");
+      }
+
+      setIsError(false);
+      setMessage("Password reset successful. Redirecting to login...");
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
+
+    } catch (err: any) {
+      setIsError(true);
+      setMessage(err.message);
+    } finally {
+      setLoading(false);
+    }
   }
-}
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md rounded-xl bg-white p-8 shadow">
-        <h1 className="text-2xl font-bold text-center">
-          Reset Password
-        </h1>
+  <div className="auth-page">
+    <div className="auth-card">
 
-        <p className="mt-2 text-center text-gray-600">
-          Enter your new password below.
-        </p>
+      <h1 className="auth-title">
+        Reset Password
+      </h1>
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-          <input
-            type="password"
-            required
-            placeholder="New Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-lg border px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
-          />
+      <p className="auth-subtitle">
+        Enter your new password below.
+      </p>
 
-          <input
-            type="password"
-            required
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full rounded-lg border px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
-          />
+      <form className="auth-form" onSubmit={handleSubmit}>
 
-          <button
-            type="submit"
-            className="w-full rounded-lg bg-blue-600 py-3 font-semibold text-white hover:bg-blue-700"
-          >
-            Reset Password
-          </button>
-        </form>
-      </div>
+        <input
+          className="auth-input"
+          type="password"
+          placeholder="New Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+
+        <input
+          className="auth-input"
+          type="password"
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+        />
+
+        <button
+          className="auth-button"
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? "Updating..." : "Reset Password"}
+        </button>
+
+      </form>
+
+      {message && (
+        <div
+          className={`auth-message ${
+            isError ? "auth-error" : "auth-success"
+          }`}
+        >
+          {message}
+        </div>
+      )}
+
     </div>
-  );
+  </div>
+);
 }

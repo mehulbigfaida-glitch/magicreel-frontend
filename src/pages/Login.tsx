@@ -132,7 +132,8 @@ const titleStyle: React.CSSProperties = {
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
-  padding: 14,
+  boxSizing: "border-box",
+  padding: "14px 16px",
   borderRadius: 10,
   border: "1px solid #1F2937",
   background: "#0B0F14",
