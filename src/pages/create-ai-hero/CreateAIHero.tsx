@@ -681,8 +681,9 @@ backRunId
         style={{
           maxWidth: 1120,
           margin: "0 auto",
-          padding:
-            "70px 20px 40px",
+          padding: isMobile
+  ? "32px 18px 28px"
+  : "70px 20px 40px",
         }}
       >
         {/* HEADER */}
@@ -702,15 +703,15 @@ backRunId
               marginBottom: 16,
             }}
           >
-            MAGICREEL AI STUDIO
+            MAGICREEL
           </div>
 
           <div
             style={{
               fontSize:
-                isMobile
-                  ? 58
-                  : 92,
+  isMobile
+    ? 44
+    : 92,
 
               lineHeight: .95,
               fontWeight: 300
@@ -718,7 +719,7 @@ backRunId
           >
             Fashion
             <br />
-            Creation Engine
+            Intelligence Engine
           </div>
         </div>
 
@@ -952,8 +953,10 @@ style={{
               style={{
                 display:"grid",
                 gridTemplateColumns:
-                  "1fr 1fr",
-                gap:14,
+  isMobile
+    ? "1fr"
+    : "1fr 1fr",
+                gap: isMobile ? 18 : 14,
                 marginBottom:16
               }}
             >
@@ -1064,7 +1067,7 @@ style={{
 
     <div
       style={{
-        fontSize: 30,
+        fontSize: 24,
         fontWeight: 700,
         color: "#fff",
       }}
@@ -1074,11 +1077,11 @@ style={{
 
     <div
       style={{
-        fontSize: 18,
+        fontSize: 15,
         color: "#9CA3AF",
       }}
     >
-      PNG, JPG or WEBP
+      PNG or JPG
     </div>
 
     <div
@@ -1088,7 +1091,7 @@ style={{
         borderRadius: 999,
         background: "rgba(168,85,247,.15)",
         color: "#C084FC",
-        fontSize: 15,
+        fontSize: 12,
         fontWeight: 600,
       }}
     >
@@ -1216,7 +1219,7 @@ style={{
 
     <div
       style={{
-        fontSize: 30,
+        fontSize: 24,
         fontWeight: 700,
         color: "#fff",
       }}
@@ -1226,11 +1229,11 @@ style={{
 
     <div
       style={{
-        fontSize: 18,
+        fontSize: 15,
         color: "#9CA3AF",
       }}
     >
-      PNG, JPG or WEBP
+      PNG or JPG
     </div>
 
     <div
@@ -1240,7 +1243,7 @@ style={{
         borderRadius: 999,
         background: "rgba(168,85,247,.15)",
         color: "#C084FC",
-        fontSize: 15,
+        fontSize: 12,
         fontWeight: 600,
       }}
     >
@@ -1701,8 +1704,10 @@ style={{
 marginTop:24,
 display:"grid",
 gridTemplateColumns:
-"repeat(auto-fit,minmax(420px,1fr))",
-gap:20
+  isMobile
+    ? "1fr"
+    : "repeat(auto-fit,minmax(420px,1fr))",
+gap: isMobile ? 18 : 20
 }}
 >
 

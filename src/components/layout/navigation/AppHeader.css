@@ -3,6 +3,7 @@
 
   display: flex;
   align-items: center;
+  justify-content: space-between;
 
   gap: 32px;
 
@@ -26,7 +27,9 @@
   letter-spacing: -.02em;
 }
 
-/* Navigation occupies remaining space */
+/* -----------------------------
+   Desktop Navigation
+------------------------------ */
 
 .mr-desktop-nav {
   flex: 1;
@@ -37,8 +40,73 @@
   gap: 28px;
 }
 
-/* Right side */
+/* -----------------------------
+   Right Side
+------------------------------ */
+
+.mr-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  flex-shrink: 0;
+}
 
 .mr-header-account {
   flex-shrink: 0;
+}
+
+/* -----------------------------
+   Mobile Menu Button
+------------------------------ */
+
+.mr-mobile-menu-button {
+  display: none;
+
+  width: 40px;
+  height: 40px;
+
+  border: none;
+  background: transparent;
+
+  color: white;
+
+  font-size: 24px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  border-radius: 10px;
+
+  transition: background .18s ease;
+}
+
+.mr-mobile-menu-button:hover {
+  background: rgba(255,255,255,.08);
+}
+
+/* -----------------------------
+   Mobile
+------------------------------ */
+
+@media (max-width: 768px) {
+
+  .mr-header {
+    height: 64px;
+
+    padding: 0 18px;
+
+    gap: 16px;
+  }
+
+  .mr-desktop-nav {
+    display: none;
+  }
+
+  .mr-mobile-menu-button {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+  }
 }

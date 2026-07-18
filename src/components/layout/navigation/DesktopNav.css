@@ -87,3 +87,15 @@
   outline-offset: 3px;
   border-radius: 6px;
 }
+
+/* ==========================================
+   Mobile
+========================================== */
+
+@media (max-width: 768px) {
+
+  .mr-desktop-nav {
+    display: none;
+  }
+
+}

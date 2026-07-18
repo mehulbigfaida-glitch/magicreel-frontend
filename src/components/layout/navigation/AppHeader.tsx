@@ -8,7 +8,6 @@ import HeaderAccount from "./HeaderAccount";
 export default function AppHeader() {
   return (
     <header className="mr-header">
-
       {/* Logo */}
 
       <Link
@@ -24,8 +23,16 @@ export default function AppHeader() {
 
       {/* Right Side */}
 
-      <HeaderAccount />
+      <div className="mr-header-right">
+        <HeaderAccount />
 
+        <button
+          className="mr-mobile-menu-button"
+          aria-label="Open navigation"
+        >
+          ☰
+        </button>
+      </div>
     </header>
   );
 }

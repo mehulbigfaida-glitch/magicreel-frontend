@@ -121,3 +121,36 @@
 .mr-profile-chevron.open {
   transform: rotate(180deg);
 }
+
+/* ==========================================
+   Mobile
+========================================== */
+
+@media (max-width: 768px) {
+
+  .mr-header-account {
+    gap: 8px;
+  }
+
+  /* Hide desktop-only information */
+
+  .mr-credits-pill,
+  .mr-plan-pill,
+  .mr-profile-name,
+  .mr-profile-chevron {
+    display: none;
+  }
+
+  /* Keep avatar compact */
+
+  .mr-profile-button {
+    padding: 0;
+    gap: 0;
+  }
+
+  .mr-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 12px;
+  }
+}
