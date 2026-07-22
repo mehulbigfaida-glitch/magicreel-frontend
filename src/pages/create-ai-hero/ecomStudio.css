@@ -457,3 +457,115 @@ opacity:.65;
 
 color:#aaa;
 }
+
+.pose-card {
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  transition: border-color 0.2s ease;
+}
+
+.pose-card.selected {
+  border-color: #4F8CFF;
+}
+
+.pose-library {
+  margin-top: 32px;
+}
+
+.pose-library h2 {
+  color: white;
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.pose-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.pose-card {
+  cursor: pointer;
+  background: #171717;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.pose-card:hover {
+  border-color: #555;
+}
+
+.pose-card.selected {
+  border-color: #8B5CF6;
+}
+
+.pose-card img {
+  width: 100%;
+  display: block;
+}
+
+.pose-card div {
+  padding: 12px;
+  color: white;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* ===============================
+   Generate Button Loading State
+=============================== */
+
+.generate-loading{
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+gap:6px;
+line-height:1.3;
+}
+
+.generate-timer{
+font-size:14px;
+font-weight:700;
+letter-spacing:.5px;
+opacity:.95;
+font-variant-numeric:tabular-nums;
+}
+
+.generate-status{
+font-size:15px;
+font-weight:500;
+display:flex;
+align-items:center;
+justify-content:center;
+gap:6px;
+text-align:center;
+animation:pulseStatus 1.8s ease-in-out infinite;
+}
+
+.generate-btn:disabled{
+cursor:not-allowed;
+opacity:.95;
+}
+
+@keyframes pulseStatus{
+
+0%{
+transform:scale(1);
+opacity:.75;
+}
+
+50%{
+transform:scale(1.03);
+opacity:1;
+}
+
+100%{
+transform:scale(1);
+opacity:.75;
+}
+
+}

@@ -1,24 +1,15 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./ecomStudio.css";
 import { API_BASE } from "../../config/api";
+import LookbookHeroPickerModal from "./LookbookHeroPickerModal";
 
-// import {
-// MALE_POSES,
-// FEMALE_POSES
-// } from "./lookbook/lookbookPoses";
 
 export default function EcomStudioPage(){
 
 const location=useLocation();
 
 const navigate=useNavigate();
-
-const fileFrontRef=
-useRef<HTMLInputElement|null>(null);
-
-const fileBackRef=
-useRef<HTMLInputElement|null>(null);
 
 const params=
 new URLSearchParams(
@@ -49,8 +40,7 @@ incomingFront
 );
 
 const[
-backHero,
-setBackHero
+backHero
 ]=useState(
 incomingBack
 );
@@ -62,45 +52,89 @@ loading,
 setLoading
 ]=useState(false);
 
+const[
+loadingMessage,
+setLoadingMessage
+]=useState("");
+
+const[
+elapsedTime,
+setElapsedTime
+]=useState(0);
+
+const[
+heroPickerOpen,
+setHeroPickerOpen
+]=useState(false);
+
 const fromHero=
 useMemo(
 ()=>!!incomingFront,
 [incomingFront]
 );
 
-const uploadImage=(
-e:any,
-setter:any
-)=>{
-const file=
-e.target.files?.[0];
-
-if(!file)return;
-
-const reader=
-new FileReader();
-
-reader.onload=()=>{
-setter(
-reader.result
-);
-};
-
-reader.readAsDataURL(file);
-};
-
 async function handleGenerate(){
 
-if(!frontHero){
-alert(
-"Front Hero required"
-);
-return;
+if (!frontHero) {
+  alert(
+    "Please select a Front Hero from your Assets."
+  );
+  return;
 }
+
+let timer: ReturnType<typeof setInterval> | undefined;
 
 try{
 
 setLoading(true);
+
+setElapsedTime(0);
+
+setLoadingMessage(
+"✨ Understanding Garment..."
+);
+
+const start = Date.now();
+
+timer = setInterval(() => {
+
+const seconds =
+Math.floor(
+(Date.now() - start) / 1000
+);
+
+setElapsedTime(seconds);
+
+if (seconds <= 30) {
+
+setLoadingMessage(
+"✨ Understanding Garment..."
+);
+
+}
+else if (seconds <= 60) {
+
+setLoadingMessage(
+"🎨 Creating Editorial Looks..."
+);
+
+}
+else if (seconds <= 90) {
+
+setLoadingMessage(
+"☁️ Processing High-Resolution Images..."
+);
+
+}
+else {
+
+setLoadingMessage(
+"✅ Finalizing Lookbook..."
+);
+
+}
+
+},1000);
 
 const token=
 localStorage.getItem(
@@ -121,23 +155,17 @@ Authorization:
 `Bearer ${token}`
 },
 
-body:
-JSON.stringify({
+body: JSON.stringify({
 
-heroImageUrl:
-frontHero,
+heroImageUrl: frontHero,
 
-backHeroImageUrl:
-backHero || undefined,
+backHeroImageUrl: backHero || undefined,
 
-lookbookStyle:
-selectedStyle,
+lookbookStyle: selectedStyle,
 
-gender:
-incomingGender,
+gender: incomingGender,
 
-category:
-incomingCategory
+category: incomingCategory,
 
 })
 }
@@ -156,11 +184,19 @@ if (!res.ok) {
   return;
 }
 
+if (timer) {
+  clearInterval(timer);
+}
+
 navigate(
   `/pack/ecom/output/${data.runId}`
 );
 }
 catch{
+
+if (timer) {
+  clearInterval(timer);
+}
 
 alert(
 "Generation failed"
@@ -173,7 +209,7 @@ setLoading(false);
 }
 
 return (
-
+<>
 <div className="ecom-page">
 
 <div className="ecom-container">
@@ -208,11 +244,7 @@ Create premium fashion lookbooks with AI-generated commercial fashion poses.
 
 <div
   className="preview-large"
-  onClick={() => {
-    if (!fromHero) {
-      fileFrontRef.current?.click();
-    }
-  }}
+  onClick={() => setHeroPickerOpen(true)}
 >
 
 {frontHero ? (
@@ -241,31 +273,7 @@ Required
 
 </div>
 
-{!fromHero && (
-  <button
-    onClick={() =>
-      fileFrontRef.current?.click()
-    }
-  >
-    {frontHero
-      ? "Change Image"
-      : "Upload Image"}
-  </button>
-)}
-
-<input
-hidden
-ref={fileFrontRef}
-type="file"
-onChange={(e)=>
-uploadImage(
-e,
-setFrontHero
-)}
-/>
-
 </div>
-
 
 <div className="hero-card">
 
@@ -276,10 +284,8 @@ setFrontHero
 </div>
 
 <div
-className="preview-large"
-onClick={() =>
-fileBackRef.current?.click()
-}
+  className="preview-large"
+  onClick={() => setHeroPickerOpen(true)}
 >
 
 {backHero ? (
@@ -308,50 +314,7 @@ Recommended
 
 </div>
 
-<button
-onClick={() =>
-fileBackRef.current?.click()
-}
->
-{backHero
-? "Change Image"
-: "Upload Image"}
-</button>
 
-<input
-hidden
-ref={fileBackRef}
-type="file"
-onChange={(e)=>
-uploadImage(
-e,
-setBackHero
-)}
-/>
-
-</div>
-
-</div>
-
-
-{/* LOOKBOOK STYLES TEMPORARILY HIDDEN */}
-
-<div className="benefits">
-
-<div>
-6 Premium Lookbook Poses
-</div>
-
-<div>
-Commercial Fashion Angles
-</div>
-
-<div>
-Consistent Identity
-</div>
-
-<div>
-Ready For Shopify & Marketplace
 </div>
 
 </div>
@@ -362,9 +325,31 @@ disabled={loading}
 onClick={handleGenerate}
 >
 
-{loading
-? "Generating... (2–3 minutes)"
-: "Generate Lookbook Pack (2 Credits)"}
+{loading ? (
+
+<div className="generate-loading">
+
+<div className="generate-timer">
+
+⏳ {Math.floor(elapsedTime/60)}
+:
+{String(elapsedTime%60).padStart(2,"0")}
+
+</div>
+
+<div className="generate-status">
+
+{loadingMessage}
+
+</div>
+
+</div>
+
+) : (
+
+"Generate Lookbook Pack (2 Credits)"
+
+)}
 
 </button>
 
@@ -372,5 +357,15 @@ onClick={handleGenerate}
 
 </div>
 
+<LookbookHeroPickerModal
+  open={heroPickerOpen}
+  onClose={() => setHeroPickerOpen(false)}
+  onSelect={(url) => {
+  setFrontHero(url);
+  setHeroPickerOpen(false);
+}}
+/>//
+
+</>
 );
 }
