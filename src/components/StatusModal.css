@@ -1,7 +1,8 @@
 .status-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -9,45 +10,65 @@
 }
 
 .status-modal {
-  width: 420px;
+  width: 440px;
   max-width: calc(100vw - 32px);
-  background: #fff;
-  border-radius: 18px;
-  padding: 32px 28px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 32px 30px;
   text-align: center;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+  animation: statusModalIn 0.22s ease-out;
 }
 
 .status-modal-icon {
-  font-size: 54px;
-  margin-bottom: 16px;
+    font-size: 40px;
+    margin-bottom: 14px;
 }
 
 .status-modal h2 {
-  margin: 0 0 12px;
-  font-size: 24px;
+  margin: 0 0 14px;
+  font-size: 26px;
   font-weight: 700;
+  color: #111827;
 }
 
 .status-modal p {
-  margin: 0;
-  color: #666;
-  line-height: 1.6;
+    font-size: 16px;
+    line-height: 1.7;
 }
 
 .status-modal button {
   margin-top: 28px;
   width: 100%;
-  padding: 12px;
+  padding: 13px;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   background: #111827;
-  color: #fff;
+  color: #ffffff;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .status-modal button:hover {
-  opacity: 0.9;
+  transform: translateY(-1px);
+  opacity: 0.96;
+}
+
+.status-modal button:active {
+  transform: translateY(0);
+}
+
+@keyframes statusModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }

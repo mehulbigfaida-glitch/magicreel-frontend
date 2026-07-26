@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import StatusModal from "../../components/StatusModal";
 
 const API_BASE =
   import.meta.env.VITE_API_BASE_URL ||
@@ -14,107 +15,139 @@ export default function ReelOutputPage() {
   const [loading, setLoading] =
     useState(true);
 
-  const [videoUrl, setVideoUrl] =
-    useState("");
+  const [failed, setFailed] =
+  useState(false);
+  
+  const [elapsedTime, setElapsedTime] =
+  useState(0);
+
+const [videoUrl, setVideoUrl] =
+  useState("");
+
+const [statusModal, setStatusModal] =
+  useState({
+    open: false,
+    type: "success" as "success" | "error",
+    title: "",
+    message: ""
+  });
 
   useEffect(() => {
 
   if (!runId) return;
 
-  const startedAt =
-    Date.now();
+  const start = Date.now();
 
-  const interval =
-    window.setInterval(
-      async () => {
+  const timer = window.setInterval(() => {
 
-        try {
+    setElapsedTime(
+      Math.floor(
+        (Date.now() - start) / 1000
+      )
+    );
 
-          if (
-            Date.now() - startedAt >
-            600000
-          ) {
+  }, 1000);
 
-            clearInterval(
-              interval
-            );
+  const startedAt = Date.now();
 
-            setLoading(false);
+  const interval = window.setInterval(
 
-            return;
-          }
+    async () => {
 
-          const token =
-  localStorage.getItem(
-    "token"
-  );
+      try {
 
-const res =
-  await fetch(
-`${API_BASE}/api/p2m/reels360/status/${runId}`,
-    {
-      headers: {
-        Authorization:
-          `Bearer ${token}`
-      }
-    }
-  );
+        if (
+          Date.now() - startedAt >
+          600000
+        ) {
 
-          const data =
-            await res.json();
+          clearInterval(interval);
+          clearInterval(timer);
 
-          console.log(
-            "360 STATUS",
-            data
-          );
+          setLoading(false);
 
-          if (
-            data.status ===
-            "completed"
-          ) {
-
-            setVideoUrl(
-              data.videoUrl
-            );
-
-            setLoading(false);
-
-            clearInterval(
-              interval
-            );
-
-          }
-
-          if (
-            data.status ===
-            "failed"
-          ) {
-
-            setLoading(false);
-
-            clearInterval(
-              interval
-            );
-
-          }
-
-        } catch (err) {
-
-          console.warn(
-            "POLL ERROR",
-            err
-          );
+          return;
 
         }
 
-      },
-      5000
-    );
+        const token =
+          localStorage.getItem("token");
 
-  return () =>
-    clearInterval(
-      interval
-    );
+        const res =
+          await fetch(
+`${API_BASE}/api/p2m/reels360/status/${runId}`,
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`
+            }
+          });
+
+        const data =
+          await res.json();
+
+        console.log(
+          "360 STATUS",
+          data
+        );
+
+        if (
+          data.status ===
+          "completed"
+        ) {
+
+          setVideoUrl(
+            data.videoUrl
+          );
+
+          setLoading(false);
+
+          clearInterval(interval);
+          clearInterval(timer);
+
+          return;
+
+        }
+
+        if (
+          data.status ===
+          "failed"
+        ) {
+
+          setFailed(true);
+
+          setLoading(false);
+
+          clearInterval(interval);
+          clearInterval(timer);
+
+          return;
+
+        }
+
+      }
+      catch (err) {
+
+        console.warn(
+          "POLL ERROR",
+          err
+        );
+
+      }
+
+    },
+
+    5000
+
+  );
+
+  return () => {
+
+    clearInterval(interval);
+
+    clearInterval(timer);
+
+  };
 
 }, [runId]);
   async function handleCopyLink() {
@@ -125,40 +158,193 @@ const res =
         window.location.href
       );
 
-      alert(
-        "Link copied"
-      );
+      setStatusModal({
+  open: true,
+  type: "success",
+  title: "Link Copied",
+  message:
+    "The preview link has been copied to your clipboard."
+});
 
     } catch (err) {
 
-      console.error(
-        "COPY LINK ERROR:",
-        err
-      );
+  console.error(
+    "COPY LINK ERROR:",
+    err
+  );
 
-    }
+  setStatusModal({
+    open: true,
+    type: "error",
+    title: "Copy Failed",
+    message:
+      "Unable to copy the preview link. Please try again."
+  });
+
+}
 
   }
 
   if (loading) {
 
-    return (
+  return (
+
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#000",
+        color: "#fff",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "40px"
+      }}
+    >
+
       <div
         style={{
-          minHeight: "100vh",
-          background: "#000",
-          color: "#fff",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          fontSize: "22px",
+          maxWidth: "700px",
+          textAlign: "center"
         }}
       >
-        Generating 360° Reel...
-      </div>
-    );
 
-  }
+        <div
+          className="hero-loading-spinner"
+          style={{
+            margin: "0 auto 32px"
+          }}
+        />
+
+        <h1
+  style={{
+    fontSize: "34px",
+    marginBottom: "18px",
+    fontWeight: 700
+  }}
+>
+  ✨ Creating your 360° Reel
+</h1>
+
+<p
+  style={{
+    fontSize: "18px",
+    color: "#bdbdbd",
+    lineHeight: 1.8
+  }}
+>
+  High-quality AI video generation typically takes 2–3 minutes.
+
+  <br />
+  <br />
+
+  Please keep this page open.
+
+  <br />
+
+  Your reel will appear automatically when it's ready.
+</p>
+
+<div
+  style={{
+    marginTop: "40px"
+  }}
+>
+  <div
+    style={{
+      color: "#888",
+      fontSize: "15px",
+      letterSpacing: "1px",
+      textTransform: "uppercase"
+    }}
+  >
+    Elapsed Time
+  </div>
+
+  <div
+    style={{
+      marginTop: "12px",
+      fontSize: "42px",
+      fontWeight: 700
+    }}
+  >
+    {String(Math.floor(elapsedTime / 60)).padStart(2, "0")}:
+    {String(elapsedTime % 60).padStart(2, "0")}
+  </div>
+</div>
+
+      </div>
+
+    </div>
+
+  );
+
+}
+
+if (failed) {
+
+  return (
+
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#000",
+        color: "#fff",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "40px"
+      }}
+    >
+
+      <div
+        style={{
+          maxWidth: "700px",
+          textAlign: "center"
+        }}
+      >
+
+        <h1
+          style={{
+            fontSize: "34px",
+            marginBottom: "20px"
+          }}
+        >
+          360° Reel Generation Failed
+        </h1>
+
+        <p
+          style={{
+            color: "#bdbdbd",
+            lineHeight: 1.8,
+            marginBottom: "36px"
+          }}
+        >
+          We couldn't generate your 360° Reel this time.
+          <br />
+          Please return to the previous page and try again.
+        </p>
+
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            padding: "14px 32px",
+            borderRadius: "10px",
+            border: "none",
+            cursor: "pointer",
+            fontSize: "16px",
+            fontWeight: 600
+          }}
+        >
+          Back
+        </button>
+
+      </div>
+
+    </div>
+
+  );
+
+}
 
   return (
 
@@ -260,12 +446,20 @@ const res =
 
     } catch (err) {
 
-      console.error(
-        "DOWNLOAD ERROR:",
-        err
-      );
+  console.error(
+    "DOWNLOAD ERROR:",
+    err
+  );
 
-    }
+  setStatusModal({
+    open: true,
+    type: "error",
+    title: "Download Failed",
+    message:
+      "Unable to download the reel. Please try again."
+  });
+
+}
 
   }}
               style={{
@@ -397,7 +591,20 @@ const res =
           Run ID: {runId}
         </div>
 
-      </div>
+            </div>
+
+      <StatusModal
+        open={statusModal.open}
+        type={statusModal.type}
+        title={statusModal.title}
+        description={statusModal.message}
+        onClose={() =>
+          setStatusModal(prev => ({
+            ...prev,
+            open: false
+          }))
+        }
+      />
 
     </div>
 

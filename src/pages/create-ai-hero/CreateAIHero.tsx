@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CreateAIHero.css";
 import { API_BASE } from "../../config/api";
-import { useAuthStore } from "../../store/authStore";
+
 import FeatureLockedModal from "../../components/FeatureLockedModal";
+import StatusModal from "../../components/StatusModal";
 import { UploadCloud } from "lucide-react";
 import {
   GARMENTS,
@@ -55,7 +56,14 @@ export default function CreateAIHero() {
 
   const [lockedFeature, setLockedFeature] = useState<string | null>(null);
 
-const [
+const [statusModal, setStatusModal] = useState({
+  open: false,
+  type: "info" as "success" | "error" | "warning" | "info",
+  title: "",
+  description: "",
+});
+
+  const [
 selectedMuse,
 setSelectedMuse
 ]=useState("");
@@ -66,11 +74,6 @@ setHoveredMuse
 ]=useState("");
 
 const pollRef = useRef<number | null>(null);
-
-const fetchMe =
-useAuthStore(
-(s)=>s.fetchMe
-);
 
 const [frontRunId,setFrontRunId]=
 useState<string|null>(null);
@@ -331,85 +334,90 @@ data.backRunId||
 null
 );
 
-await fetchMe();
+// await fetchMe();
 
-}catch(err:any){
+} catch (err: any) {
 
-setHeroError(
-err.message
-);
-
-setHeroLoading(false);
-
-}
-
+  setHeroError(
+    err.message
+  );
+} 
 };
 
 const generate360Reel = async () => {
 
-  if (!frontHeroImageUrl) return;
+  if (
+  !frontHeroImageUrl ||
+  !backHeroImageUrl ||
+  reelLoading
+) {
+  return;
+}
 
   try {
 
-    setReelLoading(true);
-    
-    const token =
-      localStorage.getItem("token");
+  setReelLoading(true);
 
-    const res = await fetch(
-      `${API_BASE}/api/p2m/reels360/generate`,
-      {
-        method: "POST",
+  const token =
+    localStorage.getItem("token");
 
-        headers: {
-          "Content-Type": "application/json",
-          Authorization:
-            `Bearer ${token}`
-        },
+  const res = await fetch(
+    `${API_BASE}/api/p2m/reels360/generate`,
+    {
+      method: "POST",
 
-        body: JSON.stringify({
+      headers: {
+        "Content-Type": "application/json",
+        Authorization:
+          `Bearer ${token}`
+      },
 
-          heroImageUrl:
-            frontHeroImageUrl,
+      body: JSON.stringify({
 
-          backHeroImageUrl:
-            backHeroImageUrl
+        heroImageUrl:
+          frontHeroImageUrl,
 
-        })
+        backHeroImageUrl:
+          backHeroImageUrl
 
-      }
-    );
+      })
 
-    const data =
-  await res.json();
-
-if (!res.ok) {
-
-  throw new Error(
-    data.error ||
-    "360 Reel failed"
+    }
   );
 
-}
+  const data =
+    await res.json();
 
-window.open(
-  `/reels360/${data.runId}`,
-  "_blank"
-);
+  if (!res.ok) {
 
-setReelLoading(false);
-
-  
-  
-  } catch (err: any) {
-
-    alert(
-      err.message
+    throw new Error(
+      data.error ||
+      "360 Reel failed"
     );
 
-    setReelLoading(false);
-
   }
+
+  window.open(
+    `/reels360/${data.runId}`,
+    "_blank"
+  );
+
+} catch (err: any) {
+
+  setStatusModal({
+  open: true,
+  type: "error",
+  title: "360° Reel",
+  description:
+    err.message ||
+    "Failed to generate the 360° Reel."
+});
+
+} finally {
+
+  setReelLoading(false);
+
+}
 
 };
 
@@ -1025,7 +1033,7 @@ style={{
 
     <div
       style={{
-        fontSize: 22,
+        fontSize: 18,
         fontWeight: 600,
       }}
     >
@@ -1168,7 +1176,7 @@ style={{
 
     <div
       style={{
-        fontSize: 22,
+        fontSize: 18,
         fontWeight: 600,
       }}
     >
@@ -1428,6 +1436,58 @@ transform:"scale(1.02)"
 
 )}
 
+<div
+  style={{
+    display: "flex",
+    gap: 10,
+    marginBottom: 18,
+    flexWrap: "wrap"
+  }}
+>
+  <button
+    type="button"
+    style={{
+      padding: "8px 18px",
+      borderRadius: 999,
+      border: "none",
+      background: "#a855f7",
+      color: "#fff",
+      fontWeight: 600,
+      fontSize: 14,
+      cursor: "pointer",
+      transition: "all .2s ease"
+    }}
+  >
+    Explore
+  </button>
+
+  <button
+    type="button"
+    onClick={() =>
+  setStatusModal({
+    open: true,
+    type: "info",
+    title: "Coming Soon",
+    description:
+  "Coming Soon!\n\nUpload a passport-style photo and MagicReel will create your personal AI Avatar.\n\nUse it instantly across Hero Images, Lookbooks and AI Fashion Reels."
+  })
+}
+    style={{
+      padding: "8px 18px",
+      borderRadius: 999,
+      border: "1px solid rgba(255,255,255,.12)",
+      background: "rgba(255,255,255,.05)",
+      color: "#fff",
+      fontWeight: 600,
+      fontSize: 14,
+      cursor: "pointer",
+      transition: "all .2s ease"
+    }}
+  >
+    Upload
+  </button>
+</div>
+
             <div
               style={{
                 display:"grid",
@@ -1521,129 +1581,13 @@ display:"block"
 
         </div>
 
-{/* ===== MORE MUSE OPTIONS ===== */}
 
-<div
-  style={{
-    marginTop: 26,
-    marginBottom: 28,
-    padding: 22,
-    borderRadius: 22,
-    background: "rgba(255,255,255,0.03)",
-    border: "1px solid rgba(255,255,255,0.08)",
-  }}
->
-  <div
-    style={{
-      fontSize: 12,
-      letterSpacing: "0.18em",
-      color: "rgba(255,255,255,0.45)",
-      marginBottom: 18,
-    }}
-  >
-    MORE MUSE OPTIONS
-  </div>
-
-  <div
-    style={{
-      display: "grid",
-      gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
-      gap: 16,
-    }}
-  >
-    {/* Explore Avatars */}
-
-<div
-  onClick={() => setLockedFeature("Explore Avatars")}
-  style={{
-    cursor: "pointer",
-    borderRadius: 18,
-    border: "1px solid rgba(255,255,255,.08)",
-    background: "rgba(255,255,255,.03)",
-    padding: 20,
-    transition: "all .25s ease",
-    textAlign: "center",
-  }}
->
-  <div
-    style={{
-      fontSize: 36,
-      marginBottom: 16,
-    }}
-  >
-    ✨
-  </div>
-
-  <div
-    style={{
-      fontSize: 18,
-      fontWeight: 600,
-      marginBottom: 8,
-    }}
-  >
-    Explore Avatars
-  </div>
-
-  <div
-    style={{
-      fontSize: 13,
-      color: "rgba(255,255,255,.55)",
-    }}
-  >
-    Coming Soon
-  </div>
-</div>
-
-    {/* Upload My Avatar */}
-
-<div
-  onClick={() => setLockedFeature("Upload My Avatar")}
-  style={{
-    cursor: "pointer",
-    borderRadius: 18,
-    border: "1px solid rgba(255,255,255,.08)",
-    background: "rgba(255,255,255,.03)",
-    padding: 20,
-    transition: "all .25s ease",
-    textAlign: "center",
-  }}
->
-  <div
-    style={{
-      fontSize: 36,
-      marginBottom: 16,
-    }}
-  >
-    ⬆️
-  </div>
-
-  <div
-    style={{
-      fontSize: 18,
-      fontWeight: 600,
-      marginBottom: 8,
-    }}
-  >
-    Upload My Avatar
-  </div>
-
-  <div
-    style={{
-      fontSize: 13,
-      color: "rgba(255,255,255,.55)",
-    }}
-  >
-    Coming Soon
-  </div>
-</div>
-  </div>
-</div>
         <div
 
 onClick={
-canGenerate
-? generateHero
-: undefined
+  canGenerate && !heroLoading
+    ? generateHero
+    : undefined
 }
 
 style={{
@@ -1664,15 +1608,12 @@ alignItems:"center",
 justifyContent:"center",
 
 cursor:
+  canGenerate && !heroLoading
+    ? "pointer"
+    : "not-allowed",
 
-canGenerate
-? "pointer"
-: "not-allowed",
-
-opacity:
-heroLoading
-? .7
-:1
+opacity: heroLoading ? 0.6 : 1,
+pointerEvents: heroLoading ? "none" : "auto",
 }}
 >
 
@@ -1730,20 +1671,14 @@ minHeight:560
 }}
 >
 
-<div style={{padding:14}}>
-✨ Front Hero
-</div>
 
 {frontHeroImageUrl ? (
 
 <>
 
 <img
-src={frontHeroImageUrl ?? undefined}
-style={{
-width:"100%",
-display:"block"
-}}
+  src={frontHeroImageUrl ?? undefined}
+  className="hero-generated-image"
 />
 
 <div className="hero-action-bar">
@@ -1790,10 +1725,51 @@ window.open(
 ) : (
 
 <div
-style={{
-height:490
-}}
-/>
+  style={{
+    height: 490,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "40px",
+    textAlign: "center",
+  }}
+>
+  <div
+    style={{
+      fontSize: 54,
+      marginBottom: 24,
+      animation: heroLoading ? "pulse 1.8s ease-in-out infinite" : "none",
+    }}
+  >
+    ✨
+  </div>
+
+  <div
+    style={{
+      fontSize: 28,
+      fontWeight: 700,
+      marginBottom: 18,
+    }}
+  >
+    {heroLoading
+      ? "Creating your AI Hero..."
+      : "Your Front Hero will appear here"}
+  </div>
+
+  {!heroLoading && (
+  <div
+    style={{
+      maxWidth: 340,
+      fontSize: 15,
+      lineHeight: 1.8,
+      color: "rgba(255,255,255,.65)",
+    }}
+  >
+    Generate a professional Hero image to preview your garment on your selected Muse.
+  </div>
+)}
+</div>
 
 )}
 
@@ -1819,20 +1795,15 @@ minHeight:560
 }}
 >
 
-<div style={{padding:14}}>
-✨ Back Hero (Only if Back Garment Uploaded)
-</div>
+
 
 {backHeroImageUrl ? (
 
 <>
 
 <img
-src={backHeroImageUrl ?? undefined}
-style={{
-width:"100%",
-display:"block"
-}}
+  src={backHeroImageUrl ?? undefined}
+  className="hero-generated-image"
 />
 
 <div className="hero-action-bar">
@@ -1857,10 +1828,51 @@ Download Back Hero
 ) : (
 
 <div
-style={{
-height:490
-}}
-/>
+  style={{
+    height: 490,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "40px",
+    textAlign: "center",
+  }}
+>
+  <div
+    style={{
+      fontSize: 54,
+      marginBottom: 24,
+      animation: heroLoading ? "pulse 1.8s ease-in-out infinite" : "none",
+    }}
+  >
+    ✨
+  </div>
+
+  <div
+    style={{
+      fontSize: 28,
+      fontWeight: 700,
+      marginBottom: 18,
+    }}
+  >
+    {heroLoading
+      ? "Creating your AI Hero..."
+      : "Your Back Hero will appear here"}
+  </div>
+
+  <div
+    style={{
+      maxWidth: 340,
+      fontSize: 15,
+      lineHeight: 1.8,
+      color: "rgba(255,255,255,.65)",
+    }}
+  >
+    {heroLoading
+      ? "Our AI is generating a professional fashion image using your garment and selected Muse.\n\nThis usually takes around 50 seconds.\n\nPlease keep this page open while we complete your Hero."
+      : "Generate a professional Hero image to preview your garment on your selected Muse."}
+  </div>
+</div>
 
 )}
 
@@ -1902,28 +1914,25 @@ height:490
 
   <div className="reel-right">
 
-    {!backHeroImageUrl && (
+    <div className="reel-warning">
 
-      <div className="reel-warning">
+  {
+    backHeroImageUrl
+      ? "Your 360° Reel is ready to be generated."
+      : "360° Reel can only be generated after both Front Hero and Back Hero have been created."
+  }
 
-        For best results, generate a Back Hero first.
-
-        <div className="reel-warning-small">
-          You can still continue with Front Hero only.
-        </div>
-
-      </div>
-
-    )}
+</div>
 
     <div className="reel-actions">
 
       <button
   className="reel-primary-btn"
   disabled={
-    !frontHeroImageUrl ||
-    reelLoading
-  }
+  !frontHeroImageUrl ||
+  !backHeroImageUrl ||
+  reelLoading
+}
 
   onClick={
     generate360Reel
@@ -1931,23 +1940,12 @@ height:490
 >
   {
     reelLoading
-      ? "Generating..."
-      : "Generate Reel"
+      ? "Generating 360° Reel..."
+      : "Generate 360° Reel"
   }
 </button>
 
-      {!backHeroImageUrl && (
-
-        <button
-          className="reel-secondary-btn"
-          disabled={!frontHeroImageUrl}
-        >
-          Continue With Front Hero Only
-        </button>
-
-      )}
-
-    </div>
+      </div>
 
   </div>
 
@@ -1992,25 +1990,20 @@ console.log("NAVIGATE TO ECOM", {
   selectedSubType
 });
 
-navigate("/pack/ecom", {
+const url =
+  `/pack/ecom?` +
+  `hero=${encodeURIComponent(frontHeroImageUrl ?? "")}` +
+  `&back=${encodeURIComponent(backHeroImageUrl ?? "")}` +
+  `&gender=${encodeURIComponent(selectedCategory)}` +
+  `&category=${encodeURIComponent(selectedSubType)}`;
 
-state: {
+console.log("OPENING NEW TAB", url);
 
-heroImageUrl:
-frontHeroImageUrl,
-
-backHeroImageUrl:
-backHeroImageUrl,
-
-gender:
-selectedCategory,
-
-category:
-selectedSubType
-
-}
-
-});
+  window.open(
+  url,
+  "_blank",
+  "noopener,noreferrer"
+);
 
 }}
 >
@@ -2089,6 +2082,19 @@ Generate Pack
   onClose={() => setLockedFeature(null)}
 />
 </div>
+
+<StatusModal
+  open={statusModal.open}
+  type={statusModal.type}
+  title={statusModal.title}
+  description={statusModal.description}
+  onClose={() =>
+    setStatusModal((prev) => ({
+      ...prev,
+      open: false,
+    }))
+  }
+/>
 
 </div>
 

@@ -1,20 +1,22 @@
 import { useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import "./ecomStudio.css";
 import { API_BASE } from "../../config/api";
 import LookbookHeroPickerModal from "./LookbookHeroPickerModal";
-
+import { useNavigate } from "react-router-dom";
 
 export default function EcomStudioPage(){
 
 const location=useLocation();
 
-const navigate=useNavigate();
+const navigate = useNavigate();
 
 const params=
 new URLSearchParams(
 location.search
 );
+
+
 
 const incomingFront=
 location.state?.heroImageUrl||
@@ -27,10 +29,14 @@ params.get("back")||
 "";
 
 const incomingGender =
-location.state?.gender || "";
+  location.state?.gender ||
+  params.get("gender") ||
+  "";
 
 const incomingCategory =
-location.state?.category || "";
+  location.state?.category ||
+  params.get("category") ||
+  "";
 
 const[
 frontHero,
