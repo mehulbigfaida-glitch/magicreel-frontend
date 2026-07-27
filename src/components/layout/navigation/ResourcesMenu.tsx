@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import {
   BookOpen,
-  CircleHelp,
   ShieldCheck,
   LifeBuoy,
   ChevronRight,
@@ -12,19 +11,13 @@ import "./ResourcesMenu.css";
 const resources = [
   {
     title: "Documentation",
-    description: "Learn MagicReel",
+    description: "Guides, Tutorials & FAQs",
     icon: BookOpen,
-    to: "/docs/image-quality",
-  },
-  {
-    title: "FAQ",
-    description: "Common Questions",
-    icon: CircleHelp,
-    to: "/faq",
+    to: "/docs",
   },
   {
     title: "Policies",
-    description: "Terms & Privacy",
+    description: "Legal & Compliance",
     icon: ShieldCheck,
     to: "/policies",
   },
@@ -32,7 +25,7 @@ const resources = [
     title: "Contact Support",
     description: "We're here to help",
     icon: LifeBuoy,
-    to: "/contact",
+    to: "/support/contact",
   },
 ];
 
@@ -41,7 +34,7 @@ export default function ResourcesMenu() {
     <div className="mr-resources-menu">
       <div className="mr-resources-header">
         <h3>Resources</h3>
-        <p>Everything you need to get started.</p>
+        <p>Everything you need to use MagicReel.</p>
       </div>
 
       <div className="mr-resources-list">

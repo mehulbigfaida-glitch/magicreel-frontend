@@ -11,6 +11,32 @@ import { useAuthStore } from "./store/authStore";
 /* =========================
    PAGES
 ========================= */
+import GettingStartedPage from "./pages/resources/guides/GettingStartedPage";
+import AIHeroGuidePage from "./pages/resources/guides/AIHeroGuidePage";
+import LookbookGuidePage from "./pages/resources/guides/LookbookGuidePage";
+import AIReelsGuidePage from "./pages/resources/guides/AIReelsGuidePage";
+import ImageQualityGuidePage from "./pages/resources/guides/ImageQualityGuidePage";
+import PublishingGuidePage from "./pages/resources/guides/PublishingGuidePage";
+import CreditsGuidePage from "./pages/resources/guides/CreditsGuidePage";
+import TroubleshootingGuidePage from "./pages/resources/guides/TroubleshootingGuidePage";
+import FAQGuidePage from "./pages/resources/guides/FAQGuidePage";
+import DocumentationPage from "./pages/resources/DocumentationPage";
+
+import PoliciesPage from "./pages/resources/policies/PoliciesPage";
+import TermsPage from "./pages/resources/policies/TermsPage";
+import PrivacyPage from "./pages/resources/policies/PrivacyPage";
+import AcceptableUsePage from "./pages/resources/policies/AcceptableUsePage";
+import RefundPage from "./pages/resources/policies/RefundPage";
+import AIContentDisclaimerPage from "./pages/resources/policies/AIContentDisclaimerPage";
+import CookiePolicyPage from "./pages/resources/policies/CookiePolicyPage";
+
+import SupportPage from "./pages/resources/support/SupportPage";
+import ContactSupportPage from "./pages/resources/support/ContactSupportPage";
+import ReportBugPage from "./pages/resources/support/ReportBugPage";
+import FeatureRequestPage from "./pages/resources/support/FeatureRequestPage";
+import BillingSupportPage from "./pages/resources/support/BillingSupportPage";
+import AIHelpPage from "./pages/resources/support/AIHelpPage";
+
 import CampaignOutputPage from "./pages/campaign/CampaignOutputPage";
 import HomePage from "./pages/HomePage";
 import CreatePage from "./pages/CreatePage";
@@ -34,7 +60,7 @@ import PredictionsPage from "./pages/PredictionsPage";
 import DashboardPage from "./pages/dashboard/DashboardPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import SharePage from "./pages/SharePage";
-import ImageQualityPage from "./pages/docs/ImageQualityPage";
+
 import CreatePageV3 from "./v3/pages/CreatePageV3";
 import SocialCampaignPage from "./pages/create-v3/SocialCampaignPage";
 import CreateAIPage from "./pages/create-ai/CreateAIPage.tsx";
@@ -88,6 +114,110 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/create" element={<CreatePage />} />
+
+    <Route
+  path="/docs"
+  element={<DocumentationPage />}
+/>
+
+       <Route
+  path="/docs/hero"
+  element={<AIHeroGuidePage />}
+/>
+
+<Route
+  path="/docs/lookbook"
+  element={<LookbookGuidePage />}
+/>
+
+<Route
+  path="/docs/reels"
+  element={<AIReelsGuidePage />}
+/>
+
+<Route
+  path="/docs/image-quality"
+  element={<ImageQualityGuidePage />}
+/>
+
+<Route
+  path="/docs/publishing"
+  element={<PublishingGuidePage />}
+/>
+
+<Route
+  path="/docs/credits"
+  element={<CreditsGuidePage />}
+/>
+
+<Route
+  path="/docs/troubleshooting"
+  element={<TroubleshootingGuidePage />}
+/>
+
+<Route
+  path="/docs/faq"
+  element={<FAQGuidePage />}
+/>
+
+<Route path="/policies" element={<PoliciesPage />} />
+
+<Route
+  path="/policies/terms"
+  element={<TermsPage />}
+/>
+
+<Route
+  path="/policies/privacy"
+  element={<PrivacyPage />}
+/>
+
+<Route
+  path="/policies/acceptable-use"
+  element={<AcceptableUsePage />}
+/>
+
+<Route
+  path="/policies/refund"
+  element={<RefundPage />}
+/>
+
+<Route
+  path="/policies/ai-content"
+  element={<AIContentDisclaimerPage />}
+/>
+
+<Route
+  path="/policies/cookies"
+  element={<CookiePolicyPage />}
+/>
+
+<Route path="/support" element={<SupportPage />} />
+
+<Route
+  path="/support/contact"
+  element={<ContactSupportPage />}
+/>
+
+<Route
+  path="/support/report-bug"
+  element={<ReportBugPage />}
+/>
+
+<Route
+  path="/support/feature-request"
+  element={<FeatureRequestPage />}
+/>
+
+<Route
+  path="/support/billing"
+  element={<BillingSupportPage />}
+/>
+
+<Route
+  path="/support/ai-help"
+  element={<AIHelpPage />}
+/>
 
       <Route
         path="/create-v2"
@@ -222,11 +352,11 @@ function AppRoutes() {
 
       <Route path="/v3" element={<CreatePageV3 />} />
 
-      <Route
-        path="/docs/image-quality"
-        element={<ImageQualityPage />}
-      />
-
+      
+<Route
+  path="/docs/getting-started"
+  element={<GettingStartedPage />}
+/>
 
     </Routes>
   );
