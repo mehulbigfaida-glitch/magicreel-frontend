@@ -38,7 +38,7 @@ import BillingSupportPage from "./pages/resources/support/BillingSupportPage";
 import AIHelpPage from "./pages/resources/support/AIHelpPage";
 
 import CampaignOutputPage from "./pages/campaign/CampaignOutputPage";
-import HomePage from "./pages/HomePage";
+import HomePage from "./pages/home/HomePage";
 import CreatePage from "./pages/CreatePage";
 import ViewPage from "./pages/ViewPage";
 import TryOnDemo from "./pages/TryOnDemo";

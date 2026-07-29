@@ -19,34 +19,52 @@ export default function HomePage() {
   return (
     <div className="mr-home">
 
-      {/* HERO SECTION */}
+            {/* HERO SECTION */}
 
       <section className="mr-home-hero">
 
         <div className="mr-home-hero-left">
 
+          <div className="mr-home-badge">
+            ✨ MAGICREEL FASHION INTELLIGENCE ENGINE
+          </div>
+
           <h1 className="mr-home-title">
-            Your AI fashion studio
+            Turn One Garment Into an Entire Fashion Campaign
           </h1>
 
           <p className="mr-home-subtitle">
-            Generate lookbooks, reels, and campaign visuals
-            from a single garment image.
+            Powered by the MagicReel Fashion Intelligence Engine,
+            create AI models, editorial lookbooks, ecommerce visuals,
+            campaign creatives and cinematic reels from a single
+            garment photo—all in one workspace.
           </p>
 
           <button
             className="mr-home-cta"
             onClick={handleStartCreating}
           >
-            Start Creating
+            Start Free
           </button>
 
           <div className="mr-home-free-credits">
-            🎁 Start with 3 free generations
+            🎁 Includes 3 Free Credits
           </div>
 
           <div className="mr-home-beta">
-            Private beta • Access via invite-only login
+            Commercial Usage • No Design Skills Required • Private Beta
+          </div>
+
+          <div className="mr-home-feature-chips">
+
+            <span>AI Models</span>
+
+            <span>Lookbooks</span>
+
+            <span>Campaigns</span>
+
+            <span>Reels</span>
+
           </div>
 
         </div>
