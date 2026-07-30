@@ -112,66 +112,262 @@
 }
 
 /* -----------------------------
-   Mobile Drawer
+   Mobile Drawer V2
 ------------------------------ */
 
 .mr-mobile-overlay {
   position: fixed;
   inset: 0;
-
-  background: rgba(0, 0, 0, 0.45);
-
+  background: rgba(4, 8, 20, 0.65);
+  backdrop-filter: blur(6px);
   z-index: 9998;
 }
 
 .mr-mobile-menu {
   position: fixed;
-
   top: 0;
   right: 0;
 
-  width: min(320px, 85vw);
+  width: min(340px, 88vw);
   height: 100vh;
-
-  background: #0f1117;
 
   display: flex;
   flex-direction: column;
 
-  padding: 72px 24px 24px;
+  padding: 24px 20px 20px;
 
-  gap: 20px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(18,24,38,.98),
+      rgba(10,14,24,.98)
+    );
+
+  border-left: 1px solid rgba(255,255,255,.08);
+
+  box-shadow:
+    -18px 0 60px rgba(0,0,0,.55);
+
+  overflow-y: auto;
 
   z-index: 9999;
-
-  box-shadow: -12px 0 40px rgba(0, 0, 0, 0.45);
 }
 
-.mr-mobile-menu a {
-  color: #ffffff;
-
-  text-decoration: none;
-
-  font-size: 17px;
-  font-weight: 600;
+.mr-mobile-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:18px;
 }
 
-.mr-mobile-close {
-  position: absolute;
+.mr-mobile-brand{
+  font-size:24px;
+  font-weight:800;
+  color:#ffffff;
+  letter-spacing:.3px;
+}
 
-  top: 18px;
-  right: 18px;
+.mr-mobile-subtitle{
+  margin-top:2px;
+  font-size:13px;
+  color:rgba(255,255,255,.58);
+}
 
-  width: 40px;
-  height: 40px;
+.mr-mobile-close{
+  width:46px;
+  height:46px;
 
-  border: none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 
-  background: transparent;
+  border:none;
+  border-radius:14px;
 
-  color: #ffffff;
+  background:rgba(255,255,255,.06);
 
-  font-size: 26px;
+  color:#ffffff;
 
-  cursor: pointer;
+  cursor:pointer;
+
+  transition:.25s;
+}
+
+.mr-mobile-close:hover{
+  background:rgba(255,255,255,.12);
+}
+
+.mr-mobile-section-title{
+  margin:12px 0 8px;
+
+  font-size:11px;
+
+  font-weight:700;
+
+  letter-spacing:1.8px;
+
+  color:rgba(255,255,255,.42);
+}
+
+.mr-mobile-divider{
+  height:1px;
+
+  margin:12px 0;
+
+  background:rgba(255,255,255,.08);
+}
+
+.mr-mobile-menu a{
+
+  display:flex;
+  align-items:center;
+  gap:14px;
+
+  padding:12px 16px;
+
+  border-radius:14px;
+
+  text-decoration:none;
+
+  color:#ffffff;
+
+  font-size:16px;
+  font-weight:600;
+
+  transition:
+      background .25s,
+      transform .2s;
+}
+
+.mr-mobile-menu a:hover{
+
+  background:rgba(255,255,255,.07);
+
+  transform:translateX(4px);
+}
+
+.mr-mobile-menu a.active{
+
+  background:
+      linear-gradient(
+        90deg,
+        rgba(109,40,217,.35),
+        rgba(79,70,229,.18)
+      );
+
+  border:1px solid rgba(139,92,246,.35);
+
+  box-shadow:
+      0 8px 24px rgba(109,40,217,.18);
+}
+
+.mr-mobile-menu a svg{
+
+  flex-shrink:0;
+
+  color:#b794f6;
+}
+
+.mr-mobile-menu a span{
+
+  flex:1;
+}
+
+.mr-mobile-footer{
+    margin-top:auto;
+    padding-top:24px;
+}
+
+.mr-mobile-footer-line{
+    height:1px;
+    background:rgba(255,255,255,.08);
+    margin-bottom:14px;
+}
+
+.mr-mobile-version{
+    font-size:12px;
+    color:rgba(255,255,255,.38);
+    text-align:center;
+    letter-spacing:.4px;
+}
+
+/* --------------------------------
+   Creative Studio Accordion
+-------------------------------- */
+
+.mr-mobile-expandable{
+  display:flex;
+  flex-direction:column;
+}
+
+.mr-mobile-expand-btn{
+  width:100%;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  padding:12px 16px;
+
+  border:none;
+  border-radius:14px;
+
+  background:transparent;
+
+  color:#ffffff;
+
+  font-size:16px;
+  font-weight:600;
+
+  cursor:pointer;
+
+  transition:
+      background .25s,
+      transform .2s;
+}
+
+.mr-mobile-expand-btn:hover{
+  background:rgba(255,255,255,.07);
+  transform:translateX(4px);
+}
+
+.mr-mobile-expand-left{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.mr-mobile-expand-left svg{
+  color:#b794f6;
+  flex-shrink:0;
+}
+
+.mr-mobile-expand-btn svg{
+  transition:transform .25s ease;
+}
+
+.mr-mobile-submenu{
+
+  margin:4px 0 10px 18px;
+
+  padding-left:18px;
+
+  border-left:1px solid rgba(255,255,255,.08);
+
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+.mr-mobile-submenu a{
+
+  padding:10px 14px;
+
+  font-size:15px;
+
+  border-radius:12px;
+}
+
+.mr-mobile-submenu a svg{
+  color:#8b5cf6;
 }
