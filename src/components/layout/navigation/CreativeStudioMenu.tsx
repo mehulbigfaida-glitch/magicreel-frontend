@@ -9,39 +9,16 @@ import {
 } from "lucide-react";
 
 import "./CreativeStudioMenu.css";
-
-const studioItems = [
-  {
-    title: "Hero Images",
-    description: "AI Fashion Photography",
-    icon: Sparkles,
-    to: "/create-ai-hero",
-    featured: true,
-  },
-  {
-    title: "Product Packs",
-    description: "E-commerce Image Packs",
-    icon: ShoppingBag,
-    to: "/pack/ecom",
-  },
-  {
-    title: "Campaign Studio",
-    description: "Marketing Campaigns",
-    icon: Megaphone,
-    to: "/campaign-engine",
-  },
-  {
-    title: "Social Studio",
-    description: "Platform-ready Creatives",
-    icon: Share2,
-    to: "/create/social-campaign",
-  },
-];
+import { CREATIVE_STUDIO_ITEMS } from "./navigationData";
 
 export default function CreativeStudioMenu() {
-  const featured = studioItems.find((item) => item.featured);
+  const featured = CREATIVE_STUDIO_ITEMS.find(
+  (item) => item.featured
+);
   const FeaturedIcon = featured?.icon;
-  const secondary = studioItems.filter((item) => !item.featured);
+  const secondary = CREATIVE_STUDIO_ITEMS.filter(
+  (item) => !item.featured
+);
 
   return (
     <div className="mr-studio-menu">

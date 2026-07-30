@@ -1,4 +1,6 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import MobileMenu from "./MobileMenu";
 
 import "./AppHeader.css";
 
@@ -6,6 +8,7 @@ import DesktopNav from "./DesktopNav";
 import HeaderAccount from "./HeaderAccount";
 
 export default function AppHeader() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   return (
     <header className="mr-header">
       {/* Logo */}
@@ -27,12 +30,17 @@ export default function AppHeader() {
         <HeaderAccount />
 
         <button
-          className="mr-mobile-menu-button"
-          aria-label="Open navigation"
-        >
-          ☰
-        </button>
+  className="mr-mobile-menu-button"
+  aria-label="Open navigation"
+  onClick={() => setMobileMenuOpen(true)}
+>
+  ☰
+</button>
       </div>
+    <MobileMenu
+  open={mobileMenuOpen}
+  onClose={() => setMobileMenuOpen(false)}
+/>
     </header>
   );
 }

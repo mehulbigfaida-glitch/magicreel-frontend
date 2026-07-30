@@ -7,27 +7,7 @@ import {
 } from "lucide-react";
 
 import "./ResourcesMenu.css";
-
-const resources = [
-  {
-    title: "Documentation",
-    description: "Guides, Tutorials & FAQs",
-    icon: BookOpen,
-    to: "/docs",
-  },
-  {
-    title: "Policies",
-    description: "Legal & Compliance",
-    icon: ShieldCheck,
-    to: "/policies",
-  },
-  {
-    title: "Contact Support",
-    description: "We're here to help",
-    icon: LifeBuoy,
-    to: "/support/contact",
-  },
-];
+import { RESOURCE_ITEMS } from "./navigationData";
 
 export default function ResourcesMenu() {
   return (
@@ -38,7 +18,7 @@ export default function ResourcesMenu() {
       </div>
 
       <div className="mr-resources-list">
-        {resources.map((item) => {
+        {RESOURCE_ITEMS.map((item) => {
           const Icon = item.icon;
 
           return (
