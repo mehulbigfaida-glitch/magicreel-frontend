@@ -1,6 +1,10 @@
 
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import CampaignHeroPickerModal from "../campaign/CampaignHeroPickerModal";
+import {
+  useAuthStore,
+} from "../../store/authStore";
 
 const editorialWorlds = [
   {
@@ -104,14 +108,14 @@ const editorialWorlds = [
   },
 
   {
-    id: "urban-luxury-cinema",
+    id: "sculpted-riviera",
 
-    title: "Urban Luxury Cinema",
+title: "Sculpted Riviera",
 
-    subtitle:
-      "Modern metropolitan cinematic realism with luxury night atmosphere.",
+subtitle:
+  "Contemporary Mediterranean architecture with sculptural luxury, refined coastal minimalism and timeless editorial elegance.",
 
-    category: "Luxury Cinema",
+category: "Coastal Luxury",
 
     featured: false,
 
@@ -124,9 +128,9 @@ const editorialWorlds = [
   },
 
   {
-    id: "museum-couture",
+    id: "lago-eleganza",
 
-    title: "Museum Couture",
+    title: "Lago Eleganza",
 
     subtitle:
       "Architectural editorial framing with sculptural stillness and gallery silence.",
@@ -144,9 +148,9 @@ const editorialWorlds = [
   },
 
   {
-    id: "heritage-romance",
+    id: "chromatic-glamour",
 
-    title: "Heritage Romance",
+    title: "Chromatic Glamour",
 
     subtitle:
       "Emotionally layered heirloom storytelling with timeless romantic luxury.",
@@ -164,9 +168,9 @@ const editorialWorlds = [
   },
 
   {
-    id: "noir-couture",
+    id: "alpine-nomad",
 
-    title: "Noir Couture",
+    title: "Alpine Nomad",
 
     subtitle:
       "Monochrome cinematic elegance with psychological darkness and restrained glamour.",
@@ -200,11 +204,51 @@ export default function SocialCampaignPage() {
   const [selectedWorld, setSelectedWorld] =
     useState(editorialWorlds[0]);
 
+    const [selectedOutput, setSelectedOutput] =
+  useState("instagram-post");
+
   const [generatedAssets, setGeneratedAssets] =
     useState<any[]>([]);
 
   const [generating, setGenerating] =
     useState(false);
+
+  const [generationSeconds, setGenerationSeconds] =
+  useState(0);
+
+  const timerRef = useRef<number | null>(null);
+
+const generationMessages = [
+  "Analyzing Hero Composition...",
+  "Building Editorial Narrative...",
+  "Styling Luxury Fashion Scene...",
+  "Balancing Cinematic Lighting...",
+  "Refining Editorial Mood...",
+  "Rendering Final Editorial..."
+];
+
+const [generationMessage, setGenerationMessage] =
+  useState(generationMessages[0]);
+
+  const [pickerOpen, setPickerOpen] =
+  useState(false);
+
+const [pickerTarget, setPickerTarget] =
+  useState<
+    "hero" |
+    "asset1" |
+    "asset2" |
+    "asset3" |
+    "asset4"
+  >("hero");
+
+const [assetPreviews, setAssetPreviews] =
+  useState<(string | null)[]>([
+    null,
+    null,
+    null,
+    null,
+  ]);
 
   async function uploadToCloudinary(
     file: File
@@ -239,6 +283,38 @@ export default function SocialCampaignPage() {
     return data.secure_url;
   }
 
+useEffect(() => {
+  if (generating) {
+    timerRef.current = window.setInterval(() => {
+      setGenerationSeconds((prev) => {
+        const next = prev + 1;
+
+        setGenerationMessage(
+          generationMessages[
+            Math.min(
+              Math.floor(next / 5),
+              generationMessages.length - 1
+            )
+          ]
+        );
+
+        return next;
+      });
+    }, 1000);
+  } else {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  }
+
+  return () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+  };
+}, [generating]);
+
   async function generateCampaign() {
     if (generating) {
       return;
@@ -254,8 +330,13 @@ export default function SocialCampaignPage() {
 
       setGenerating(true);
 
+      setGenerationSeconds(0);
+
       setGeneratedAssets([]);
 
+      const token =
+  localStorage.getItem("token");
+      
       const response =
         await fetch(
           `${import.meta.env.VITE_API_BASE_URL}/api/editorial/generate-campaign`,
@@ -263,20 +344,25 @@ export default function SocialCampaignPage() {
             method: "POST",
 
             headers: {
-              "Content-Type":
-                "application/json",
-            },
+  "Content-Type":
+    "application/json",
+
+  Authorization:
+    `Bearer ${token}`,
+},
 
             body: JSON.stringify({
-              editorialWorld:
-                selectedWorld.id,
+  editorialWorld: selectedWorld.id,
 
-              heroImageUrl:
-                heroCloudinaryUrl,
+  heroImageUrl: heroCloudinaryUrl,
 
-              logoImageUrl:
-                logoCloudinaryUrl,
-            }),
+  logoImageUrl: logoCloudinaryUrl,
+
+  additionalImageUrls:
+    assetPreviews.filter(Boolean),
+
+  output: selectedOutput,
+}),
           }
         );
 
@@ -287,13 +373,42 @@ export default function SocialCampaignPage() {
       }
 
       const data =
-        await response.json();
+  await response.json();
 
-      if (data?.success) {
-        setGeneratedAssets(
-          data.assets || []
-        );
-      }
+console.log(
+  "EDITORIAL RESPONSE:",
+  data
+);
+
+if (data?.success) {
+
+useAuthStore
+  .getState()
+  .refreshCredits();
+
+  localStorage.setItem(
+  "magicreel-editorial-output",
+  JSON.stringify({
+    assets: data.assets || [],
+    world: selectedWorld,
+
+    output: {
+  id: selectedOutput.id,
+  imageUrl: data.assets?.[0]?.imageUrl,
+  prompt: data.assets?.[0]?.prompt,
+  format: data.assets?.[0]?.output,
+},
+
+    heroImage: heroPreview,
+    generatedAt: Date.now(),
+  })
+);
+
+window.open(
+  "/editorial/output",
+  "_blank"
+);
+}
     } catch (error) {
       console.error(
         "Generate campaign error:",
@@ -376,213 +491,248 @@ export default function SocialCampaignPage() {
           </p>
         </div>
 
-        {/* UPLOADS */}
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        {/* =========================
+    UPLOADS
+========================= */}
 
+<div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(420px, 1fr))",
+    gap: 28,
+    marginBottom: 56,
+    alignItems: "start",
+  }}
+>
+  {/* ==========================================================
+      CAMPAIGN HERO
+  ========================================================== */}
+
+  <div
+    style={{
+      padding: 30,
+      borderRadius: 34,
+      background: "rgba(255,255,255,0.03)",
+      border: "1px solid rgba(255,255,255,0.08)",
+    }}
+  >
+    <div
+      style={{
+        fontSize: 12,
+        letterSpacing: 3,
+        textTransform: "uppercase",
+        opacity: 0.5,
+        marginBottom: 16,
+      }}
+    >
+      Campaign Hero
+    </div>
+
+    <div
+      style={{
+        fontSize: 32,
+        fontWeight: 300,
+        marginBottom: 14,
+      }}
+    >
+      Upload Hero Image
+    </div>
+
+    <div
+      style={{
+        opacity: 0.68,
+        lineHeight: 1.8,
+        marginBottom: 24,
+      }}
+    >
+      Upload the primary fashion image used
+      to generate your editorial campaign.
+    </div>
+
+    <button
+  type="button"
+  onClick={() => {
+    setPickerTarget("hero");
+    setPickerOpen(true);
+  }}
+  style={{
+    width: "100%",
+    padding: "16px",
+    borderRadius: 18,
+    border: "1px solid rgba(255,255,255,.12)",
+    background: "rgba(255,255,255,.05)",
+    color: "white",
+    fontSize: 16,
+    cursor: "pointer",
+    marginBottom: 20,
+  }}
+>
+  Choose Hero
+</button>
+
+    {heroPreview && (
+      <img
+        src={heroPreview}
+        alt="Hero Preview"
+        style={{
+          marginTop: 22,
+          width: "100%",
+          height: 720,
+          objectFit: "contain",
+          background: "#101010",
+          padding: 6,
+          borderRadius: 24,
+        }}
+      />
+    )}
+  </div>
+
+  {/* ==========================================================
+      EDITORIAL ASSETS
+  ========================================================== */}
+
+  <div
+    style={{
+      padding: 30,
+      borderRadius: 34,
+      background: "rgba(255,255,255,0.03)",
+      border: "1px solid rgba(255,255,255,0.08)",
+    }}
+  >
+    <div
+      style={{
+        fontSize: 12,
+        letterSpacing: 3,
+        textTransform: "uppercase",
+        opacity: 0.5,
+        marginBottom: 16,
+      }}
+    >
+      Supporting Fashion Models (Optional)
+    </div>
+
+    <div
+      style={{
+        fontSize: 32,
+        fontWeight: 300,
+        marginBottom: 14,
+      }}
+    >
+      Additional Fashion Models
+    </div>
+
+    <div
+      style={{
+        opacity: 0.68,
+        lineHeight: 1.8,
+        marginBottom: 24,
+      }}
+    >
+      Add up to four additional Fashion Models from your portfolio
+      to create a luxury editorial campaign featuring multiple models.
+      Each selected Fashion Model will retain their identity, garments and styling.
+    </div>
+
+    <div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: 18,
+  }}
+>
+  {[1, 2, 3, 4].map((asset) => (
+    <button
+      key={asset}
+      type="button"
+      onClick={() => {
+        setPickerTarget(
+          `asset${asset}` as
+            | "asset1"
+            | "asset2"
+            | "asset3"
+            | "asset4"
+        );
+
+        setPickerOpen(true);
+      }}
+      style={{
+        aspectRatio: "2 / 3",
+        borderRadius: 22,
+        border:
+          "1px dashed rgba(255,255,255,.18)",
+        background:
+          "rgba(255,255,255,.02)",
+        overflow: "hidden",
+        cursor: "pointer",
+        padding: 0,
+        transition: "all .2s ease",
+      }}
+    >
+      {assetPreviews[asset - 1] ? (
+        <img
+          src={assetPreviews[asset - 1]!}
+          alt={`Asset ${asset}`}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: "block",
+          }}
+        />
+      ) : (
         <div
           style={{
-            display: "grid",
-
-            gridTemplateColumns:
-              "repeat(auto-fit, minmax(320px, 1fr))",
-
-            gap: 24,
-            marginBottom: 54,
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 46,
+            fontWeight: 200,
+            color:
+              "rgba(255,255,255,.75)",
           }}
         >
-          {/* HERO */}
-
-          <div
-            style={{
-              padding: 28,
-              borderRadius: 34,
-
-              background:
-                "rgba(255,255,255,0.03)",
-
-              border:
-                "1px solid rgba(255,255,255,0.08)",
-            }}
-          >
-            <div
-              style={{
-                fontSize: 12,
-                letterSpacing: 3,
-                textTransform:
-                  "uppercase",
-
-                opacity: 0.5,
-                marginBottom: 16,
-              }}
-            >
-              Campaign Hero
-            </div>
-
-            <div
-              style={{
-                fontSize: 32,
-                fontWeight: 300,
-                marginBottom: 14,
-              }}
-            >
-              Upload Hero Image
-            </div>
-
-            <div
-              style={{
-                opacity: 0.68,
-                lineHeight: 1.8,
-                marginBottom: 24,
-              }}
-            >
-              Upload the primary fashion
-              image used to transform the
-              cinematic editorial world.
-            </div>
-
-            <input
-              type="file"
-              accept="image/*"
-              onChange={async (e) => {
-                const file =
-                  e.target
-                    .files?.[0];
-
-                if (file) {
-                  setHeroPreview(
-                    URL.createObjectURL(
-                      file
-                    )
-                  );
-
-                  const uploadedUrl =
-                    await uploadToCloudinary(
-                      file
-                    );
-
-                  setHeroCloudinaryUrl(
-                    uploadedUrl
-                  );
-                }
-              }}
-            />
-
-            {heroPreview && (
-              <img
-                src={heroPreview}
-                alt="Hero Preview"
-                style={{
-                  marginTop: 22,
-                  width: "100%",
-                  borderRadius: 24,
-                  objectFit:
-                    "contain",
-
-                  height: 460,
-                  background:
-                    "#101010",
-
-                  padding: 12,
-                }}
-              />
-            )}
-          </div>
-
-          {/* LOGO */}
-
-          <div
-            style={{
-              padding: 28,
-              borderRadius: 34,
-
-              background:
-                "rgba(255,255,255,0.03)",
-
-              border:
-                "1px solid rgba(255,255,255,0.08)",
-            }}
-          >
-            <div
-              style={{
-                fontSize: 12,
-                letterSpacing: 3,
-                textTransform:
-                  "uppercase",
-
-                opacity: 0.5,
-                marginBottom: 16,
-              }}
-            >
-              Brand Identity
-            </div>
-
-            <div
-              style={{
-                fontSize: 32,
-                fontWeight: 300,
-                marginBottom: 14,
-              }}
-            >
-              Upload Brand Logo
-            </div>
-
-            <div
-              style={{
-                opacity: 0.68,
-                lineHeight: 1.8,
-                marginBottom: 24,
-              }}
-            >
-              Optional logo integration for
-              cinematic luxury campaign
-              placement.
-            </div>
-
-            <input
-              type="file"
-              accept="image/*"
-              onChange={async (e) => {
-                const file =
-                  e.target
-                    .files?.[0];
-
-                if (file) {
-                  setLogoPreview(
-                    URL.createObjectURL(
-                      file
-                    )
-                  );
-
-                  const uploadedUrl =
-                    await uploadToCloudinary(
-                      file
-                    );
-
-                  setLogoCloudinaryUrl(
-                    uploadedUrl
-                  );
-                }
-              }}
-            />
-
-            {logoPreview && (
-              <img
-                src={logoPreview}
-                alt="Logo Preview"
-                style={{
-                  marginTop: 22,
-                  width: 180,
-                  borderRadius: 20,
-                  background:
-                    "white",
-
-                  padding: 18,
-                  objectFit:
-                    "contain",
-                }}
-              />
-            )}
-          </div>
+          +
         </div>
+      )}
+    </button>
+  ))}
+</div>
+
+    <div
+      style={{
+        marginTop: 22,
+        opacity: 0.6,
+        fontSize: 15,
+        lineHeight: 1.7,
+      }}
+    >
+      Maximum 4 creative assets.
+    </div>
+  </div>
+</div>
 
         {/* WORLDS */}
 
@@ -660,7 +810,7 @@ export default function SocialCampaignPage() {
                   >
                     <div
                       style={{
-                        height: 260,
+                        height: 280,
                         position:
                           "relative",
                         overflow:
@@ -757,173 +907,277 @@ export default function SocialCampaignPage() {
           </div>
         </div>
 
-        {/* OUTPUTS */}
+        
+        {/* ==========================================================
+    OUTPUT CONFIGURATION + GENERATE
+========================================================== */}
 
-        {generatedAssets.length >
-          0 && (
-          <div
-            style={{
-              marginBottom: 60,
-            }}
-          >
-            <div
-              style={{
-                fontSize: 12,
-                letterSpacing: 3,
-                textTransform:
-                  "uppercase",
+<div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "1.3fr 1fr",
+    gap: 28,
+    marginBottom: 40,
+  }}
+>
+  {/* OUTPUT FORMAT */}
 
-                opacity: 0.5,
-                marginBottom: 24,
-              }}
-            >
-              Generated Editorials
-            </div>
+  <div
+    style={{
+      padding: 30,
+      borderRadius: 34,
+      background: "rgba(255,255,255,0.03)",
+      border: "1px solid rgba(255,255,255,0.08)",
+    }}
+  >
+    <div
+      style={{
+        fontSize: 12,
+        letterSpacing: 3,
+        textTransform: "uppercase",
+        opacity: 0.5,
+        marginBottom: 18,
+      }}
+    >
+      Output Format
+    </div>
 
-            <div
-              style={{
-                display: "grid",
+    <div
+      style={{
+        fontSize: 32,
+        fontWeight: 300,
+        marginBottom: 28,
+      }}
+    >
+      Choose Final Output
+    </div>
 
-                gridTemplateColumns:
-                  "repeat(auto-fit, minmax(320px, 1fr))",
-
-                gap: 24,
-              }}
-            >
-              {generatedAssets.map(
-                (
-                  asset,
-                  index
-                ) => (
-                  <div
-                    key={index}
-                    style={{
-                      overflow:
-                        "hidden",
-
-                      borderRadius: 28,
-
-                      background:
-                        "rgba(255,255,255,0.03)",
-
-                      border:
-                        "1px solid rgba(255,255,255,0.08)",
-                    }}
-                  >
-                    <img
-                      src={
-                        asset.imageUrl
-                      }
-                      alt="Editorial"
-                      style={{
-                        width:
-                          "100%",
-                        display:
-                          "block",
-                      }}
-                    />
-                  </div>
-                )
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* GENERATE */}
-
-        <div
+    <div
+      style={{
+        display: "flex",
+        gap: 18,
+        flexWrap: "wrap",
+      }}
+    >
+      {[
+  { label: "16:9", id: "landscape-16-9" },
+  { label: "2:3", id: "portrait-2-3" },
+  { label: "4:5", id: "portrait-4-5" },
+  { label: "1:1", id: "square-1-1" },
+  { label: "9:16", id: "portrait-9-16" },
+].map((format) => (
+        <button
+          key={format.label}
+          onClick={() =>
+  setSelectedOutput(format.id)
+}
           style={{
-            padding: 36,
-            borderRadius: 36,
-
-            background:
-              "rgba(255,255,255,0.03)",
-
+            width: 88,
+            height: 120,
+            borderRadius: 18,
             border:
-              "1px solid rgba(255,255,255,0.08)",
-
-            display: "flex",
-
-            alignItems:
-              "center",
-
-            justifyContent:
-              "space-between",
-
-            gap: 30,
-
-            flexWrap: "wrap",
+              selectedOutput === format.id
+                ? "1px solid #D4AF37"
+                : "1px solid rgba(255,255,255,.10)",
+            background:
+              selectedOutput === format.id
+                ? "rgba(212,175,55,.08)"
+                : "transparent",
+            color: "white",
+            cursor: "pointer",
           }}
         >
-          <div>
-            <div
-              style={{
-                fontSize: 12,
-                letterSpacing: 3,
-                textTransform:
-                  "uppercase",
-
-                opacity: 0.5,
-                marginBottom: 12,
-              }}
-            >
-              Generate Campaign
-            </div>
-
-            <div
-              style={{
-                fontSize: 42,
-                fontWeight: 300,
-              }}
-            >
-              Build Editorial Universe
-            </div>
-          </div>
-
-          <button
-            onClick={
-              generateCampaign
-            }
-            disabled={
-              generating ||
-              !heroCloudinaryUrl
-            }
+          <div
             style={{
-              padding:
-                "18px 36px",
-
-              borderRadius: 999,
-
-              border:
-                "1px solid white",
-
-              background:
-                generating
-                  ? "#777"
-                  : "white",
-
-              color:
-                "black",
-
-              fontSize: 13,
-
-              letterSpacing: 2,
-
-              textTransform:
-                "uppercase",
-
-              cursor:
-                generating
-                  ? "not-allowed"
-                  : "pointer",
+              marginTop: 16,
+              fontSize: 28,
             }}
           >
-            {generating
-              ? "Generating..."
-              : "Generate"}
-          </button>
-        </div>
+            ▭
+          </div>
+
+          <div
+            style={{
+              marginTop: 18,
+              fontSize: 14,
+            }}
+          >
+            {format.label}
+          </div>
+        </button>
+      ))}
+    </div>
+  </div>
+
+  {/* BRANDING */}
+
+  <div
+    style={{
+      padding: 30,
+      borderRadius: 34,
+      background: "rgba(255,255,255,0.03)",
+      border: "1px solid rgba(255,255,255,0.08)",
+    }}
+  >
+    <div
+      style={{
+        fontSize: 12,
+        letterSpacing: 3,
+        textTransform: "uppercase",
+        opacity: 0.5,
+        marginBottom: 18,
+      }}
+    >
+      Branding
+    </div>
+
+    <div
+      style={{
+        fontSize: 30,
+        fontWeight: 300,
+        marginBottom: 24,
+      }}
+    >
+      Brand Logo
+    </div>
+
+    <label
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 14,
+        fontSize: 18,
+        cursor: "pointer",
+      }}
+    >
+      <input
+        type="checkbox"
+      />
+
+      Include Brand Logo (Coming Soon)
+    </label>
+
+    <div
+      style={{
+        marginTop: 24,
+        opacity: 0.65,
+        lineHeight: 1.8,
+      }}
+    >
+      Brand Logo support will be available in a future update.
+      Once available, you will be able to automatically apply
+      your Brand Logo to Editorial Creatives generated by MagicReel.
+
+      <br />
+      
+    </div>
+  </div>
+</div>
+
+{/* ==========================================================
+    GENERATE
+========================================================== */}
+
+<div
+  style={{
+    padding: 34,
+    borderRadius: 34,
+    background:
+      "linear-gradient(90deg,#241B2C,#38263D)",
+    border:
+      "1px solid rgba(212,175,55,.18)",
+
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 30,
+    flexWrap: "wrap",
+  }}
+>
+  <div>
+    <div
+      style={{
+        fontSize: 34,
+        fontWeight: 300,
+        marginBottom: 8,
+      }}
+    >
+      Ready to Create Editorial?
+    </div>
+
+    <div
+      style={{
+        opacity: 0.68,
+      }}
+    >
+      Hero, Editorial World and Output Settings are ready.
+    </div>
+  </div>
+
+  <button
+    onClick={generateCampaign}
+    disabled={
+      generating ||
+      !heroCloudinaryUrl
+    }
+    style={{
+      padding: "18px 42px",
+      borderRadius: 999,
+      border: "none",
+      background: "#D4AF37",
+      color: "#111",
+      fontSize: 15,
+      fontWeight: 600,
+      cursor: "pointer",
+    }}
+  >
+    {generating
+  ? `Generating • ${String(
+      Math.floor(generationSeconds / 60)
+    ).padStart(2, "0")}:${String(
+      generationSeconds % 60
+    ).padStart(2, "0")}`
+  : "Generate Editorial"}
+  </button>
+</div>
       </div>
+    <CampaignHeroPickerModal
+  open={pickerOpen}
+  onClose={() => setPickerOpen(false)}
+  allowVideos={false}
+  
+  onSelect={(url) => {
+  if (pickerTarget === "hero") {
+    setHeroPreview(url);
+    setHeroCloudinaryUrl(url);
+  } else {
+    const updated = [...assetPreviews];
+
+    switch (pickerTarget) {
+      case "asset1":
+        updated[0] = url;
+        break;
+
+      case "asset2":
+        updated[1] = url;
+        break;
+
+      case "asset3":
+        updated[2] = url;
+        break;
+
+      case "asset4":
+        updated[3] = url;
+        break;
+    }
+
+    setAssetPreviews(updated);
+  }
+
+  setPickerOpen(false);
+}}
+/>
+    
     </div>
   );
 }

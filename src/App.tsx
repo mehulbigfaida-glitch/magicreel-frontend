@@ -52,6 +52,8 @@ import CreateV2Page from "./pages/create-v2/CreateV2Page";
 import SocialPackPage from "./pages/create-v2/SocialPackPage";
 import LookbookPage from "./pages/create-v2/lookbook/LookbookPage";
 import CinematicPage from "./pages/create-v2/cinematic/CinematicPage";
+import EditorialStudio from "./pages/editorial-v2/EditorialStudio";
+import EditorialOutputPage from "./pages/editorial-output/EditorialOutputPage";
 
 import ReelViewerPage from "./pages/reel/ReelViewerPage";
 import ReelMobileView from "./pages/reel/ReelMobileView";
@@ -301,6 +303,15 @@ function AppRoutes() {
 
       <Route path="/lookbook" element={<LookbookPage />} />
       <Route path="/cinematic" element={<CinematicPage />} />
+      <Route
+  path="/editorial-v2"
+  element={<EditorialStudio />}
+/>
+    <Route
+  path="/editorial/output"
+  element={<EditorialOutputPage />}
+/>
+
       <Route path="/plans" element={<PlansPage />} />
       <Route path="/tryon-demo" element={<TryOnDemo />} />
 
