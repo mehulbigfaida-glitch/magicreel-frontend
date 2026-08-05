@@ -472,31 +472,34 @@ const [cta, setCta] =
 
                   </div>
 
-                  <label
-                    className="campaign-replace-button"
-                    style={{
-                      pointerEvents: loading ? "none" : "auto",
-                      opacity: loading ? .5 : 1,
-                    }}
-                  >
-
-                    Replace Hero
-
-                    <input
-                      hidden
-                      type="file"
-                      accept="image/*"
-                      onChange={onHeroChange}
-                      disabled={loading}
-                    />
-
-                  </label>
+                  <button
+  className="campaign-replace-button"
+  type="button"
+  disabled={loading}
+  onClick={() => {
+    setPickerTarget("hero");
+    setPickerOpen(true);
+  }}
+>
+  Replace Hero
+</button>
 
                 </>
 
               ) : (
 
-                <label className="campaign-upload-box">
+                <div
+  className="campaign-upload-box"
+  onClick={() => {
+    if (loading) return;
+
+    setPickerTarget("hero");
+    setPickerOpen(true);
+  }}
+  style={{
+    cursor: loading ? "default" : "pointer",
+  }}
+>
 
                   {heroUploading ? (
 
@@ -528,15 +531,9 @@ const [cta, setCta] =
 
                   </div>
 
-                  <input
-                    hidden
-                    type="file"
-                    accept="image/*"
-                    onChange={onHeroChange}
-                    disabled={loading}
-                  />
+                  
 
-                </label>
+                </div>
 
               )}
 
