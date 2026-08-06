@@ -47,6 +47,9 @@ const [popupBlocked, setPopupBlocked] =
 const [assetModalOpen, setAssetModalOpen] =
   useState(false);
 
+const [pickerTarget, setPickerTarget] =
+  useState<"hero" | "asset">("asset");
+
 /**
  * Upload states
  */
@@ -239,52 +242,79 @@ const [cta, setCta] =
   };
 
   /**
-   * Asset Picker
-   */
+ * Asset Picker
+ */
 
-  const openAssetPicker = () => {
+const openAssetPicker = () => {
 
-    if (loading) return;
+  if (loading) return;
 
-    setAssetModalOpen(true);
+  setPickerTarget("asset");
+  setAssetModalOpen(true);
 
-  };
+};
 
-  const onAssetsSelected = (
-    url: string,
-    _type: string,
-    _heroUrl?: string
-  ) => {
+const onAssetsSelected = (
+  url: string,
+  _type: string,
+  _heroUrl?: string
+) => {
 
-    if (loading) {
-
-      setAssetModalOpen(false);
-
-      return;
-
-    }
-
-    setSupportingAssets(prev => {
-
-      if (prev.length >= 4)
-        return prev;
-
-      return [
-
-        ...prev,
-
-        {
-          id: crypto.randomUUID(),
-          url,
-        },
-
-      ];
-
-    });
+  if (loading) {
 
     setAssetModalOpen(false);
 
-  };
+    return;
+
+  }
+
+  setSupportingAssets(prev => {
+
+    if (prev.length >= 4)
+      return prev;
+
+    return [
+
+      ...prev,
+
+      {
+        id: crypto.randomUUID(),
+        url,
+      },
+
+    ];
+
+  });
+
+  setAssetModalOpen(false);
+
+};
+
+const onHeroSelected = (
+  url: string,
+  _type: string,
+  _heroUrl?: string
+) => {
+
+  if (loading) {
+
+    setAssetModalOpen(false);
+
+    return;
+
+  }
+
+  setHeroUploading(true);
+
+  setHeroImageLoaded(false);
+
+  setHeroImageUrl(url);
+
+  setPickerTarget("asset");
+
+  setAssetModalOpen(false);
+
+};
 
   /**
    * Generate Campaign
@@ -473,15 +503,26 @@ const [cta, setCta] =
                   </div>
 
                   <button
-  className="campaign-replace-button"
   type="button"
+  className="campaign-replace-button"
   disabled={loading}
   onClick={() => {
+
+    if (loading) return;
+
     setPickerTarget("hero");
-    setPickerOpen(true);
+
+    setAssetModalOpen(true);
+
+  }}
+  style={{
+    pointerEvents: loading ? "none" : "auto",
+    opacity: loading ? 0.5 : 1,
   }}
 >
+
   Replace Hero
+
 </button>
 
                 </>
@@ -491,10 +532,13 @@ const [cta, setCta] =
                 <div
   className="campaign-upload-box"
   onClick={() => {
+
     if (loading) return;
 
     setPickerTarget("hero");
-    setPickerOpen(true);
+
+    setAssetModalOpen(true);
+
   }}
   style={{
     cursor: loading ? "default" : "pointer",
@@ -1106,7 +1150,11 @@ const [cta, setCta] =
         <CampaignHeroPickerModal
           open={assetModalOpen}
           onClose={() => setAssetModalOpen(false)}
-          onSelect={onAssetsSelected}
+          onSelect={
+  pickerTarget === "hero"
+    ? onHeroSelected
+    : onAssetsSelected
+}
         />
 
       </div>

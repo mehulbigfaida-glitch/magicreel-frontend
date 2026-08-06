@@ -38,7 +38,13 @@ const [loadedImages, setLoadedImages] =
   useState<Record<string, boolean>>({});
 
   useEffect(() => {
+
     if (!open) return;
+
+    // Already loaded once
+    if (assets.length > 0) {
+        return;
+    }
 
     async function load() {
 
@@ -87,7 +93,7 @@ const [loadedImages, setLoadedImages] =
 }
       
     load();
-  }, [open]);
+  }, [open, assets.length]);
 
   if (!open) return null;
 
