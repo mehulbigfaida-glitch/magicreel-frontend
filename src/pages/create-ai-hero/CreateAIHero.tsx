@@ -97,14 +97,52 @@ setHeroLoading
 ]=useState(false);
 
 const [
-heroError,
-setHeroError
-]=useState<string|null>(null);
+  heroError,
+  setHeroError
+]=
+useState<string|null>(null);
+
+useEffect(() => {
+  if (!frontHeroImageUrl) return;
+
+  heroPreviewRef.current?.scrollIntoView({
+    behavior: "smooth",
+    block: "start",
+  });
+}, [frontHeroImageUrl]);
 
 const [
-reelLoading,
-setReelLoading
-]=useState(false);
+  reelLoading,
+  setReelLoading
+]=
+useState(false);
+
+const [
+  generationTime,
+  setGenerationTime
+] = useState(0);
+
+const heroPreviewRef =
+  useRef<HTMLDivElement | null>(null);
+
+useEffect(() => {
+  if (!heroLoading) {
+    return;
+  }
+
+  const startTime = performance.now();
+
+  const timer = window.setInterval(() => {
+    const elapsed =
+      (performance.now() - startTime) / 1000;
+
+    setGenerationTime(elapsed);
+  }, 100);
+
+  return () => {
+    window.clearInterval(timer);
+  };
+}, [heroLoading]);
 
 const downloadImage = async (
   imageUrl: string,
@@ -229,10 +267,12 @@ try{
 
 setHeroError(null);
 
+setGenerationTime(0);
+
 setHeroLoading(true);
 
 setFrontHeroImageUrl(
-null
+  null
 );
 
 setBackHeroImageUrl(
@@ -1619,7 +1659,7 @@ pointerEvents: heroLoading ? "none" : "auto",
 
 {
 heroLoading
-? "Generating..."
+? `Generating... ${generationTime.toFixed(2)} sec`
 : "Generate Hero"
 }
 
@@ -1655,6 +1695,7 @@ gap: isMobile ? 18 : 20
 {/* FRONT HERO */}
 
 <div
+ref={heroPreviewRef}
 className={
 heroLoading
 ? "hero-preview-card"
@@ -1667,7 +1708,8 @@ border:
 "1px solid rgba(255,255,255,.08)",
 background:
 "linear-gradient(180deg,#111,#1a1a1a)",
-minHeight:560
+minHeight:560,
+scrollMarginTop:100
 }}
 >
 
