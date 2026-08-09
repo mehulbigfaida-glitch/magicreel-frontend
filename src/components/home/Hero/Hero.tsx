@@ -56,17 +56,34 @@ export default function Hero() {
           <div className="hero-actions">
 
             <button
-              className="primary-btn"
-              onClick={() => navigate("/create-ai-hero")}
-            >
-              Start Creating
-              <ArrowRight size={18} />
-            </button>
+  className="primary-btn"
+  onClick={() =>
+    navigate(
+      localStorage.getItem("token")
+        ? "/create-ai-hero"
+        : "/login?redirect=/create-ai-hero"
+    )
+  }
+>
+  Start Creating
+  <ArrowRight size={18} />
+</button>
 
           </div>
 
 <p className="hero-trust">
-    ✨ First creation is free. No credit card required.
+  ✨ Want to test MagicReel?{" "}
+  <a
+    href="/testing-credits/request"
+    style={{
+      color: "inherit",
+      fontWeight: 700,
+      textDecoration: "underline",
+      cursor: "pointer",
+    }}
+  >
+    Request free testing credits.
+  </a>
 </p>
 
                 </div>
@@ -278,31 +295,38 @@ export default function Hero() {
 </p>
 
   <a
-    href="/create-ai-hero"
-    className="closing-button"
-  >
-    Start Creating Free
-    <ArrowRight size={18} />
-  </a>
+  href={
+    localStorage.getItem("token")
+      ? "/create-ai-hero"
+      : "/login?redirect=/create-ai-hero"
+  }
+  className="closing-button"
+>
+  Start Creating
+  <ArrowRight size={18} />
+</a>
 
   <div className="closing-features">
 
     <div>
-      <CheckCircle2 size={18} />
-      1 Welcome Credit
-    </div>
+  <CheckCircle2 size={18} />
+  <span>
+    ✨ Want to test MagicReel?{" "}
+    <a
+      href="/testing-credits/request"
+      style={{
+        color: "inherit",
+        fontWeight: 700,
+        textDecoration: "underline",
+        cursor: "pointer",
+      }}
+    >
+      Request free testing credits.
+    </a>
+  </span>
+</div>
 
-    <div>
-      <CheckCircle2 size={18} />
-      No Credit Card Required
-    </div>
-
-    <div>
-      <CheckCircle2 size={18} />
-      Commercial Use
-    </div>
-
-  </div>
+      </div>
 
 </div>
 

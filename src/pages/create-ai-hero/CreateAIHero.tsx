@@ -1944,7 +1944,7 @@ Download Back Hero
 
       <div className="reel-meta">
 
-        <span>⏱ 6 Seconds</span>
+        <span>⏱ 5 Seconds</span>
 
         <span>⚡ 3 Credits</span>
 

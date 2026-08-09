@@ -45,6 +45,7 @@ import TryOnDemo from "./pages/TryOnDemo";
 import PlansPage from "./pages/PlansPage";
 import Login from "./pages/Login";
 import SignupV2Page from "./pages/SignupV2Page";
+import RequestTestingCreditsPage from "./pages/RequestTestingCreditsPage";
 import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import OnboardingWizard from "./pages/onboarding/OnboardingWizard";
@@ -317,6 +318,10 @@ function AppRoutes() {
 
       <Route path="/login" element={<Login />} />
 <Route path="/signup" element={<SignupV2Page />} />
+<Route
+  path="/testing-credits/request"
+  element={<RequestTestingCreditsPage />}
+/>
 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 <Route path="/reset-password" element={<ResetPasswordPage />} />
 <Route
