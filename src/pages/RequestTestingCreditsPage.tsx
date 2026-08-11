@@ -35,37 +35,71 @@ export default function RequestTestingCreditsPage() {
     );
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (
+  e: React.FormEvent
+) => {
+  e.preventDefault();
 
-    if (
-      !form.name.trim() ||
-      !form.designation.trim() ||
-      !form.company.trim() ||
-      !form.email.trim()
-    ) {
-      return;
+  if (
+    !form.name.trim() ||
+    !form.designation.trim() ||
+    !form.company.trim() ||
+    !form.email.trim()
+  ) {
+    return;
+  }
+
+  try {
+    const res = await fetch(
+      "https://api.magicreel.in/api/testing-credits/request",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          name: form.name.trim(),
+          designation: form.designation.trim(),
+          company: form.company.trim(),
+          email: form.email.trim(),
+          mobile: form.mobile.trim() || null,
+          instagram:
+            form.instagram.trim() || null,
+          requestedFeatures: tests,
+        }),
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(
+        data.error ||
+          "Unable to submit testing credit request."
+      );
     }
 
-    /*
-     * TESTING CREDIT REQUEST
-     *
-     * UI-only for this first implementation.
-     *
-     * We will connect this to the backend request
-     * endpoint after the page and flow are verified.
-     *
-     * No credits are allocated here.
-     * No existing signup logic is touched.
-     */
-
-    console.log("Testing Credit Request", {
-      ...form,
-      requestedFeatures: tests,
-    });
+    console.log(
+      "Testing Credit Request Submitted",
+      data
+    );
 
     setSubmitted(true);
-  };
+
+  } catch (error: any) {
+    console.error(
+      "TESTING CREDIT REQUEST ERROR:",
+      error
+    );
+
+    alert(
+      error?.message ||
+        "Unable to submit your request. Please try again."
+    );
+  }
+};
 
   return (
     <div style={styles.page}>
