@@ -61,6 +61,7 @@ import ReelMobileView from "./pages/reel/ReelMobileView";
 
 import PredictionsPage from "./pages/PredictionsPage";
 import DashboardPage from "./pages/dashboard/DashboardPage";
+import TestingCreditRequestsPage from "./pages/admin/TestingCreditRequestsPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import SharePage from "./pages/SharePage";
 
@@ -117,6 +118,11 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/create" element={<CreatePage />} />
+
+ <Route
+    path="/admin/testing-credits"
+    element={<TestingCreditRequestsPage />}
+  />
 
     <Route
   path="/docs"

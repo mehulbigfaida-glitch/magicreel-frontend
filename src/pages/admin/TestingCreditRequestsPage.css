@@ -1,0 +1,306 @@
+/* =========================================================
+   TESTING CREDIT REQUESTS — ADMIN
+========================================================= */
+
+.testing-credit-page {
+  min-height: 100vh;
+  padding: 48px;
+  background: #f7f7f8;
+  color: #171717;
+}
+
+.testing-credit-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.testing-credit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 36px;
+}
+
+.testing-credit-title {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.testing-credit-subtitle {
+  margin: 10px 0 0;
+  color: #666;
+  font-size: 16px;
+}
+
+.testing-credit-refresh {
+  border: 1px solid #d7d7d7;
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.testing-credit-refresh:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.testing-credit-alert {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.testing-credit-alert-error {
+  background: #fff1f1;
+  border: 1px solid #f0caca;
+  color: #b42318;
+}
+
+.testing-credit-alert-success {
+  background: #eefbf3;
+  border: 1px solid #c8ead4;
+  color: #16713b;
+}
+
+.testing-credit-section {
+  margin-top: 0;
+}
+
+.testing-credit-section + .testing-credit-section {
+  margin-top: 48px;
+}
+
+.testing-credit-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.testing-credit-section-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 650;
+}
+
+.testing-credit-section-count {
+  font-size: 13px;
+  color: #666;
+}
+
+.testing-credit-empty,
+.testing-credit-loading {
+  background: #fff;
+  border: 1px solid #e4e4e4;
+  border-radius: 12px;
+  padding: 40px;
+  text-align: center;
+  color: #666;
+}
+
+.testing-credit-pending-list {
+  display: grid;
+  gap: 12px;
+}
+
+.testing-credit-request-card {
+  background: #fff;
+  border: 1px solid #e4e4e4;
+  border-radius: 12px;
+  padding: 22px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 24px;
+  align-items: center;
+}
+
+.testing-credit-applicant-name {
+  font-size: 18px;
+  font-weight: 650;
+  margin-bottom: 8px;
+}
+
+.testing-credit-applicant-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  color: #555;
+  font-size: 14px;
+}
+
+.testing-credit-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.testing-credit-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.testing-credit-status-pending {
+  background: #fff4d6;
+  color: #8a5a00;
+}
+
+.testing-credit-status-approved {
+  background: #eefbf3;
+  color: #16713b;
+}
+
+.testing-credit-status-rejected {
+  background: #fff1f1;
+  color: #b42318;
+}
+
+.testing-credit-approve,
+.testing-credit-reject {
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-weight: 650;
+  cursor: pointer;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease,
+    background 0.15s ease;
+}
+
+.testing-credit-approve {
+  border: none;
+  background: #111;
+  color: #fff;
+}
+
+.testing-credit-reject {
+  border: 1px solid #d7d7d7;
+  background: #fff;
+  color: #333;
+}
+
+.testing-credit-approve:hover:not(:disabled) {
+  background: #2a2a2a;
+}
+
+.testing-credit-reject:hover:not(:disabled) {
+  background: #f7f7f7;
+}
+
+.testing-credit-approve:disabled,
+.testing-credit-reject:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.testing-credit-history {
+  background: #fff;
+  border: 1px solid #e4e4e4;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.testing-credit-history-scroll {
+  overflow-x: auto;
+}
+
+.testing-credit-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+}
+
+.testing-credit-table th {
+  padding: 14px 18px;
+  border-bottom: 1px solid #e4e4e4;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 650;
+  color: #555;
+}
+
+.testing-credit-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+}
+
+.testing-credit-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.testing-credit-history-status {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 800px) {
+  .testing-credit-page {
+    padding: 28px 20px;
+  }
+
+  .testing-credit-header {
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .testing-credit-refresh {
+    width: 100%;
+  }
+
+  .testing-credit-request-card {
+    grid-template-columns: 1fr;
+  }
+
+  .testing-credit-actions {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 520px) {
+  .testing-credit-page {
+    padding: 22px 16px;
+  }
+
+  .testing-credit-title {
+    font-size: 26px;
+  }
+
+  .testing-credit-subtitle {
+    font-size: 14px;
+  }
+
+  .testing-credit-request-card {
+    padding: 18px;
+  }
+
+  .testing-credit-actions {
+    align-items: stretch;
+  }
+
+  .testing-credit-actions .testing-credit-status {
+    width: 100%;
+  }
+
+  .testing-credit-approve,
+  .testing-credit-reject {
+    flex: 1;
+  }
+}
