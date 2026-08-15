@@ -29,21 +29,68 @@ const [loading,setLoading]=
 useState(true);
 
 
-const handlePredictionClick=(item:any)=>{
+const handlePredictionClick = (item: any) => {
 
-if(
-item.type?.toLowerCase()==="lookbook"
-){
+  const type =
+    item.type?.toLowerCase();
 
-window.location.href=
+  /* =========================
+     LOOKBOOK
+  ========================= */
 
-`/pack/ecom/output/${
-item.runId || item.id
-}`;
+  if (type === "lookbook") {
 
-return;
+    window.location.href =
+      `/pack/ecom/output/${
+        item.runId || item.id
+      }`;
 
-}
+    return;
+  }
+
+  /* =========================
+     CAMPAIGN
+  ========================= */
+
+  if (type === "campaign") {
+
+    window.location.href =
+      `/campaign/${item.id}`;
+
+    return;
+  }
+
+  /* =========================
+     REEL
+  ========================= */
+
+  if (type === "reel") {
+
+    window.location.href =
+      `/reel/${item.id}`;
+
+    return;
+  }
+
+  /* =========================
+     EDITORIAL / SOCIAL / HERO
+     No dedicated persistent
+     output route yet.
+  ========================= */
+
+  const mediaUrl =
+    item.mediaUrl ||
+    item.heroImageUrl;
+
+  if (mediaUrl) {
+
+    window.open(
+      mediaUrl,
+      "_blank",
+      "noopener,noreferrer"
+    );
+
+  }
 
 };
 
