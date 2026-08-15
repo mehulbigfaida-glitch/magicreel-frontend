@@ -67,16 +67,24 @@ async function handleDownload(
     return;
   }
 
-  const url =
-  item.type?.toLowerCase() === "reel" ||
-  item.type?.toLowerCase() === "editorial"
+  const type =
+  item.type?.toLowerCase();
+
+const url =
+  type === "reel"
     ? (item.mediaUrl || item.heroImageUrl)
-    : (
-        item.heroImageUrl ||
-        item.mediaUrl ||
-        (item.lookbookImages &&
-          item.lookbookImages[0])
-      );
+    : type === "social"
+      ? (item.mediaUrl || item.heroImageUrl)
+      : type === "editorial"
+        ? (item.mediaUrl || item.heroImageUrl)
+        : type === "campaign"
+          ? (item.mediaUrl || item.heroImageUrl)
+          : (
+              item.heroImageUrl ||
+              item.mediaUrl ||
+              (item.lookbookImages &&
+                item.lookbookImages[0])
+            );
 
   if(!url){
   return;
@@ -362,16 +370,24 @@ gap:"20px"
 
 {data.map((item)=>{
 
+const type =
+  item.type?.toLowerCase();
+
 const originalUrl =
-  item.type?.toLowerCase() === "reel" ||
-  item.type?.toLowerCase() === "editorial"
+  type === "reel"
     ? (item.mediaUrl || item.heroImageUrl)
-    : (
-        item.heroImageUrl ||
-        item.mediaUrl ||
-        (item.lookbookImages &&
-          item.lookbookImages[0])
-      );
+    : type === "social"
+      ? (item.mediaUrl || item.heroImageUrl)
+      : type === "editorial"
+        ? (item.mediaUrl || item.heroImageUrl)
+        : type === "campaign"
+          ? (item.mediaUrl || item.heroImageUrl)
+          : (
+              item.heroImageUrl ||
+              item.mediaUrl ||
+              (item.lookbookImages &&
+                item.lookbookImages[0])
+            );
 
 const isVideo =
   item.type === "reel" ||
