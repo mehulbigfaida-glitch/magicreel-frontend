@@ -68,7 +68,8 @@ async function handleDownload(
   }
 
   const url =
-  item.type?.toLowerCase() === "reel"
+  item.type?.toLowerCase() === "reel" ||
+  item.type?.toLowerCase() === "editorial"
     ? (item.mediaUrl || item.heroImageUrl)
     : (
         item.heroImageUrl ||
@@ -362,7 +363,8 @@ gap:"20px"
 {data.map((item)=>{
 
 const originalUrl =
-  item.type?.toLowerCase() === "reel"
+  item.type?.toLowerCase() === "reel" ||
+  item.type?.toLowerCase() === "editorial"
     ? (item.mediaUrl || item.heroImageUrl)
     : (
         item.heroImageUrl ||
