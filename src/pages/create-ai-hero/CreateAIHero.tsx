@@ -27,6 +27,18 @@ MUSE_REGISTRY
 }
 from "../create-ai/museRegistry";
 
+const getMuseGender = (museId: string): "female" | "male" | null => {
+  if (museId.startsWith("FS") || museId.startsWith("FP")) {
+    return "female";
+  }
+
+  if (museId.startsWith("MS") || museId.startsWith("MP")) {
+    return "male";
+  }
+
+  return null;
+};
+
 export default function CreateAIHero() {
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(
@@ -72,6 +84,32 @@ const [
 hoveredMuse,
 setHoveredMuse
 ]=useState("");
+
+const visibleMuses = Object.values(MUSE_REGISTRY).filter((muse) => {
+  if (selectedCategory === "Women") {
+    return getMuseGender(muse.id) === "female";
+  }
+
+  if (selectedCategory === "Men") {
+    return getMuseGender(muse.id) === "male";
+  }
+
+  return true;
+});
+
+useEffect(() => {
+  if (!selectedCategory || visibleMuses.length === 0) {
+    return;
+  }
+
+  const selectedMuseIsVisible = visibleMuses.some(
+    (muse) => muse.id === selectedMuse
+  );
+
+  if (!selectedMuseIsVisible) {
+    setSelectedMuse(visibleMuses[0].id);
+  }
+}, [selectedCategory, selectedMuse, visibleMuses]);
 
 const pollRef = useRef<number | null>(null);
 
@@ -212,42 +250,56 @@ const downloadImage = async (
   };
 
   const handleFrontUpload = async (
-    file: File
-  ) => {
-    setFrontUploading(true);
+  file: File
+) => {
+  setFrontUploading(true);
 
-    try {
-      const url =
-        await uploadImage(file);
+  try {
+    const url =
+      await uploadImage(file);
 
-      setProductImageUrl(url);
-    } catch {
-      alert(
-        "Front image upload failed"
-      );
-    } finally {
-      setFrontUploading(false);
-    }
-  };
+    setProductImageUrl(url);
+  } catch (error) {
+    console.error(
+      "Front image upload failed:",
+      error
+    );
+
+    alert(
+      error instanceof Error
+        ? error.message
+        : "Front image upload failed"
+    );
+  } finally {
+    setFrontUploading(false);
+  }
+};
 
   const handleBackUpload = async (
-    file: File
-  ) => {
-    setBackUploading(true);
+  file: File
+) => {
+  setBackUploading(true);
 
-    try {
-      const url =
-        await uploadImage(file);
+  try {
+    const url =
+      await uploadImage(file);
 
-      setBackImageUrl(url);
-    } catch {
-      alert(
-        "Back image upload failed"
-      );
-    } finally {
-      setBackUploading(false);
-    }
-  };
+    setBackImageUrl(url);
+  } catch (error) {
+    console.error(
+      "Back image upload failed:",
+      error
+    );
+
+    alert(
+      error instanceof Error
+        ? error.message
+        : "Back image upload failed"
+    );
+  } finally {
+    setBackUploading(false);
+  }
+};
 
 const generateHero = async()=>{
 
@@ -827,6 +879,8 @@ style={{
    Upload garment images to create realistic AI fashion models.
 
   <div>✓ PNG or JPEG</div>
+
+  <div>✓ Maximum file size: 10 MB</div>
 
   <div>✓ Hanger / Mannequin only</div>
 
@@ -1541,9 +1595,7 @@ transform:"scale(1.02)"
               }}
             >
 
-              {Object.values(
-MUSE_REGISTRY
-).map((muse)=>(
+              {visibleMuses.map((muse) => (
 
 <div
 key={muse.id}
@@ -1591,6 +1643,11 @@ selectedMuse===muse.id
 ? "0 0 30px rgba(168,85,247,.4)"
 : "none",
 
+transform:
+selectedMuse===muse.id
+? "scale(1.04)"
+: "scale(1)",
+
 transition:"all .25s ease"
 
 }}
@@ -1610,7 +1667,27 @@ objectPosition:"center top",
 display:"block"
 }}
 />
-
+{selectedMuse === muse.id && (
+  <div
+    style={{
+      position: "absolute",
+      left: 0,
+      right: 0,
+      bottom: 0,
+      padding: "7px 6px",
+      background: "#a855f7",
+      color: "#fff",
+      fontSize: 10,
+      fontWeight: 700,
+      lineHeight: 1,
+      textAlign: "center",
+      zIndex: 2,
+      boxShadow: "0 -4px 12px rgba(0,0,0,.25)"
+    }}
+  >
+    ✓ Selected
+  </div>
+)}
 </div>
 
 ))}
@@ -2065,7 +2142,7 @@ Generate Pack
   </div>
 
   <div className="ai-pack-title">
-    Campaign Page
+    Campaign Studio
   </div>
 
   <div className="ai-pack-sub">

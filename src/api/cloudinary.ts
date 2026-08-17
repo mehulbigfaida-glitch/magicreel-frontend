@@ -1,9 +1,19 @@
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 
+const MAX_IMAGE_SIZE_MB = 10;
+const MAX_IMAGE_SIZE_BYTES =
+  MAX_IMAGE_SIZE_MB * 1024 * 1024;
+
 export async function uploadToCloudinary(
   file: File
 ): Promise<string> {
+  if (file.size > MAX_IMAGE_SIZE_BYTES) {
+    throw new Error(
+      `Image is too large. Maximum file size is ${MAX_IMAGE_SIZE_MB} MB.`
+    );
+  }
+
   if (!CLOUD_NAME || !UPLOAD_PRESET) {
     console.error("Cloudinary env vars missing");
     throw new Error("Cloudinary not configured");

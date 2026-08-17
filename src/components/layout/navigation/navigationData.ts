@@ -19,7 +19,7 @@ export const CREATIVE_STUDIO_ITEMS: NavigationItem[] = [
     featured: true,
   },
   {
-    title: "Product Packs",
+    title: "E-COM Lookbook",
     description: "E-commerce Image Packs",
     icon: ShoppingBag,
     to: "/pack/ecom",
@@ -31,7 +31,7 @@ export const CREATIVE_STUDIO_ITEMS: NavigationItem[] = [
     to: "/campaign-engine",
   },
   {
-    title: "Social Studio",
+    title: "Editorial Studio",
     description: "Platform-ready Creatives",
     icon: Share2,
     to: "/create/social-campaign",

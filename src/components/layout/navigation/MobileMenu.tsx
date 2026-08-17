@@ -106,7 +106,7 @@ export default function MobileMenu({
                 className={isActive("/pack/ecom") ? "active" : ""}
               >
                 <Package size={17} />
-                <span>Lookbook Studio</span>
+                <span>E-COM Lookbook</span>
               </Link>
 
               <Link
@@ -124,7 +124,7 @@ export default function MobileMenu({
                 className={isActive("/create/social-campaign") ? "active" : ""}
               >
                 <Newspaper size={17} />
-                <span>Editorial Campaign Studio</span>
+                <span>Editorial Studio</span>
               </Link>
 
             </div>
