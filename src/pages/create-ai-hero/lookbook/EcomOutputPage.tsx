@@ -25,35 +25,107 @@ const [poses, setPoses] =
 
   useEffect(() => {
 
-    async function load() {
+  let cancelled = false;
+  let timer:
+    ReturnType<typeof setTimeout> | null = null;
 
-      try {
+  async function load() {
 
-        const res =
-          await fetch(
-            `${API_BASE}/api/p2m/lookbook/${id}`
-          );
+    if (!id) {
+      setLoading(false);
+      return;
+    }
 
-        const data =
-          await res.json();
+    try {
 
-        setPoses(
-          data.poses || []
+      const res =
+        await fetch(
+          `${API_BASE}/api/p2m/lookbook/${id}`
         );
 
-      } catch (err) {
+      const data =
+        await res.json();
 
-        console.error(err);
+      if (cancelled) {
+        return;
+      }
+
+      if (!res.ok) {
+        throw new Error(
+          data.error ||
+          "Failed to load Lookbook"
+        );
+      }
+
+      setPoses(
+        data.poses || []
+      );
+
+      if (
+        data.status === "completed"
+      ) {
+
+        setLoading(false);
+        return;
 
       }
 
-      setLoading(false);
+      if (
+        data.status === "failed"
+      ) {
+
+        console.error(
+          "❌ Lookbook generation failed"
+        );
+
+        setLoading(false);
+        return;
+
+      }
+
+      // Still processing.
+      setLoading(true);
+
+      timer =
+        setTimeout(
+          load,
+          5000
+        );
+
+    } catch (err) {
+
+      if (!cancelled) {
+
+        console.error(
+          "LOOKBOOK POLL ERROR:",
+          err
+        );
+
+        timer =
+          setTimeout(
+            load,
+            5000
+          );
+
+      }
 
     }
 
-    load();
+  }
 
-  }, [id]);
+  load();
+
+  return () => {
+
+    cancelled = true;
+
+    if (timer) {
+      clearTimeout(timer);
+    }
+
+  };
+
+}, [id]);
 
   const heroImages =
     useMemo(
