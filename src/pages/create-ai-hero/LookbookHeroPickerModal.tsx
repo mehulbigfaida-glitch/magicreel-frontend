@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { API_BASE } from "../../config/api";
 
 interface Prediction {
   id: string;
@@ -6,6 +7,8 @@ interface Prediction {
   mediaUrl?: string;
   heroImageUrl?: string;
   lookbookImages?: string[];
+  avatarGender?: string;
+  categoryKey?: string;
   createdAt: string;
 }
 
@@ -16,10 +19,12 @@ interface Props {
   allowVideos?: boolean;
 
   onSelect: (
-    url: string,
-    type: string,
-    heroUrl?: string
-  ) => void;
+  url: string,
+  type: string,
+  heroUrl?: string,
+  avatarGender?: string,
+  categoryKey?: string
+) => void;
 }
 
 export default function AssetPickerModal({
@@ -40,7 +45,7 @@ export default function AssetPickerModal({
           localStorage.getItem("token");
 
         const res = await fetch(
-          "https://magicreel-backend-production.up.railway.app/api/predictions",
+  `${API_BASE}/api/predictions`,
           {
             headers: {
               Authorization:
@@ -51,6 +56,11 @@ export default function AssetPickerModal({
 
         const json =
           await res.json();
+
+console.log(
+  "=== LOOKBOOK PREDICTIONS ===",
+  json
+);
 
         const predictions =
           Array.isArray(json)
@@ -127,7 +137,7 @@ setAssets(heroAssets);
 ) {
   return null;
 }
-  
+
             // -----------------------
             // REEL
             // -----------------------
@@ -196,13 +206,25 @@ setAssets(heroAssets);
                   background:
                     "#fff",
                 }}
-                onClick={() =>
+                onClick={() => {
+
+  console.log("LOOKBOOK HERO SELECTED", {
+    id: item.id,
+    avatarGender: item.avatarGender,
+    categoryKey: item.categoryKey,
+    selectedUrl,
+  });
+
   onSelect(
     selectedUrl,
     assetType,
-    item.heroImageUrl || thumbnailUrl
-  )
-}
+    item.heroImageUrl || thumbnailUrl,
+    item.avatarGender,
+    item.categoryKey
+  );
+}}
+
+
               >
                 <img
   src={thumbnailUrl}

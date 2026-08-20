@@ -38,6 +38,20 @@ const incomingCategory =
   params.get("category") ||
   "";
 
+const [
+  selectedGender,
+  setSelectedGender
+] = useState(
+  incomingGender
+);
+
+const [
+  selectedCategory,
+  setSelectedCategory
+] = useState(
+  incomingCategory
+);
+
 const[
 frontHero,
 setFrontHero
@@ -46,12 +60,47 @@ incomingFront
 );
 
 const[
-backHero
+  backHero,
+  setBackHero
 ]=useState(
-incomingBack
+  incomingBack
 );
 
-const selectedStyle = "studio";
+const LOOKBOOK_WORLDS = [
+  {
+    id: "designer-marketplace",
+    name: "Designer Marketplace",
+    description:
+      "Refined designer-commerce presentation with product-focused poses."
+  },
+  {
+    id: "ethnic-luxe",
+    name: "Ethnic Luxe",
+    description:
+      "Jewellery, accessories, elegant styling and premium Indian fashion presentation."
+  },
+  {
+    id: "modern-minimal",
+    name: "Modern Minimal",
+    description:
+      "Clean backgrounds, restrained styling and strong garment focus."
+  },
+  {
+    id: "editorial-couture",
+    name: "Editorial Couture",
+    description:
+      "Expressive poses, sophisticated compositions and fashion-magazine energy."
+  },
+  {
+  id: "bridal-couture",
+  name: "Bridal Couture",
+  description:
+    "Grand couture presentation with luxurious styling and elaborate bridal jewellery."
+}
+];
+
+const [selectedWorld, setSelectedWorld] =
+  useState("designer-marketplace");
 
 const[
 loading,
@@ -72,6 +121,11 @@ const[
 heroPickerOpen,
 setHeroPickerOpen
 ]=useState(false);
+
+const [
+  heroPickerTarget,
+  setHeroPickerTarget
+] = useState<"front" | "back">("front");
 
 const fromHero=
 useMemo(
@@ -167,11 +221,11 @@ heroImageUrl: frontHero,
 
 backHeroImageUrl: backHero || undefined,
 
-lookbookStyle: selectedStyle,
+lookbookWorld: selectedWorld,
 
-gender: incomingGender,
+gender: selectedGender,
 
-category: incomingCategory,
+category: selectedCategory,
 
 })
 }
@@ -250,7 +304,10 @@ Create premium fashion lookbooks with AI-generated commercial fashion poses.
 
 <div
   className="preview-large"
-  onClick={() => setHeroPickerOpen(true)}
+  onClick={() => {
+    setHeroPickerTarget("front");
+    setHeroPickerOpen(true);
+  }}
 >
 
 {frontHero ? (
@@ -291,7 +348,10 @@ Required
 
 <div
   className="preview-large"
-  onClick={() => setHeroPickerOpen(true)}
+  onClick={() => {
+    setHeroPickerTarget("back");
+    setHeroPickerOpen(true);
+  }}
 >
 
 {backHero ? (
@@ -322,6 +382,47 @@ Recommended
 
 
 </div>
+
+</div>
+
+<div className="section-title">
+CHOOSE YOUR LOOKBOOK WORLD
+</div>
+
+<div className="world-grid">
+
+{LOOKBOOK_WORLDS.map((world) => (
+
+<div
+  key={world.id}
+  className={
+    `world-card ${
+      selectedWorld === world.id
+        ? "selected"
+        : ""
+    }`
+  }
+  onClick={() =>
+    !loading &&
+    setSelectedWorld(world.id)
+  }
+>
+
+<div className="world-content">
+
+<h3>
+{world.name}
+</h3>
+
+<p>
+{world.description}
+</p>
+
+</div>
+
+</div>
+
+))}
 
 </div>
 
@@ -366,11 +467,37 @@ onClick={handleGenerate}
 <LookbookHeroPickerModal
   open={heroPickerOpen}
   onClose={() => setHeroPickerOpen(false)}
-  onSelect={(url) => {
-  setFrontHero(url);
-  setHeroPickerOpen(false);
-}}
-/>//
+  onSelect={(
+    url,
+    _type,
+    _heroUrl,
+    selectedGenderFromAsset,
+    selectedCategoryFromAsset
+  ) => {
+
+    if (heroPickerTarget === "front") {
+      setFrontHero(url);
+    }
+
+    if (heroPickerTarget === "back") {
+      setBackHero(url);
+    }
+
+    if (selectedGenderFromAsset) {
+      setSelectedGender(
+        selectedGenderFromAsset
+      );
+    }
+
+    if (selectedCategoryFromAsset) {
+      setSelectedCategory(
+        selectedCategoryFromAsset
+      );
+    }
+
+    setHeroPickerOpen(false);
+  }}
+/>
 
 </>
 );

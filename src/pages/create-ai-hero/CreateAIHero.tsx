@@ -8,6 +8,7 @@ import StatusModal from "../../components/StatusModal";
 import { UploadCloud } from "lucide-react";
 import {
   GARMENTS,
+  ETHNIC_SET_SUBTYPES,
   type GarmentCategory,
   type GarmentSubType,
 } from "../../magicreel/config/garments";
@@ -962,89 +963,76 @@ style={{
 
 
               <select
-  value={
-    selectedSubType
-  }
-
+  value={selectedSubType}
   disabled={!selectedCategory}
 
-                onChange={(e) => {
+  onChange={(e) => {
+    const subtype =
+      e.target.value as GarmentSubType;
 
-                  const subtype =
-                    e.target
-                      .value as GarmentSubType;
+    setSelectedSubType(subtype);
 
-                
-                  setSelectedSubType(
-                    subtype
-                  );
+    const pills =
+      CATEGORY_PILLS[subtype];
 
-                  const pills =
-                    CATEGORY_PILLS[
-                    subtype
-                    ];
+    if (pills?.length) {
+      setSelectedPill(pills[0]);
+    } else {
+      setSelectedPill("");
+    }
+  }}
 
-                  if (
-                    pills?.length
-                  ) {
+  style={{
+    height: 46,
+    borderRadius: 12,
+    background: "#111",
+    color: "white",
 
-                    setSelectedPill(
-                      pills[0]
-                    );
+    opacity:
+      selectedCategory ? 1 : 0.45,
 
-                  }
+    cursor:
+      selectedCategory
+        ? "pointer"
+        : "not-allowed",
 
-                }}
+    transition: "all .25s ease"
+  }}
+>
+  <option value="">
+    Select Garment
+  </option>
 
-                style={{
-  height:46,
-  borderRadius:12,
-  background:"#111",
-  color:"white",
+  {selectedCategory &&
+    GARMENTS[selectedCategory]
+      .filter(
+        (item) =>
+          item.key !== "ethnic_set"
+      )
+      .map((item) => (
+        <option
+          key={item.key}
+          value={item.key}
+        >
+          {item.label}
+        </option>
+      ))}
 
-  opacity:
-    selectedCategory ? 1 : 0.45,
-
-  cursor:
-    selectedCategory
-      ? "pointer"
-      : "not-allowed",
-
-  transition:
-    "all .25s ease"
-}}
-              >
-
-                <option value="">
-                  Select Garment
-                </option>
-
-                {selectedCategory &&
-                  GARMENTS[
-                    selectedCategory
-                  ].map(
-                    (
-                      item
-                    ) => (
-
-                      <option
-                        key={
-                          item.key
-                        }
-
-                        value={
-                          item.key
-                        }
-                      >
-                        {
-                          item.label
-                        }
-                      </option>
-
-                    )
-                  )}
-
-              </select>
+  {selectedCategory === "Women" && (
+    <optgroup label="Ethnic Set">
+      {ETHNIC_SET_SUBTYPES.map(
+        (item) => (
+          <option
+            key={item.key}
+            value={item.key}
+          >
+            {item.label}
+          </option>
+        )
+      )}
+    </optgroup>
+  )}
+</select>
 
             </div>
 

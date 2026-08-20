@@ -4,7 +4,9 @@ import type { GarmentSubType } from "./garments";
    SUB-CATEGORY → PILLS
 ========================= */
 
-export const CATEGORY_PILLS: Record<GarmentSubType, string[]> = {
+export const CATEGORY_PILLS: Partial<
+  Record<GarmentSubType, string[]>
+> = {
 
   /* WOMEN */
 
@@ -12,20 +14,29 @@ export const CATEGORY_PILLS: Record<GarmentSubType, string[]> = {
 
   tshirt: ["UNTUCKED", "TUCKED"],
 
-  shirt: ["UNTUCKED", "TUCKED"],
+  shirt_blouse: ["UNTUCKED", "TUCKED"],
 
   one_piece: ["SLEEVELESS", "SLEEVED"],
 
-  ethnic_set: ["SLEEVELESS", "SLEEVED"],
-
   saree: ["SLEEVELESS", "SLEEVED"],
 
-  lehenga: ["SLEEVELESS", "SLEEVED"],
-
-  overlay: ["OPEN", "BUTTONED"],
+  overlay_jacket: ["OPEN", "BUTTONED"],
 
   bottoms: ["SHORTS", "CROPPED", "FULL_LENGTH"],
 
+  top_bottom: ["COORDINATED", "CONTRAST"],
+
+  /* ETHNIC SET */
+
+  kurta_sets: ["SLEEVELESS", "SLEEVED"],
+
+  sharara_sets: ["SLEEVELESS", "SLEEVED"],
+
+  lehenga_set: ["SLEEVELESS", "SLEEVED"],
+
+  dhoti_kurta: ["SLEEVELESS", "SLEEVED"],
+
+  anarkali: ["SLEEVELESS", "SLEEVED"],
 
   /* MEN */
 
