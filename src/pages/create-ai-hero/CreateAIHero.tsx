@@ -434,7 +434,7 @@ null
   setHeroError(
     err.message
   );
-} 
+}
 };
 
 const generate360Reel = async () => {
@@ -1036,6 +1036,68 @@ style={{
 
             </div>
 
+            {selectedSubType && (
+
+              <div
+                style={{
+                  display: "flex",
+                  gap: 10,
+                  flexWrap: "wrap",
+                  marginBottom: 16,
+                }}
+              >
+
+                {CATEGORY_PILLS[
+                  selectedSubType
+                ]?.map(
+                  (
+                    pill: string
+                  ) => (
+
+                    <button
+                      key={pill}
+                      type="button"
+
+                      onClick={() =>
+                        setSelectedPill(
+                          pill
+                        )
+                      }
+
+                      style={{
+                        padding:
+                          "10px 18px",
+
+                        borderRadius:
+                          999,
+
+                        border:
+                          selectedPill === pill
+                            ? "1px solid rgba(255,255,255,.2)"
+                            : "1px solid rgba(255,255,255,.08)",
+
+                        color: "white",
+
+                        background:
+                          selectedPill === pill
+                            ? "linear-gradient(90deg,#7c3aed,#ec4899)"
+                            : "#111",
+
+                        cursor: "pointer",
+                        whiteSpace: "nowrap",
+                        fontSize: 13,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {pill}
+                    </button>
+
+                  )
+                )}
+
+              </div>
+
+            )}
 
             {/* uploads */}
 
@@ -1348,61 +1410,6 @@ style={{
             </div>
 
 
-            {selectedSubType && (
-
-              <div
-                style={{
-                  display:"flex",
-                  gap:10,
-                  flexWrap:"wrap"
-                }}
-              >
-
-                {CATEGORY_PILLS[
-                  selectedSubType
-                ]?.map(
-                  (
-                    pill:string
-                  )=>(
-
-                    <button
-                      key={pill}
-
-                      onClick={()=>
-                        setSelectedPill(
-                          pill
-                        )
-                      }
-
-                      style={{
-                        padding:
-                          "10px 18px",
-
-                        borderRadius:
-                          999,
-
-                        border:"none",
-
-                        color:"white",
-
-                        background:
-
-                        selectedPill===pill
-
-                        ? "linear-gradient(90deg,#7c3aed,#ec4899)"
-
-                        :"#111"
-                      }}
-                    >
-                      {pill}
-                    </button>
-
-                  )
-                )}
-
-              </div>
-
-            )}
 
           </div>
 
