@@ -400,17 +400,408 @@ window.location.href =
 
   if (loading) {
 
-    return (
+  const generatedCount =
+    poses.filter(
+      (p) =>
+        p.poseId !== "REEL" &&
+        p.imageUrl
+    ).length;
 
-      <div className="ecom-loading">
+  const expectedImages =
+    heroImages.length > 0
+      ? 4
+      : 4;
 
-        Loading Lookbook...
+  const progress =
+    Math.min(
+      100,
+      Math.round(
+        (generatedCount /
+          expectedImages) *
+          100
+      )
+    );
+
+  return (
+
+    <div
+      className="ecom-page"
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "28px 18px",
+      }}
+    >
+
+      <div
+        style={{
+          width: "100%",
+          maxWidth: 620,
+
+          padding:
+            "42px 28px",
+
+          borderRadius: 30,
+
+          background:
+            "linear-gradient(145deg, rgba(20,20,20,.98), rgba(9,9,9,.98))",
+
+          border:
+            "1px solid rgba(255,255,255,.09)",
+
+          boxShadow:
+            "0 30px 90px rgba(0,0,0,.45)",
+
+          textAlign: "center",
+
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+
+        <div
+          style={{
+            position: "absolute",
+            width: 260,
+            height: 260,
+            borderRadius: "50%",
+            background:
+              "radial-gradient(circle, rgba(168,85,247,.18), transparent 70%)",
+            top: -120,
+            left: "50%",
+            transform: "translateX(-50%)",
+            pointerEvents: "none",
+          }}
+        />
+
+        <div
+          style={{
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
+
+          <div
+            style={{
+              width: 82,
+              height: 82,
+              margin:
+                "0 auto 24px",
+
+              borderRadius: "50%",
+
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+
+              background:
+                "linear-gradient(135deg,#7c3aed,#ec4899)",
+
+              boxShadow:
+                "0 0 45px rgba(168,85,247,.28)",
+
+              animation:
+                "pulse 2.4s ease-in-out infinite",
+            }}
+          >
+
+            <div
+              style={{
+                width: 58,
+                height: 58,
+
+                borderRadius: "50%",
+
+                border:
+                  "3px solid rgba(255,255,255,.18)",
+
+                borderTopColor:
+                  "#fff",
+
+                animation:
+                  "spin 1.1s linear infinite",
+              }}
+            />
+
+          </div>
+
+
+          <div
+            style={{
+              fontSize: 12,
+              letterSpacing: ".28em",
+              opacity: .5,
+              marginBottom: 12,
+            }}
+          >
+            MAGICREEL AI STUDIO
+          </div>
+
+
+          <h1
+            style={{
+              margin: 0,
+
+              fontSize:
+                "clamp(28px, 6vw, 42px)",
+
+              lineHeight: 1.05,
+
+              fontWeight: 500,
+
+              letterSpacing: "-.02em",
+            }}
+          >
+            Creating Your
+            <br />
+            Lookbook
+          </h1>
+
+
+          <p
+            style={{
+              margin:
+                "18px auto 0",
+
+              maxWidth: 430,
+
+              fontSize: 15,
+
+              lineHeight: 1.6,
+
+              color:
+                "rgba(255,255,255,.68)",
+            }}
+          >
+            MagicReel is creating
+            premium fashion poses
+            from your Hero image.
+          </p>
+
+
+          <div
+            style={{
+              marginTop: 28,
+
+              display: "inline-flex",
+
+              alignItems: "center",
+
+              gap: 10,
+
+              padding:
+                "10px 16px",
+
+              borderRadius: 999,
+
+              background:
+                "rgba(255,255,255,.05)",
+
+              border:
+                "1px solid rgba(255,255,255,.07)",
+
+              fontSize: 13,
+
+              color:
+                "rgba(255,255,255,.75)",
+            }}
+          >
+            <span>⏱</span>
+
+            Usually 7–8 minutes
+
+          </div>
+
+
+          <div
+            style={{
+              marginTop: 30,
+              textAlign: "left",
+            }}
+          >
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+
+                marginBottom: 10,
+
+                fontSize: 13,
+              }}
+            >
+
+              <span
+                style={{
+                  color:
+                    "rgba(255,255,255,.58)",
+                }}
+              >
+                Generating fashion images
+              </span>
+
+              <span
+                style={{
+                  fontWeight: 700,
+                }}
+              >
+                {generatedCount} /{" "}
+                {expectedImages}
+              </span>
+
+            </div>
+
+
+            <div
+              style={{
+                height: 8,
+
+                borderRadius: 999,
+
+                background:
+                  "rgba(255,255,255,.07)",
+
+                overflow: "hidden",
+              }}
+            >
+
+              <div
+                style={{
+                  width:
+                    `${progress}%`,
+
+                  height: "100%",
+
+                  borderRadius: 999,
+
+                  background:
+                    "linear-gradient(90deg,#7c3aed,#ec4899)",
+
+                  transition:
+                    "width .6s ease",
+                }}
+              />
+
+            </div>
+
+          </div>
+
+
+          <div
+            style={{
+              marginTop: 28,
+
+              display: "grid",
+
+              gridTemplateColumns:
+                "repeat(4,1fr)",
+
+              gap: 10,
+            }}
+          >
+
+            {[
+              "Front",
+              "Pose 1",
+              "Pose 2",
+              "Pose 3",
+            ].map(
+              (label, index) => {
+
+                const done =
+                  generatedCount >
+                  index;
+
+                return (
+
+                  <div
+                    key={label}
+
+                    style={{
+                      padding:
+                        "12px 6px",
+
+                      borderRadius: 14,
+
+                      background:
+                        done
+                          ? "rgba(168,85,247,.12)"
+                          : "rgba(255,255,255,.035)",
+
+                      border:
+                        done
+                          ? "1px solid rgba(168,85,247,.24)"
+                          : "1px solid rgba(255,255,255,.06)",
+
+                      transition:
+                        "all .35s ease",
+                    }}
+                  >
+
+                    <div
+                      style={{
+                        fontSize: 16,
+                        marginBottom: 5,
+                      }}
+                    >
+                      {done
+                        ? "✓"
+                        : "○"}
+                    </div>
+
+                    <div
+                      style={{
+                        fontSize: 11,
+
+                        color:
+                          done
+                            ? "#fff"
+                            : "rgba(255,255,255,.42)",
+                      }}
+                    >
+                      {label}
+                    </div>
+
+                  </div>
+
+                );
+
+              }
+            )}
+
+          </div>
+
+
+          <p
+            style={{
+              marginTop: 24,
+
+              marginBottom: 0,
+
+              fontSize: 12,
+
+              lineHeight: 1.5,
+
+              color:
+                "rgba(255,255,255,.42)",
+            }}
+          >
+            Please keep this tab open.
+            Your images will appear automatically
+            when they are ready.
+          </p>
+
+        </div>
 
       </div>
 
-    );
+    </div>
 
-  }
+  );
+
+}
 
   return (
 
