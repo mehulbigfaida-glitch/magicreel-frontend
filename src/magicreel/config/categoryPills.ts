@@ -40,6 +40,8 @@ export const CATEGORY_PILLS: Partial<
 
   /* MEN */
 
+  shirt: ["UNTUCKED", "TUCKED"],
+
   kurta: ["CASUAL", "FORMAL"],
 
   kurta_set: ["PLAIN_SET", "WITH_BUNDI"],
