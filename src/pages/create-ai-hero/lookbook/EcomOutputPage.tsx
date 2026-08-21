@@ -38,24 +38,32 @@ const [poses, setPoses] =
 
     try {
 
-      const res =
-        await fetch(
-          `${API_BASE}/api/p2m/lookbook/${id}`
-        );
+  const res =
+    await fetch(
+      `${API_BASE}/api/p2m/lookbook/${id}`
+    );
 
-      const data =
-        await res.json();
+  const data =
+    await res.json();
 
-      if (cancelled) {
-        return;
-      }
+  console.log(
+    "LOOKBOOK POLL:",
+    {
+      status: data.status,
+      poses: data.poses?.length || 0,
+    }
+  );
 
-      if (!res.ok) {
-        throw new Error(
-          data.error ||
-          "Failed to load Lookbook"
-        );
-      }
+  if (cancelled) {
+    return;
+  }
+
+  if (!res.ok) {
+    throw new Error(
+      data.error ||
+      "Failed to load Lookbook"
+    );
+  }
 
       setPoses(
         data.poses || []
