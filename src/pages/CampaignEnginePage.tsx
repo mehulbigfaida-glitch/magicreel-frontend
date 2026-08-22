@@ -908,10 +908,10 @@ export default function CampaignEnginePage() {
     logoPreview,
   }
 );
-                
+
                 const payload = {
-                  
-                  
+
+
                     assetType:
                     "campaign",
 
@@ -1098,7 +1098,7 @@ if (
               fontSize: 14,
             }}
           >
-            1 Credit
+            1 ⚡
           </div>
         </div>
 

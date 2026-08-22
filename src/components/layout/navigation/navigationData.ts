@@ -36,6 +36,12 @@ export const CREATIVE_STUDIO_ITEMS: NavigationItem[] = [
     icon: Share2,
     to: "/create/social-campaign",
   },
+  {
+  title: "360° Reel",
+  description: "360° Product Reels",
+  icon: Sparkles,
+  to: "/create/360-reel",
+},
 ];
 
 export const RESOURCE_ITEMS: NavigationItem[] = [

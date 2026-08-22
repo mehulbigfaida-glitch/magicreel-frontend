@@ -454,7 +454,30 @@ onClick={handleGenerate}
 
 ) : (
 
-"Generate Lookbook Pack (2 Credits)"
+  <>
+
+    <div
+      style={{
+        fontSize: 15,
+        fontWeight: 700,
+        lineHeight: 1.15,
+      }}
+    >
+      Generate Lookbook Pack
+    </div>
+
+    <div
+      style={{
+        marginTop: 4,
+        fontSize: 11,
+        fontWeight: 500,
+        opacity: 0.78,
+      }}
+    >
+      2 ⚡ · ~7–8 min
+    </div>
+
+  </>
 
 )}
 

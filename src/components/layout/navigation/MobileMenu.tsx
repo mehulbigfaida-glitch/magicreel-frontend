@@ -127,6 +127,19 @@ export default function MobileMenu({
                 <span>Editorial Studio</span>
               </Link>
 
+              <Link
+  to="/create/360-reel"
+  onClick={onClose}
+  className={
+    isActive("/create/360-reel")
+      ? "active"
+      : ""
+  }
+>
+  <Sparkles size={17} />
+  <span>360° Reel</span>
+</Link>
+
             </div>
 
           )}

@@ -13,11 +13,18 @@ const API_BASE =
 export default function EcomOutputPage() {
 
   const { id } = useParams();
-  
+
   const [loading, setLoading] =
   useState(true);
 
 const [generatingReel, setGeneratingReel] =
+  useState(false);
+
+const [exportingZip, setExportingZip] =
+  useState(false);
+
+
+const [sharing, setSharing] =
   useState(false);
 
 const [poses, setPoses] =
@@ -162,7 +169,9 @@ const [poses, setPoses] =
   async function handleExportZip() {
 
     try {
-      
+
+      setExportingZip(true);
+
       const images =
         poses.map(
           (p) => p.imageUrl
@@ -250,6 +259,10 @@ const [poses, setPoses] =
         err
       );
 
+    } finally {
+
+      setExportingZip(false);
+
     }
 
   }
@@ -257,6 +270,8 @@ const [poses, setPoses] =
   async function handleShare() {
 
     try {
+
+      setSharing(true);
 
       const url =
 
@@ -277,51 +292,13 @@ const [poses, setPoses] =
         err
       );
 
+    } finally {
+
+      setSharing(false);
+
     }
 
   }
-
-function handlePublish() {
-
-  console.log("PUBLISH CLICKED");
-
-  console.log(
-    "HERO IMAGES:",
-    heroImages
-  );
-
-  console.log(
-    "FIRST HERO:",
-    heroImages[0]
-  );
-
-  const hero =
-    heroImages[0]?.imageUrl;
-
-  console.log(
-    "HERO URL:",
-    hero
-  );
-
-  if (!hero) {
-
-    alert(
-      "No hero image found"
-    );
-
-    return;
-
-  }
-
-  const publishUrl =
-  `/publish?assetUrl=${encodeURIComponent(hero)}&type=image`;
-
-window.open(
-  publishUrl,
-  "_blank"
-);
-
-}
 
   async function handleCarouselReel() {
 
@@ -833,48 +810,52 @@ window.location.href =
           <div className="ecom-actions">
 
             <button
-              onClick={
-                handleExportZip
+              onClick={handleExportZip}
+              disabled={exportingZip}
+              className={
+                exportingZip
+                  ? "ecom-action-active"
+                  : ""
               }
             >
-
-              Export ZIP
-
+              {
+                exportingZip
+                  ? "Exporting..."
+                  : "Export ZIP"
+              }
             </button>
 
             <button
-  onClick={handlePublish}
->
-  Publish
-</button>
-
-            <button
-              onClick={
-                handleShare
+              onClick={handleShare}
+              disabled={sharing}
+              className={
+                sharing
+                  ? "ecom-action-active"
+                  : ""
               }
             >
-
-              Copy Preview Link
-
+              {
+                sharing
+                  ? "Copied ✓"
+                  : "Copy Preview Link"
+              }
             </button>
 
             <button
-  className="primary"
-  onClick={
-    handleCarouselReel
-  }
-  disabled={
-    generatingReel
-  }
->
-
-  {
-    generatingReel
-      ? "🎬 Rendering Reel..."
-      : "Carousel Reel ✨"
-  }
-
-</button>
+              className={
+                generatingReel
+                  ? "primary ecom-action-active"
+                  : "primary"
+              }
+              onClick={handleCarouselReel}
+              disabled={generatingReel}
+            >
+              {
+                generatingReel
+                  ? "🎬 Rendering Reel..."
+                  : "Carousel Reel ✨"
+              }
+            </button>
 
           </div>
 

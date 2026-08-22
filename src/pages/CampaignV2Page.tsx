@@ -888,19 +888,47 @@ const onHeroSelected = (
 
                     {loading ? (
 
-                      <>
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Generating Campaign...
-                      </>
+  <>
+    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+    Generating Campaign...
+  </>
 
-                    ) : (
+) : (
 
-                      <>
-                        Generate Campaign
-                        <ChevronRight className="ml-2 h-5 w-5" />
-                      </>
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      lineHeight: 1.15,
+    }}
+  >
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        fontSize: 15,
+        fontWeight: 700,
+      }}
+    >
+      Generate Campaign
+      <ChevronRight className="ml-2 h-5 w-5" />
+    </div>
 
-                    )}
+    <div
+      style={{
+        marginTop: 4,
+        fontSize: 11,
+        fontWeight: 500,
+        opacity: 0.78,
+      }}
+    >
+      1 ⚡
+    </div>
+  </div>
+
+)}
 
                   </button>
 

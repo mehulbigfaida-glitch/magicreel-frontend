@@ -73,6 +73,7 @@ import EcomStudioPage from "./pages/create-ai-hero/EcomStudioPage";
 import EcomOutputPage from "./pages/create-ai-hero/lookbook/EcomOutputPage";
 import ReelOutputPage from "./pages/reel/ReelOutputPage";
 import Reels360OutputPage from "./pages/reels360/Reels360OutputPage";
+import Create360ReelPage from "./pages/reels360/Create360ReelPage";
 import PublishPage from "./pages/publish/PublishPage";
 import CampaignV2Page
 from "./pages/CampaignV2Page";
@@ -114,7 +115,7 @@ function GlobalHeader() {
 
 function AppRoutes() {
   return (
-        
+
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/create" element={<CreatePage />} />
@@ -358,6 +359,15 @@ function AppRoutes() {
   element={<Reels360OutputPage />}
 />
 
+<Route
+  path="/create/360-reel"
+  element={
+    <ProtectedRoute>
+      <Create360ReelPage />
+    </ProtectedRoute>
+  }
+/>
+
       <Route path="/reel/view" element={<ReelMobileView />} />
       <Route path="/share/:id" element={<SharePage />} />
       <Route path="/reel" element={<ReelViewerPage />} />
@@ -374,7 +384,7 @@ function AppRoutes() {
 
       <Route path="/v3" element={<CreatePageV3 />} />
 
-      
+
 <Route
   path="/docs/getting-started"
   element={<GettingStartedPage />}

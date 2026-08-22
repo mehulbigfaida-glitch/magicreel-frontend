@@ -1694,48 +1694,73 @@ display:"block"
         </div>
 
 
-        <div
+                <div
 
-onClick={
-  canGenerate && !heroLoading
-    ? generateHero
-    : undefined
-}
+          onClick={
+            canGenerate && !heroLoading
+              ? generateHero
+              : undefined
+          }
 
-style={{
-height:60,
+          style={{
+            height: 60,
 
-background:
+            background:
 
-canGenerate
-? "linear-gradient(90deg,#7c3aed,#ec4899)"
-: "#111",
+              canGenerate
+                ? "linear-gradient(90deg,#7c3aed,#ec4899)"
+                : "#111",
 
-borderRadius:20,
+            borderRadius: 20,
 
-display:"flex",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
 
-alignItems:"center",
+            cursor:
+              canGenerate && !heroLoading
+                ? "pointer"
+                : "not-allowed",
 
-justifyContent:"center",
+            opacity:
+              heroLoading
+                ? 0.6
+                : 1,
 
-cursor:
-  canGenerate && !heroLoading
-    ? "pointer"
-    : "not-allowed",
+            pointerEvents:
+              heroLoading
+                ? "none"
+                : "auto",
+          }}
+        >
 
-opacity: heroLoading ? 0.6 : 1,
-pointerEvents: heroLoading ? "none" : "auto",
-}}
->
+          <div
+            style={{
+              fontSize: 16,
+              fontWeight: 700,
+              lineHeight: 1.15,
+            }}
+          >
+            {
+              heroLoading
+                ? `Generating... ${generationTime.toFixed(2)} sec`
+                : "Generate Hero"
+            }
+          </div>
 
-{
-heroLoading
-? `Generating... ${generationTime.toFixed(2)} sec`
-: "Generate Hero"
-}
+          <div
+            style={{
+              marginTop: 4,
+              fontSize: 11,
+              fontWeight: 500,
+              opacity: 0.78,
+            }}
+          >
+            1 ⚡ · ~2–3 min
+          </div>
 
-</div>
+        </div>
 
 
 {heroError && (
@@ -1812,24 +1837,37 @@ Download Hero
 
 <button
   className="hero-action-btn primary"
+  disabled={!frontHeroImageUrl}
   onClick={() => {
+
     if (!frontHeroImageUrl) return;
 
-    const publishUrl =
-  `/publish?assetUrl=${encodeURIComponent(
-    frontHeroImageUrl
-  )}&assetType=hero&heroImageUrl=${encodeURIComponent(
-    frontHeroImageUrl
-  )}`;
+    console.log("NAVIGATE TO ECOM", {
+      selectedCategory,
+      selectedSubType
+    });
 
-window.open(
-  publishUrl,
-  "_blank",
-  "noopener,noreferrer"
-);
+    const url =
+      `/pack/ecom?` +
+      `hero=${encodeURIComponent(frontHeroImageUrl ?? "")}` +
+      `&back=${encodeURIComponent(backHeroImageUrl ?? "")}` +
+      `&gender=${encodeURIComponent(selectedCategory)}` +
+      `&category=${encodeURIComponent(selectedSubType)}`;
+
+    console.log(
+      "OPENING NEW TAB",
+      url
+    );
+
+    window.open(
+      url,
+      "_blank",
+      "noopener,noreferrer"
+    );
+
   }}
 >
-  Publish Hero
+  Generate Lookbook
 </button>
 
 </div>
@@ -1994,199 +2032,9 @@ Download Back Hero
 
 </div>
 
-{/* 360° REEL */}
-
-<div className="reel-section">
-
-  <div className="reel-left">
-
-    <div className="reel-icon">
-      🎬
-    </div>
-
-    <div className="reel-info">
-
-      <div className="reel-title">
-        360° Reel
-      </div>
-
-      <div className="reel-subtitle">
-        Uses Front Hero + Back Hero
-      </div>
-
-      <div className="reel-meta">
-
-        <span>⏱ 5 Seconds</span>
-
-        <span>⚡ 3 Credits</span>
-
-      </div>
-
-    </div>
-
-  </div>
-
-  <div className="reel-right">
-
-    <div className="reel-warning">
-
-  {
-    backHeroImageUrl
-      ? "Your 360° Reel is ready to be generated."
-      : "360° Reel can only be generated after both Front Hero and Back Hero have been created."
-  }
-
-</div>
-
-    <div className="reel-actions">
-
-      <button
-  className="reel-primary-btn"
-  disabled={
-  !frontHeroImageUrl ||
-  !backHeroImageUrl ||
-  reelLoading
-}
-
-  onClick={
-    generate360Reel
-  }
->
-  {
-    reelLoading
-      ? "Generating 360° Reel..."
-      : "Generate 360° Reel"
-  }
-</button>
-
-      </div>
-
-  </div>
-
-</div>
-
-{/* CONTINUE WITH AI */}
-
-<div className="ai-destination-title">
-
-✨ Create Content From Your Hero
-
-</div>
-
-
-<div className="ai-pack-grid">
-
-{/* E-COM */}
-
-<div className="ai-pack-card">
-
-<div className="ai-pack-icon purple">
-<ShoppingBag size={26}/>
-</div>
-
-<div className="ai-pack-title">
-E-COM Lookbook
-</div>
-
-<div className="ai-pack-sub">
-Generate marketplace-ready product photos,
-6 different model poses with clean backgrounds
-for Amazon, Shopify and online stores.
-</div>
-
-<button
-className="ai-pack-btn"
-disabled={!frontHeroImageUrl}
-onClick={() => {
-
-console.log("NAVIGATE TO ECOM", {
-  selectedCategory,
-  selectedSubType
-});
-
-const url =
-  `/pack/ecom?` +
-  `hero=${encodeURIComponent(frontHeroImageUrl ?? "")}` +
-  `&back=${encodeURIComponent(backHeroImageUrl ?? "")}` +
-  `&gender=${encodeURIComponent(selectedCategory)}` +
-  `&category=${encodeURIComponent(selectedSubType)}`;
-
-console.log("OPENING NEW TAB", url);
-
-  window.open(
-  url,
-  "_blank",
-  "noopener,noreferrer"
-);
-
-}}
->
-Generate Pack
-</button>
-
-</div>
 
 
 
-{/* SOCIAL */}
-
-<div className="ai-pack-card">
-
-  <div className="ai-pack-icon pink">
-    <Share2 size={26}/>
-  </div>
-
-  <div className="ai-pack-title">
-    Campaign Studio
-  </div>
-
-  <div className="ai-pack-sub">
-    Create promotional offers, festival greetings,
-    invitations and marketing creatives using
-    your AI Hero image.
-  </div>
-
-  <button
-    className="ai-pack-btn"
-    disabled={!frontHeroImageUrl}
-    onClick={() => navigate("/campaign-engine")}
-  >
-    Create Campaign
-  </button>
-
-</div>
-
-
-
-{/* CAMPAIGN */}
-
-<div className="ai-pack-card">
-
-  <div className="ai-pack-icon orange">
-    <Megaphone size={26}/>
-  </div>
-
-  <div className="ai-pack-title">
-    Editorial Studio
-  </div>
-
-  <div className="ai-pack-sub">
-    Transform your garment into luxury fashion
-    campaigns using premium editorial worlds
-    and cinematic storytelling.
-  </div>
-
-  <button
-    className="ai-pack-btn"
-    disabled={!frontHeroImageUrl}
-    onClick={() => navigate("/create/social-campaign")}
-  >
-    Create Editorial
-  </button>
-
-</div>
-
-</div>
 
 <FeatureLockedModal
   open={lockedFeature !== null}
