@@ -4,23 +4,19 @@ import OnboardingLayout from "./OnboardingLayout";
 
 interface WelcomeStepProps {
   onContinue: () => void;
-  onSkip: () => void;
 }
 
 const WelcomeStep: React.FC<WelcomeStepProps> = ({
   onContinue,
-  onSkip,
 }) => {
   return (
     <OnboardingLayout
       step={1}
       totalSteps={4}
       title="Welcome to MagicReel"
-      subtitle="Let's setup your AI Fashion Workspace in less than one minute."
+      subtitle="Let's set up your MagicReel Fashion Workspace in less than one minute."
       primaryText="Let's Setup My Brand"
-      secondaryText="Skip for now"
       onPrimary={onContinue}
-      onSecondary={onSkip}
     >
       <div style={styles.wrapper}>
         <div style={styles.icon}>
@@ -28,14 +24,14 @@ const WelcomeStep: React.FC<WelcomeStepProps> = ({
         </div>
 
         <div style={styles.heading}>
-          Your AI Fashion Workspace
+          Your MagicReel Fashion Workspace
           is ready.
         </div>
 
         <div style={styles.description}>
           We'll personalize your workspace
           with your brand identity, logo and
-          social presence so every AI creation
+          social presence so every MagicReel creation
           stays consistent.
         </div>
 

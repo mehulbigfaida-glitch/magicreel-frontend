@@ -65,7 +65,7 @@ const SocialPresenceStep: React.FC<
       title="Social Presence"
       subtitle="Connect your social identities. You can always update these later."
       primaryText="Continue"
-      secondaryText="Skip"
+      secondaryText="Back"
       onPrimary={handleContinue}
       onSecondary={onSkip}
     >

@@ -11,6 +11,9 @@ import "./HeaderAccount.css";
 
 export default function HeaderAccount() {
   const user = useAuthStore((state) => state.user);
+  const refreshCredits = useAuthStore(
+    (state) => state.refreshCredits
+  );
 
   const location = useLocation();
 
@@ -41,6 +44,25 @@ export default function HeaderAccount() {
       document.removeEventListener("keydown", handleEscape);
     };
   }, []);
+
+  // Refresh global account credits after purchases/generation
+  useEffect(() => {
+    const handleCreditsUpdated = () => {
+      void refreshCredits();
+    };
+
+    window.addEventListener(
+      "creditsUpdated",
+      handleCreditsUpdated
+    );
+
+    return () => {
+      window.removeEventListener(
+        "creditsUpdated",
+        handleCreditsUpdated
+      );
+    };
+  }, [refreshCredits]);
 
   const displayName =
     user?.fullName ||

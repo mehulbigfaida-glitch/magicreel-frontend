@@ -60,9 +60,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       const data = await res.json();
 
+      const refreshedUser =
+        data.user || data;
+
       // ✅ SAFE SET
       set({
-        user: data.user || null,
+        user: refreshedUser || null,
         loading: false,
       });
 
@@ -94,12 +97,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const data = await res.json();
 
       const currentUser = get().user;
+      const refreshedUser = data.user || data;
 
       // ✅ MERGE instead of overwrite
       set({
         user: {
           ...currentUser,
-          ...data.user,
+          ...refreshedUser,
         },
       });
 

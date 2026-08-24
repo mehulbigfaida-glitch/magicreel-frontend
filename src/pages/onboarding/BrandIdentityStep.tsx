@@ -85,7 +85,7 @@ const BrandIdentityStep: React.FC<
       title="Brand Identity"
       subtitle="Tell MagicReel about your brand."
       primaryText="Continue"
-      secondaryText="Skip"
+      secondaryText="Back"
       onPrimary={handleContinue}
       onSecondary={onSkip}
     >
