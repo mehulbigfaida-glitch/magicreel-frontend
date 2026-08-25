@@ -322,6 +322,8 @@ setHeroError(null);
 
 setGenerationTime(0);
 
+setHeroLoading(true);
+
 setFrontHeroImageUrl(
   null
 );
@@ -398,49 +400,23 @@ selectedPill || null
 const data=
 await res.json();
 
-if(
-  res.status===400 ||
-  res.status===403
-){
+if(res.status===403){
 
-  if(
-    data.error ===
-    "Insufficient credits" ||
-    data.error ===
-    "No credits left"
-  ){
+window.location.href=
+"/plans";
 
-    setHeroLoading(false);
+return;
 
-    window.location.href =
-      "/plans?reason=insufficient-credits";
-
-    return;
-  }
-
-  if(res.status===403){
-
-    setHeroLoading(false);
-
-    window.location.href =
-      "/plans";
-
-    return;
-  }
 }
 
 if(!res.ok){
 
-  setHeroLoading(false);
-
-  throw new Error(
-    data.error ||
-    "Hero failed"
-  );
+throw new Error(
+data.error ||
+"Hero failed"
+);
 
 }
-
-setHeroLoading(true);
 
 setFrontRunId(
 data.frontRunId
