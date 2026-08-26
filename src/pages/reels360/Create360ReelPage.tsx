@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { API_BASE } from "../../config/api";
 import LookbookHeroPickerModal from "../create-ai-hero/LookbookHeroPickerModal";
+import FeatureLockedModal from "../../components/FeatureLockedModal";
 
 export default function Create360ReelPage() {
 
@@ -27,6 +28,11 @@ export default function Create360ReelPage() {
 
   const [error, setError] =
     useState("");
+
+  const [
+    lockedFeature,
+    setLockedFeature,
+  ] = useState<string | null>(null);
 
   function openPicker(
     target: "front" | "back"
@@ -104,6 +110,18 @@ export default function Create360ReelPage() {
 
       const data =
         await response.json();
+
+      if (
+        data?.error === "INSUFFICIENT_CREDITS" ||
+        data?.error === "Insufficient credits" ||
+        data?.error === "No credits left"
+      ) {
+        setGenerating(false);
+
+        setLockedFeature("360° Reel Generation");
+
+        return;
+      }
 
       if (!response.ok) {
 
@@ -576,6 +594,31 @@ export default function Create360ReelPage() {
 
       </div>
 
+
+      <FeatureLockedModal
+        open={lockedFeature !== null}
+        title={
+          lockedFeature === "360° Reel Generation"
+            ? "Insufficient Credit"
+            : "Upgrade Required"
+        }
+        description={
+          lockedFeature === "360° Reel Generation"
+            ? "You don't have enough credits to generate this 360° Reel. Upgrade your plan or add credits to continue."
+            : "This feature is available on higher plans. Upgrade your subscription to unlock premium AI content packs."
+        }
+        featureName={
+          lockedFeature === "360° Reel Generation"
+            ? undefined
+            : lockedFeature ?? undefined
+        }
+        primaryLabel={
+          lockedFeature === "360° Reel Generation"
+            ? "Upgrade / Add Credit"
+            : "Upgrade Plan"
+        }
+        onClose={() => setLockedFeature(null)}
+      />
 
       <LookbookHeroPickerModal
         open={

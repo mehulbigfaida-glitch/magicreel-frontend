@@ -21,6 +21,7 @@ import { uploadToCloudinary } from "../api/cloudinary";
 import "./CampaignV2Page.css";
 
 import CampaignHeroPickerModal from "./campaign/CampaignHeroPickerModal";
+import FeatureLockedModal from "../components/FeatureLockedModal";
 
 type Asset = {
   id: string;
@@ -34,6 +35,11 @@ export default function CampaignV2Page() {
   // const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
+
+  const [
+    lockedFeature,
+    setLockedFeature,
+  ] = useState<string | null>(null);
 
 const [campaignReady, setCampaignReady] =
   useState(false);
@@ -374,6 +380,18 @@ const onHeroSelected = (
       "Campaign generation failed:",
       error
     );
+
+    const message =
+      error instanceof Error
+        ? error.message
+        : String(error);
+
+    if (
+      message === "Insufficient credits" ||
+      message === "No credits left"
+    ) {
+      setLockedFeature("Campaign Generation");
+    }
 
   } finally {
 
@@ -1183,6 +1201,14 @@ const onHeroSelected = (
     ? onHeroSelected
     : onAssetsSelected
 }
+        />
+
+        <FeatureLockedModal
+          open={lockedFeature !== null}
+          title="Insufficient Credit"
+          description="You don't have enough credits to generate this Campaign. Upgrade your plan or add credits to continue."
+          primaryLabel="Upgrade / Add Credit"
+          onClose={() => setLockedFeature(null)}
         />
 
       </div>

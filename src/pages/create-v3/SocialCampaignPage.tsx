@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import CampaignHeroPickerModal from "../campaign/CampaignHeroPickerModal";
+import FeatureLockedModal from "../../components/FeatureLockedModal";
 import {
   useAuthStore,
 } from "../../store/authStore";
@@ -283,6 +284,9 @@ const [assetPreviews, setAssetPreviews] =
     return data.secure_url;
   }
 
+  const [lockedFeature, setLockedFeature] =
+    useState<string | null>(null);
+
 useEffect(() => {
   if (generating) {
     timerRef.current = window.setInterval(() => {
@@ -366,14 +370,25 @@ useEffect(() => {
           }
         );
 
+      const data =
+  await response.json();
+
+      if (
+        data.error === "Insufficient credits" ||
+        data.error === "No credits left"
+      ) {
+        setGenerating(false);
+
+        setLockedFeature("Editorial Generation");
+
+        return;
+      }
+
       if (!response.ok) {
         throw new Error(
           "Campaign generation failed"
         );
       }
-
-      const data =
-  await response.json();
 
 console.log(
   "EDITORIAL RESPONSE:",
@@ -1265,6 +1280,31 @@ window.open(
   setPickerOpen(false);
 }}
 />
+
+    <FeatureLockedModal
+      open={lockedFeature !== null}
+      title={
+        lockedFeature === "Editorial Generation"
+          ? "Insufficient Credit"
+          : "Upgrade Required"
+      }
+      description={
+        lockedFeature === "Editorial Generation"
+          ? "You don't have enough credits to generate this Editorial. Upgrade your plan or add credits to continue."
+          : "This feature is available on higher plans. Upgrade your subscription to unlock premium AI content packs."
+      }
+      featureName={
+        lockedFeature === "Editorial Generation"
+          ? undefined
+          : lockedFeature ?? undefined
+      }
+      primaryLabel={
+        lockedFeature === "Editorial Generation"
+          ? "Upgrade / Add Credit"
+          : "Upgrade Plan"
+      }
+      onClose={() => setLockedFeature(null)}
+    />
 
     </div>
   );

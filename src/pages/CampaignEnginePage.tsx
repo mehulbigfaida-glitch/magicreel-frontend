@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import AssetPickerModal from "./publish/AssetPickerModal";
+import FeatureLockedModal from "../components/FeatureLockedModal";
 
 type CampaignType =
   | "new-arrival"
@@ -126,6 +127,11 @@ export default function CampaignEnginePage() {
     generating,
     setGenerating,
   ] = useState(false);
+
+  const [
+    lockedFeature,
+    setLockedFeature,
+  ] = useState<string | null>(null);
 
   const [
     showAssetPicker,
@@ -993,6 +999,17 @@ console.log(
   data
 );
 
+if (
+  data?.error === "Insufficient credits" ||
+  data?.error === "No credits left"
+) {
+  setGenerating(false);
+
+  setLockedFeature("Campaign Generation");
+
+  return;
+}
+
 if (!response.ok) {
   throw new Error(
     data?.error ||
@@ -1090,6 +1107,31 @@ if (
               ? "Generating Campaign..."
               : "Generate Campaign Creative"}
           </button>
+
+          <FeatureLockedModal
+            open={lockedFeature !== null}
+            title={
+              lockedFeature === "Campaign Generation"
+                ? "Insufficient Credit"
+                : "Upgrade Required"
+            }
+            description={
+              lockedFeature === "Campaign Generation"
+                ? "You don't have enough credits to generate this Campaign. Upgrade your plan or add credits to continue."
+                : "This feature is available on higher plans. Upgrade your subscription to unlock premium AI content packs."
+            }
+            featureName={
+              lockedFeature === "Campaign Generation"
+                ? undefined
+                : lockedFeature ?? undefined
+            }
+            primaryLabel={
+              lockedFeature === "Campaign Generation"
+                ? "Upgrade / Add Credit"
+                : "Upgrade Plan"
+            }
+            onClose={() => setLockedFeature(null)}
+          />
 
           <div
             style={{
