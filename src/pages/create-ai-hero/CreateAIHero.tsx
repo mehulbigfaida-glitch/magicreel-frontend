@@ -400,13 +400,30 @@ selectedPill || null
 const data=
 await res.json();
 
+if(
+  data.error ===
+  "Insufficient credits" ||
+  data.error ===
+  "No credits left"
+){
+
+  setHeroLoading(false);
+
+  setLockedFeature(
+    "Hero Generation"
+  );
+
+  return;
+}
+
 if(res.status===403){
 
-window.location.href=
-"/plans";
+  setHeroLoading(false);
 
-return;
+  window.location.href=
+  "/plans";
 
+  return;
 }
 
 if(!res.ok){
@@ -2038,9 +2055,26 @@ Download Back Hero
 
 <FeatureLockedModal
   open={lockedFeature !== null}
-  title="Upgrade Required"
-  description="This feature is available on higher plans. Upgrade your subscription to unlock premium AI content packs."
-  featureName={lockedFeature ?? undefined}
+  title={
+    lockedFeature === "Hero Generation"
+      ? "Insufficient Credit"
+      : "Upgrade Required"
+  }
+  description={
+    lockedFeature === "Hero Generation"
+      ? "You don't have enough credits to generate this Hero. Upgrade your plan or add credits to continue."
+      : "This feature is available on higher plans. Upgrade your subscription to unlock premium AI content packs."
+  }
+  featureName={
+    lockedFeature === "Hero Generation"
+      ? undefined
+      : lockedFeature ?? undefined
+  }
+  primaryLabel={
+    lockedFeature === "Hero Generation"
+      ? "Upgrade / Add Credit"
+      : "Upgrade Plan"
+  }
   onClose={() => setLockedFeature(null)}
 />
 </div>

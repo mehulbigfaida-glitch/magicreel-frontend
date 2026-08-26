@@ -7,6 +7,7 @@ export interface FeatureLockedModalProps {
   title: string;
   description: string;
   featureName?: string;
+  primaryLabel?: string;
   onClose: () => void;
 }
 
@@ -15,6 +16,7 @@ export default function FeatureLockedModal({
   title,
   description,
   featureName,
+  primaryLabel = "Upgrade Plan",
   onClose,
 }: FeatureLockedModalProps) {
   const navigate = useNavigate();
@@ -87,7 +89,7 @@ export default function FeatureLockedModal({
             className="primary"
             onClick={handleUpgrade}
           >
-            Upgrade Plan
+            {primaryLabel}
           </button>
 
           <button
