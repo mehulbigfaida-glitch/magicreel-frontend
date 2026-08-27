@@ -81,12 +81,12 @@ const [
 
   async function handleGenerateAI() {
 
-    
+
     try {
 
       setLoadingAI(true);
 
-      
+
       const response =
         await fetch(
 
@@ -233,7 +233,10 @@ async function handlePublish() {
 
       if (!data.success) {
 
-  if (data.error === "PLAN_NOT_ALLOWED") {
+  if (
+    data.error === "PUBLISHING_SUBSCRIPTION_REQUIRED" ||
+    data.error === "PLAN_NOT_ALLOWED"
+  ) {
     setShowUpgradeModal(true);
     return;
   }
@@ -261,6 +264,7 @@ setShowStatusModal(true);
     );
 
     if (
+  err?.message?.includes("PUBLISHING_SUBSCRIPTION_REQUIRED") ||
   err?.message?.includes("PLAN_NOT_ALLOWED")
 ) {
   setShowUpgradeModal(true);
@@ -473,9 +477,10 @@ setShowStatusModal(true);
 
 <FeatureLockedModal
   open={showUpgradeModal}
-  title="Upgrade Required"
-  description="Social Publishing is available on the PRO plan and above."
+  title="Publishing Is Not Activated"
+  description="Your account does not have an active Publishing subscription. Activate Publishing to connect your social accounts and publish your MagicReel content."
   featureName="Social Publishing"
+  primaryLabel="Activate Publishing"
   onClose={() =>
     setShowUpgradeModal(false)
   }

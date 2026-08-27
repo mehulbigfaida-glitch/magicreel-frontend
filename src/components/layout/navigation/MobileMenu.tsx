@@ -155,14 +155,6 @@ export default function MobileMenu({
           <span>Portfolio</span>
         </Link>
 
-        <Link
-          to="/publish"
-          onClick={onClose}
-          className={isActive("/publish") ? "active" : ""}
-        >
-          <Rocket size={18} />
-          <span>Publish</span>
-        </Link>
 
         <div className="mr-mobile-divider" />
 

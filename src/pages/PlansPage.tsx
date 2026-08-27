@@ -1,4 +1,5 @@
 import "./PlansPage.css";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 
 type PaidPlan =
@@ -98,6 +99,8 @@ const loadRazorpayScript =
     });
 
 export default function PlansPage() {
+
+  const navigate = useNavigate();
 
   const BACKEND_URL =
     import.meta.env.VITE_API_BASE_URL;
@@ -865,6 +868,19 @@ export default function PlansPage() {
               );
 
               await refreshAccount();
+
+              /*
+               * FIRST-TIME PUBLISH ONBOARDING
+               *
+               * Publishing has just become active.
+               * Take the user directly to Social Accounts so
+               * they can connect Instagram through Zernio.
+               *
+               * Subsequent visits do not come through this path,
+               * so an already-connected user is not forced to
+               * reconnect their account.
+               */
+              navigate("/social-media?onboarding=1");
 
             } catch (error: any) {
 
