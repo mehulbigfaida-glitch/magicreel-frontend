@@ -198,16 +198,11 @@ function handlePublish(
   }
 
   const assetUrl =
-    item.type?.toLowerCase() === "reel"
-      ? item.mediaUrl
-      : (
-          item.heroImageUrl ||
-          item.mediaUrl
-        );
+    item.mediaUrl ||
+    "";
 
   const heroImageUrl =
     item.heroImageUrl ||
-    item.mediaUrl ||
     "";
 
   if(!assetUrl){

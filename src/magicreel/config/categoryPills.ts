@@ -40,6 +40,8 @@ export const CATEGORY_PILLS: Partial<
 
   /* MEN */
 
+  overlay: ["OPEN", "BUTTONED"],
+
   shirt: ["UNTUCKED", "TUCKED"],
 
   kurta: ["CASUAL", "FORMAL"],

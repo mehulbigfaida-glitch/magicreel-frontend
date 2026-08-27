@@ -21,7 +21,7 @@ export const GARMENTS = {
     { key: "kurta", label: "Kurta" },
     { key: "kurta_set", label: "Kurta Set" },
     { key: "sherwani", label: "Sherwani" },
-    { key: "overlay", label: "Overlay / Jacket" },
+    { key: "overlay_jacket", label: "Overlay / Jacket" },
     { key: "bottoms", label: "Bottoms" },
   ],
 
