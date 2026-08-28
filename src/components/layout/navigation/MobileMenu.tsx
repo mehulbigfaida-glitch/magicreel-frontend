@@ -76,6 +76,15 @@ export default function MobileMenu({
           CREATE
         </div>
 
+        <Link
+          to="/create-ai-hero"
+          onClick={onClose}
+          className={isActive("/create-ai-hero") ? "active" : ""}
+        >
+          <Sparkles size={18} />
+          <span>Hero Images</span>
+        </Link>
+
         <div className="mr-mobile-expandable">
 
           <button
