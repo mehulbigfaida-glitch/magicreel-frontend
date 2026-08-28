@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import CampaignHeroPickerModal from "../campaign/CampaignHeroPickerModal";
 import FeatureLockedModal from "../../components/FeatureLockedModal";
+import "./SocialCampaignMobile.css";
+
 import {
   useAuthStore,
 } from "../../store/authStore";
@@ -532,6 +534,7 @@ window.open(
 ========================= */}
 
 <div
+  className="editorial-mobile-upload-grid"
   style={{
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(420px, 1fr))",
@@ -670,6 +673,7 @@ window.open(
     </div>
 
     <div
+  className="editorial-mobile-model-grid"
   style={{
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
@@ -771,6 +775,7 @@ window.open(
           </div>
 
           <div
+            className="editorial-mobile-world-grid"
             style={{
               display: "grid",
 
@@ -928,6 +933,7 @@ window.open(
 ========================================================== */}
 
 <div
+  className="editorial-mobile-output-grid"
   style={{
     display: "grid",
     gridTemplateColumns: "1.3fr 1fr",

@@ -1,0 +1,106 @@
+/*
+ * MAGICREEL — EDITORIAL STUDIO
+ * MOBILE RESPONSIVE PRESENTATION LAYER
+ *
+ * Desktop layout is intentionally untouched.
+ */
+
+@media (max-width: 767px) {
+
+  /*
+   * Prevent the Editorial Studio from creating horizontal
+   * viewport overflow on mobile.
+   */
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
+  /*
+   * HERO + SUPPORTING MODELS
+   *
+   * The original upload container uses:
+   * repeat(auto-fit, minmax(420px, 1fr))
+   *
+   * That minimum is too wide for a mobile viewport.
+   */
+  .editorial-mobile-upload-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100%;
+    max-width: 100%;
+    gap: 18px !important;
+    margin-bottom: 34px !important;
+  }
+
+  /*
+   * Inner supporting-model grid.
+   */
+  .editorial-mobile-model-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100%;
+    max-width: 100%;
+    gap: 14px !important;
+  }
+
+  /*
+   * Keep uploaded hero preview inside the viewport.
+   */
+  .editorial-mobile-upload-grid img {
+    max-width: 100%;
+    height: auto !important;
+    max-height: 620px;
+    object-fit: contain !important;
+  }
+
+  /*
+   * CINEMATIC WORLDS
+   *
+   * One card per row gives the world artwork enough
+   * breathing room on a narrow phone.
+   */
+  .editorial-mobile-world-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100%;
+    max-width: 100%;
+    gap: 18px !important;
+  }
+
+  .editorial-mobile-world-grid > button {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  /*
+   * OUTPUT FORMAT + BRANDING
+   *
+   * The original desktop structure is 1.3fr / 1fr.
+   * Stack the two cards vertically on mobile.
+   */
+  .editorial-mobile-output-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100%;
+    max-width: 100%;
+    gap: 18px !important;
+    margin-bottom: 28px !important;
+  }
+
+  /*
+   * Output format buttons must be allowed to wrap inside
+   * the mobile card rather than forcing overflow.
+   */
+  .editorial-mobile-output-grid button {
+    max-width: 100%;
+  }
+
+  /*
+   * Mobile typography containment.
+   */
+  .editorial-mobile-upload-grid *,
+  .editorial-mobile-model-grid *,
+  .editorial-mobile-world-grid *,
+  .editorial-mobile-output-grid * {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
