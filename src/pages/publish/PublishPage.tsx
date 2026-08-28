@@ -325,41 +325,209 @@ setShowStatusModal(true);
   }
 />
 
-        <div className="publish-platforms">
+        <div className="publish-platforms publish-destinations">
 
-  <label>
+  <div className="publish-destinations-header">
 
-    <input
-      type="checkbox"
-      checked={platforms.instagram}
-      onChange={(e) =>
+    <div>
+
+      <div className="publish-destinations-eyebrow">
+        PUBLISH DESTINATIONS
+      </div>
+
+      <h2>
+        Choose where to publish
+      </h2>
+
+      <p>
+        Select one or more social platforms for your content.
+      </p>
+
+    </div>
+
+    <div className="publish-destinations-count">
+      {Object.values(platforms).filter(Boolean).length}
+      {" selected"}
+    </div>
+
+  </div>
+
+
+  <div className="publish-destination-grid">
+
+    <button
+      type="button"
+      className={
+        "publish-destination-card " +
+        (
+          platforms.instagram
+            ? "publish-destination-active"
+            : ""
+        )
+      }
+      aria-pressed={platforms.instagram}
+      onClick={() =>
         setPlatforms({
           ...platforms,
-          instagram: e.target.checked,
+          instagram: !platforms.instagram,
         })
       }
-    />
+    >
 
-    Instagram
+      <div className="publish-destination-top">
 
-  </label>
+        <div className="publish-destination-brand instagram-brand">
+          ◎
+        </div>
 
-  <label>
+        <div
+          className={
+            "publish-destination-check " +
+            (
+              platforms.instagram
+                ? "publish-destination-check-active"
+                : ""
+            )
+          }
+        >
+          {platforms.instagram ? "✓" : ""}
+        </div>
 
-    <input
-      type="checkbox"
-      checked={platforms.facebook}
-      onChange={(e) =>
+      </div>
+
+
+      <div className="publish-destination-content">
+
+        <div className="publish-destination-name">
+          Instagram
+        </div>
+
+        <div className="publish-destination-description">
+          Reels, posts and visual stories
+        </div>
+
+      </div>
+
+
+      <div className="publish-destination-footer">
+
+        <span>
+          {platforms.instagram
+            ? "READY TO PUBLISH"
+            : "SELECT DESTINATION"}
+        </span>
+
+      </div>
+
+    </button>
+
+
+    <button
+      type="button"
+      className={
+        "publish-destination-card " +
+        (
+          platforms.facebook
+            ? "publish-destination-active"
+            : ""
+        )
+      }
+      aria-pressed={platforms.facebook}
+      onClick={() =>
         setPlatforms({
           ...platforms,
-          facebook: e.target.checked,
+          facebook: !platforms.facebook,
         })
       }
-    />
+    >
 
-    Facebook
+      <div className="publish-destination-top">
 
-  </label>
+        <div className="publish-destination-brand facebook-brand">
+          f
+        </div>
+
+        <div
+          className={
+            "publish-destination-check " +
+            (
+              platforms.facebook
+                ? "publish-destination-check-active"
+                : ""
+            )
+          }
+        >
+          {platforms.facebook ? "✓" : ""}
+        </div>
+
+      </div>
+
+
+      <div className="publish-destination-content">
+
+        <div className="publish-destination-name">
+          Facebook
+        </div>
+
+        <div className="publish-destination-description">
+          Posts, campaigns and social content
+        </div>
+
+      </div>
+
+
+      <div className="publish-destination-footer">
+
+        <span>
+          {platforms.facebook
+            ? "READY TO PUBLISH"
+            : "SELECT DESTINATION"}
+        </span>
+
+      </div>
+
+    </button>
+
+
+    <div className="publish-destination-card publish-destination-coming">
+
+      <div className="publish-destination-top">
+
+        <div className="publish-destination-brand more-brand">
+          +
+        </div>
+
+        <div className="publish-destination-soon">
+          SOON
+        </div>
+
+      </div>
+
+
+      <div className="publish-destination-content">
+
+        <div className="publish-destination-name">
+          More destinations
+        </div>
+
+        <div className="publish-destination-description">
+          More channels are coming to MagicReel.
+        </div>
+
+      </div>
+
+
+      <div className="publish-destination-footer">
+
+        <span>
+          EXPANDING ECOSYSTEM
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
 
 </div>
 
@@ -377,7 +545,7 @@ setShowStatusModal(true);
             {
               loadingAI
                 ? "✨ Analyzing Garment..."
-                : "✨ AI Social Assistant"
+                : "Generate Caption & Hashtags"
             }
 
           </button>
