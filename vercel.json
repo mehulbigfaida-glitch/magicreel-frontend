@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/download/MagicReel-AI-Hero-7-Step-Guide.pdf",
+      "destination": "/docs/MagicReel-AI-Hero-7-Step-Guide.pdf"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

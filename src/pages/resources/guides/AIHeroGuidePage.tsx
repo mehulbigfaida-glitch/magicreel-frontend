@@ -7,6 +7,8 @@ import {
 } from "lucide-react";
 
 import "../Resources.css";
+import HeroWorkflowSlideshow from "../../../components/resources/HeroWorkflowSlideshow";
+
 
 export default function AIHeroGuidePage() {
   return (
@@ -71,65 +73,91 @@ export default function AIHeroGuidePage() {
           WORKFLOW
       ======================================================= */}
 
-      <section className="resource-section">
+      <section className="resource-section hero-workflow-section">
 
         <div className="section-header">
 
           <h2>AI Hero Workflow</h2>
 
           <p>
-            Follow these recommended steps to consistently
-            generate high-quality Hero images.
+            Create your AI Hero in 7 simple steps.
+            Follow the visual walkthrough below to go from
+            garment selection to your finished Hero images.
           </p>
 
         </div>
 
-        <div className="quick-start-grid">
-
-          <div className="guide-card">
-
-            <div className="step-number">1</div>
-
-            <h3>Upload Garment</h3>
-
-            <p>
-              Upload a clean front garment image with good
-              lighting and minimal wrinkles.
-            </p>
-
-          </div>
-
-          <div className="guide-card">
-
-            <div className="step-number">2</div>
-
-            <h3>Select Muse</h3>
-
-            <p>
-              Choose the AI model that best matches your
-              campaign requirements.
-            </p>
-
-          </div>
-
-          <div className="guide-card">
-
-            <div className="step-number">3</div>
-
-            <h3>Generate Hero</h3>
-
-            <p>
-              MagicReel creates a realistic fashion model while
-              preserving garment appearance and fit.
-            </p>
-
-          </div>
-
-        </div>
+        <HeroWorkflowSlideshow
+          steps={[
+            {
+              number: 1,
+              title: "Select Gender",
+              narration:
+                "Start by selecting the gender that matches your garment and the fashion presentation you want to create.",
+              image:
+                new URL("../../../assets/docs/hero/hero-step-1.png", import.meta.url).href,
+              alt: "Step 1: Select Gender in MagicReel",
+            },
+            {
+              number: 2,
+              title: "Select Garment",
+              narration:
+                "Select the garment category that matches your product. Browse the available garment categories before making your selection.",
+              image:
+                new URL("../../../assets/docs/hero/hero-step-2.png", import.meta.url).href,
+              alt: "Step 2: Select Garment category in MagicReel",
+            },
+            {
+              number: 3,
+              title: "Select Garment Detail",
+              narration:
+                "Select the garment detail pills that accurately describe your product. These selections help MagicReel understand the garment correctly.",
+              image:
+                new URL("../../../assets/docs/hero/hero-step-3.png", import.meta.url).href,
+              alt: "Step 3: Select garment detail pills in MagicReel",
+            },
+            {
+              number: 4,
+              title: "Upload Your Garment",
+              narration:
+                "Upload the Front garment image. A Back image is optional at this stage.",
+              image:
+                new URL("../../../assets/docs/hero/hero-step-4.png", import.meta.url).href,
+              alt: "Step 4: Upload Front and Back garment images",
+            },
+            {
+              number: 5,
+              title: "Confirm Your Garment",
+              narration:
+                "Front is required. Back is optional but required for Lookbook Back Pose and 360° Reel.",
+              image:
+                new URL("../../../assets/docs/hero/hero-step-5.png", import.meta.url).href,
+              alt: "Step 5: Confirm uploaded garment images before generating",
+            },
+            {
+              number: 6,
+              title: "Select Your Muse",
+              narration:
+                "Choose the Muse that best matches the look and presentation you want for your AI Hero.",
+              image:
+                new URL("../../../assets/docs/hero/hero-step-6.png", import.meta.url).href,
+              alt: "Step 6: Select a Muse in MagicReel",
+            },
+            {
+              number: 7,
+              title: "Generate Your Hero",
+              narration:
+                "Click Generate Hero. MagicReel processes your selections and displays the generated Hero images in the result area.",
+              image:
+                new URL("../../../assets/docs/hero/hero-step-7.png", import.meta.url).href,
+              alt: "Step 7: Generate Hero and view the resulting Hero images",
+            },
+          ]}
+        />
 
       </section>
 
-            {/* ======================================================
+      {/* ======================================================
           IMAGE REQUIREMENTS
       ======================================================= */}
 
