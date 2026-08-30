@@ -44,7 +44,8 @@ export default function RequestTestingCreditsPage() {
     !form.name.trim() ||
     !form.designation.trim() ||
     !form.company.trim() ||
-    !form.email.trim()
+    !form.email.trim() ||
+    !form.mobile.trim()
   ) {
     return;
   }
@@ -64,7 +65,7 @@ export default function RequestTestingCreditsPage() {
           designation: form.designation.trim(),
           company: form.company.trim(),
           email: form.email.trim(),
-          mobile: form.mobile.trim() || null,
+          mobile: form.mobile.trim(),
           instagram:
             form.instagram.trim() || null,
           requestedFeatures: tests,
@@ -238,7 +239,7 @@ export default function RequestTestingCreditsPage() {
 
                 <input
                   type="tel"
-                  placeholder="Mobile Number (Optional)"
+                  placeholder="Mobile Number"
                   value={form.mobile}
                   onChange={(e) =>
                     updateField(
@@ -247,6 +248,7 @@ export default function RequestTestingCreditsPage() {
                     )
                   }
                   style={styles.input}
+                  required
                 />
 
                 <input
