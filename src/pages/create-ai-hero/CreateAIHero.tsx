@@ -956,25 +956,15 @@ style={{
                   Select Gender
                 </option>
 
-                {Object.keys(
-                  GARMENTS
-                ).map(
-                  (category) => (
-
-                    <option
-                      key={
-                        category
-                      }
-
-                      value={
-                        category
-                      }
-                    >
-                      {category}
-                    </option>
-
-                  )
-                )}
+                {Object.keys(GARMENTS).map((category) => (
+  <option
+    key={category}
+    value={category}
+    disabled={category === "Kids"}
+  >
+    {category}
+  </option>
+))}
 
               </select>
 
