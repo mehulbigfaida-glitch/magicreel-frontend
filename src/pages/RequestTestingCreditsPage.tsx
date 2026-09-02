@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./RequestTestingCreditsPage.css";
 
 export default function RequestTestingCreditsPage() {
   const navigate = useNavigate();
@@ -103,12 +104,12 @@ export default function RequestTestingCreditsPage() {
 };
 
   return (
-    <div style={styles.page}>
+    <div className="testing-credits-page" style={styles.page}>
       {/* ======================================================
           LEFT PANEL
       ====================================================== */}
 
-      <div style={styles.leftPanel}>
+      <div className="testing-credits-left-panel" style={styles.leftPanel}>
         <div style={styles.brand}>MagicReel</div>
 
         <div>
@@ -162,8 +163,8 @@ export default function RequestTestingCreditsPage() {
           RIGHT PANEL
       ====================================================== */}
 
-      <div style={styles.rightPanel}>
-        <div style={styles.card}>
+      <div className="testing-credits-right-panel" style={styles.rightPanel}>
+        <div className="testing-credits-card" style={styles.card}>
 
           {!submitted ? (
             <>

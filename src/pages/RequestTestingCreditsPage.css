@@ -1,0 +1,144 @@
+/* ==========================================================
+   MAGICREEL — TESTING CREDITS REQUEST
+   Responsive presentation layer
+   ========================================================== */
+
+.testing-credits-page {
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.testing-credits-left-panel,
+.testing-credits-right-panel {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.testing-credits-card {
+  box-sizing: border-box;
+}
+
+/* ==========================================================
+   TABLET / MOBILE
+   ========================================================== */
+
+@media (max-width: 768px) {
+  .testing-credits-page {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    min-height: 100vh !important;
+  }
+
+  .testing-credits-left-panel {
+    flex: none !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 40px 28px !important;
+    box-sizing: border-box !important;
+  }
+
+  .testing-credits-right-panel {
+    flex: none !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 32px 24px 48px !important;
+    box-sizing: border-box !important;
+  }
+
+  .testing-credits-card {
+    width: 100% !important;
+    max-width: 520px !important;
+    box-sizing: border-box !important;
+    padding: 32px 28px !important;
+  }
+
+  /* Keep the mobile hero strong but contained */
+  .testing-credits-left-panel h1 {
+    font-size: 40px !important;
+    line-height: 1.08 !important;
+  }
+
+  .testing-credits-left-panel p {
+    max-width: 100% !important;
+  }
+
+  .testing-credits-left-panel {
+    justify-content: flex-start !important;
+  }
+}
+
+/* ==========================================================
+   SMALL PHONES
+   ========================================================== */
+
+@media (max-width: 480px) {
+  .testing-credits-left-panel {
+    padding: 32px 22px !important;
+  }
+
+  .testing-credits-right-panel {
+    padding: 24px 16px 40px !important;
+  }
+
+  .testing-credits-card {
+    padding: 28px 20px !important;
+    border-radius: 16px !important;
+  }
+
+  .testing-credits-left-panel h1 {
+    font-size: 36px !important;
+  }
+
+  .testing-credits-left-panel p {
+    font-size: 16px !important;
+    line-height: 1.6 !important;
+  }
+
+  .testing-credits-card h2 {
+    font-size: 28px !important;
+    line-height: 1.15 !important;
+  }
+
+  .testing-credits-card input {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .testing-credits-card button {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* ==========================================================
+   VERY SMALL PHONES
+   ========================================================== */
+
+@media (max-width: 380px) {
+  .testing-credits-left-panel {
+    padding: 28px 18px !important;
+  }
+
+  .testing-credits-right-panel {
+    padding: 20px 12px 36px !important;
+  }
+
+  .testing-credits-card {
+    padding: 24px 18px !important;
+  }
+
+  .testing-credits-left-panel h1 {
+    font-size: 32px !important;
+  }
+
+  .testing-credits-left-panel > div:first-child {
+    font-size: 32px !important;
+  }
+
+  /* Give the feature list enough room on very narrow screens */
+  .testing-credits-left-panel div[style*="grid"] {
+    grid-template-columns: 1fr !important;
+  }
+}
