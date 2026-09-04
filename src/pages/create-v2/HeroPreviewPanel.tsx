@@ -12,8 +12,8 @@ type Props = {
   activeView?: "front" | "back";
   onToggle?: (view: "front" | "back") => void;
   categoryKey?: string | null;
-
-  /* 🔥 REEL */
+  gender?: string | null;
+  lookbookWorld?: string | null;
   reelUrl?: string | null;
   reelLoading?: boolean;
 };
@@ -26,254 +26,95 @@ export default function HeroPreviewPanel({
   showToggle = false,
   activeView = "front",
   onToggle,
-
-  /* 🔥 FIX: ADD THESE */
+  categoryKey,
+  gender,
+  lookbookWorld = "ecom-clean",
   reelUrl,
   reelLoading,
-
 }: Props) {
-
   const [menuOpen, setMenuOpen] = useState(false);
   const [showReady, setShowReady] = useState(false);
-
   const menuRef = useRef<HTMLDivElement | null>(null);
 
-  /* -----------------------------
-     HERO COMPLETION DETECTION
-  ----------------------------- */
   useEffect(() => {
     if (heroImageUrl && !loading) {
-      const t = setTimeout(() => {
-        setShowReady(true);
-      }, 300);
+      const t = setTimeout(() => setShowReady(true), 300);
       return () => clearTimeout(t);
-    } else {
-      setShowReady(false);
     }
+    setShowReady(false);
   }, [heroImageUrl, loading]);
 
-  /* -----------------------------
-     CLOSE MENU ON OUTSIDE CLICK
-  ----------------------------- */
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(e.target as Node)
-      ) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
         setMenuOpen(false);
       }
     };
-
-    if (menuOpen) {
-      document.addEventListener("click", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
+    if (menuOpen) document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
   }, [menuOpen]);
 
-  /* -----------------------------
-     DOWNLOAD HERO
-  ----------------------------- */
   const handleDownloadHero = () => {
-    if (!heroImageUrl) return;
-    window.open(heroImageUrl, "_blank");
+    if (heroImageUrl) window.open(heroImageUrl, "_blank");
   };
 
-  /* -----------------------------
-     GENERATE LOOKBOOK
-  ----------------------------- */
   const handleGenerateLookbook = () => {
     if (!heroImageUrl) return;
-
     setMenuOpen(false);
-
-    const url = `/lookbook?hero=${encodeURIComponent(heroImageUrl)}${
-      backHeroImageUrl
-        ? `&back=${encodeURIComponent(backHeroImageUrl)}`
-        : ""
-    }`;
-
-    window.open(url, "_blank");
+    const query = new URLSearchParams({
+      hero: heroImageUrl,
+      category: categoryKey || "shirt",
+      gender: gender || "unisex",
+      world: lookbookWorld || "ecom-clean",
+    });
+    if (backHeroImageUrl) query.set("back", backHeroImageUrl);
+    window.open(`/lookbook?${query.toString()}`, "_blank");
   };
 
-  /* -----------------------------
-     GENERATE REEL
-  ----------------------------- */
   const handleGenerateReel = () => {
     if (!heroImageUrl) return;
-
     setMenuOpen(false);
-
-    window.open(
-      `/reel?hero=${encodeURIComponent(heroImageUrl)}`,
-      "_blank"
-    );
+    window.open(`/reel?hero=${encodeURIComponent(heroImageUrl)}`, "_blank");
   };
 
-  /* -----------------------------
-     CREATE SOCIAL PACK
-  ----------------------------- */
   const handleCreateSocialPack = () => {
     if (!heroImageUrl) return;
-
     setMenuOpen(false);
-
-    window.open(
-      `/create/social-pack?hero=${encodeURIComponent(heroImageUrl)}`,
-      "_blank"
-    );
-  };
-
-  /* -----------------------------
-     TOGGLE MENU
-  ----------------------------- */
-  const toggleMenu = () => {
-    setMenuOpen((prev) => !prev);
+    window.open(`/create/social-pack?hero=${encodeURIComponent(heroImageUrl)}`, "_blank");
   };
 
   return (
     <div className="hero-preview-panel">
-
-      {error && (
-        <div className="hero-preview-error">
-          {error}
-        </div>
-      )}
-
+      {error && <div className="hero-preview-error">{error}</div>}
       <div className="hero-stage">
-
         {showToggle && (
           <div className="hero-toggle">
-
-            <button
-              className={
-                activeView === "front"
-                  ? "toggle-btn active"
-                  : "toggle-btn"
-              }
-              onClick={() => onToggle?.("front")}
-            >
-              Front
-            </button>
-
-            <button
-              className={
-                activeView === "back"
-                  ? "toggle-btn active"
-                  : "toggle-btn"
-              }
-              onClick={() => onToggle?.("back")}
-            >
-              Back
-            </button>
-
+            <button className={activeView === "front" ? "toggle-btn active" : "toggle-btn"} onClick={() => onToggle?.("front")}>Front</button>
+            <button className={activeView === "back" ? "toggle-btn active" : "toggle-btn"} onClick={() => onToggle?.("back")}>Back</button>
           </div>
         )}
-
         <div className="hero-card">
-
-          {heroImageUrl && (
-            <img
-              src={heroImageUrl}
-              alt="Hero preview"
-              className="hero-preview-image"
-            />
-          )}
-
-          {!heroImageUrl && !loading && (
-            <div className="hero-preview-empty">
-              Hero image will appear here
-            </div>
-          )}
-
-          {loading && (
-            <div className="hero-loading-overlay">
-              <div className="hero-spinner" />
-              <div className="hero-loading-text">
-                Generating AI Hero...
-              </div>
-            </div>
-          )}
-
-          {showReady && (
-            <div className="hero-ready-text">
-              ✨ Your AI Model is Ready
-            </div>
-          )}
-
+          {heroImageUrl && <img src={heroImageUrl} alt="Hero preview" className="hero-preview-image" />}
+          {!heroImageUrl && !loading && <div className="hero-preview-empty">Hero image will appear here</div>}
+          {loading && <div className="hero-loading-overlay"><div className="hero-spinner" /><div className="hero-loading-text">Generating AI Hero...</div></div>}
+          {showReady && <div className="hero-ready-text">✨ Your AI Model is Ready</div>}
           {heroImageUrl && !loading && (
             <div className="ai-actions-container" ref={menuRef}>
-
-              <button
-                className="ai-action-btn"
-                onClick={toggleMenu}
-              >
-                ✨ AI Actions
-              </button>
-
+              <button className="ai-action-btn" onClick={() => setMenuOpen((prev) => !prev)}>✨ AI Actions</button>
               {menuOpen && (
                 <div className="ai-dropdown">
-
-                  <button
-                    onClick={handleGenerateLookbook}
-                    disabled={!heroImageUrl}
-                  >
-                    Generate Lookbook
-                  </button>
-
-                  <button
-                    onClick={handleGenerateReel}
-                    disabled={!heroImageUrl}
-                  >
-                    Generate Reel
-                  </button>
-
-                  <button
-                    onClick={handleCreateSocialPack}
-                    disabled={!heroImageUrl}
-                  >
-                    Create Social Pack
-                  </button>
-
-                  <button onClick={handleDownloadHero}>
-                    Download Image
-                  </button>
-
+                  <button onClick={handleGenerateLookbook}>Generate Lookbook</button>
+                  <button onClick={handleGenerateReel}>Generate Reel</button>
+                  <button onClick={handleCreateSocialPack}>Create Social Pack</button>
+                  <button onClick={handleDownloadHero}>Download Image</button>
                 </div>
               )}
-
             </div>
           )}
-
-          {/* 🔥 REEL OUTPUT */}
-
-          {reelLoading && (
-            <div style={{ marginTop: 12 }}>
-              Generating Reel...
-            </div>
-          )}
-
-          {reelUrl && (
-            <video
-              src={reelUrl}
-              controls
-              autoPlay
-              loop
-              style={{
-                width: "100%",
-                borderRadius: 12,
-                marginTop: 12,
-              }}
-            />
-          )}
-
+          {reelLoading && <div style={{ marginTop: 12 }}>Generating Reel...</div>}
+          {reelUrl && <video src={reelUrl} controls autoPlay loop style={{ width: "100%", borderRadius: 12, marginTop: 12 }} />}
         </div>
-
       </div>
-
     </div>
   );
 }
