@@ -21,24 +21,23 @@ export default function LookbookPage() {
   const gender = state.gender || state.avatarGender || params.get("gender") || "unisex";
   const world = state.lookbookWorld || state.worldId || params.get("world") || "ecom-clean";
 
+  const initialRatio = params.get("ar") as AspectRatio | null;
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>(
-    (params.get("ar") as AspectRatio) || "2:3"
+    initialRatio && ASPECT_RATIOS.includes(initialRatio) ? initialRatio : "2:3"
   );
   const [runId, setRunId] = useState<string | null>(params.get("runId"));
+  const [shareId, setShareId] = useState<string | null>(null);
   const [poses, setPoses] = useState<Pose[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(heroImageUrl || null);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("Ready to create your Lookbook");
   const [error, setError] = useState<string | null>(null);
 
-  const normalizePoses = (items: any[]): Pose[] =>
-    items.map((p) => ({
-      poseId: String(p.poseId || "").toLowerCase(),
-      imageUrl: p.imageUrl || p.resultImageUrl || undefined,
-    }));
-
   const fetchLookbook = async (id: string) => {
-    const res = await fetch(`${API_BASE}/api/p2m/lookbook/${id}`);
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_BASE}/api/p2m/lookbook-v1/status/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     if (!res.ok) throw new Error("Unable to fetch Lookbook status");
     return res.json();
   };
@@ -54,10 +53,17 @@ export default function LookbookPage() {
         const data = await fetchLookbook(runId);
         if (cancelled) return;
 
-        const nextPoses = normalizePoses(data?.poses || []);
+        const nextPoses: Pose[] = (data?.poses || []).map((p: any) => ({
+          poseId: String(p.poseId || "").toLowerCase(),
+          imageUrl: p.imageUrl || p.resultImageUrl || undefined,
+        }));
         if (nextPoses.length) {
           setPoses(nextPoses);
           setSelectedImage((current) => current || nextPoses[0]?.imageUrl || null);
+        }
+        if (data?.shareId) setShareId(data.shareId);
+        if (data?.aspectRatio && ASPECT_RATIOS.includes(data.aspectRatio)) {
+          setAspectRatio(data.aspectRatio);
         }
 
         if (data?.status === "completed") {
@@ -65,7 +71,6 @@ export default function LookbookPage() {
           setStatus(`Lookbook ready — ${nextPoses.length} images`);
           return;
         }
-
         if (data?.status === "failed") {
           setLoading(false);
           setError("Lookbook generation failed");
@@ -78,7 +83,6 @@ export default function LookbookPage() {
           setError("Lookbook generation timed out. Please try again.");
           return;
         }
-
         window.setTimeout(poll, POLL_MS);
       } catch (err) {
         if (!cancelled) {
@@ -96,14 +100,13 @@ export default function LookbookPage() {
     setLoading(true);
     setStatus("Creating your Lookbook...");
     poll();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [runId]);
 
   const handleStartGeneration = async () => {
     setError(null);
     setPoses([]);
+    setShareId(null);
     setSelectedImage(heroImageUrl || null);
     setLoading(true);
     setStatus("Starting Lookbook generation...");
@@ -115,28 +118,22 @@ export default function LookbookPage() {
 
       const res = await fetch(`${API_BASE}/api/p2m/lookbook-v1/generate`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          heroImageUrl,
-          backHeroImageUrl,
-          lookbookWorld: world,
-          gender,
-          category,
-          aspectRatio,
-        }),
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ heroImageUrl, backHeroImageUrl, lookbookWorld: world, gender, category, aspectRatio }),
       });
-
       const data = await res.json();
-      if (res.status === 403) {
-        window.location.href = "/plans";
-        return;
-      }
+      if (res.status === 403) { window.location.href = "/plans"; return; }
       if (!res.ok) throw new Error(data?.error || "Lookbook generation failed");
-
       setRunId(data.runId);
+      window.history.replaceState(null, "", `${window.location.pathname}?${new URLSearchParams({
+        hero: heroImageUrl,
+        ...(backHeroImageUrl ? { back: backHeroImageUrl } : {}),
+        category,
+        gender,
+        world,
+        ar: aspectRatio,
+        runId: data.runId,
+      }).toString()}`);
       window.dispatchEvent(new Event("creditsUpdated"));
     } catch (err: any) {
       console.error("Lookbook generation error:", err);
@@ -151,10 +148,7 @@ export default function LookbookPage() {
       const token = localStorage.getItem("token");
       const res = await fetch(`${API_BASE}/api/p2m/lookbook-v1/export`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ images: poses.map((p) => p.imageUrl).filter(Boolean) }),
       });
       if (!res.ok) throw new Error("Export failed");
@@ -172,7 +166,9 @@ export default function LookbookPage() {
   };
 
   const handleShare = () => {
-    alert("Share will become available when the isolated Lookbook share/status flow is connected.");
+    if (!shareId) return;
+    const shareUrl = `${window.location.origin}/share/${shareId}`;
+    window.open(shareUrl, "_blank");
   };
 
   if (!runId && !loading && !poses.length) {
@@ -184,29 +180,14 @@ export default function LookbookPage() {
           <div style={{ fontWeight: 600, marginBottom: 10 }}>Aspect Ratio</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
             {ASPECT_RATIOS.map((ratio) => (
-              <button
-                key={ratio}
-                type="button"
-                onClick={() => setAspectRatio(ratio)}
-                style={{
-                  padding: "10px 8px",
-                  borderRadius: 10,
-                  border: aspectRatio === ratio ? "2px solid #111" : "1px solid #d0d5dd",
-                  background: aspectRatio === ratio ? "#111" : "#fff",
-                  color: aspectRatio === ratio ? "#fff" : "#111",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                }}
-              >
+              <button key={ratio} type="button" onClick={() => setAspectRatio(ratio)} style={{ padding: "10px 8px", borderRadius: 10, border: aspectRatio === ratio ? "2px solid #111" : "1px solid #d0d5dd", background: aspectRatio === ratio ? "#111" : "#fff", color: aspectRatio === ratio ? "#fff" : "#111", fontWeight: 600, cursor: "pointer" }}>
                 {ratio}
               </button>
             ))}
           </div>
         </div>
         {error && <div style={{ color: "red" }}>{error}</div>}
-        <button disabled={loading} onClick={handleStartGeneration}>
-          {loading ? "Generating..." : "Generate Lookbook"}
-        </button>
+        <button disabled={loading} onClick={handleStartGeneration}>{loading ? "Generating..." : "Generate Lookbook"}</button>
       </div>
     );
   }
@@ -225,28 +206,20 @@ export default function LookbookPage() {
     <div className="lookbook-page">
       <div className="lookbook-header">
         <div className="header-left">MagicReel Lookbook</div>
-        <div className="header-right">
-          <button className="export-btn" onClick={handleExport}>Download Lookbook</button>
-        </div>
+        <div className="header-right"><button className="export-btn" onClick={handleExport}>Download Lookbook</button></div>
       </div>
       <div className="lookbook-main">
         <div className="hero-column">
           <div style={{ marginBottom: 12, fontWeight: 600 }}>Main Preview · {aspectRatio}</div>
           <div className="hero-frame">{selectedImage && <img src={selectedImage} alt="Lookbook preview" />}</div>
-          <div className="hero-actions">
-            <button className="reel-btn" onClick={handleShare}>🔗 Share Lookbook</button>
-          </div>
+          <div className="hero-actions"><button className="reel-btn" onClick={handleShare} disabled={!shareId}>🔗 Share Lookbook</button></div>
         </div>
         <div className="thumbnail-panel">
           {error && <div style={{ color: "red", marginBottom: 12 }}>{error}</div>}
           <div className="lookbook-section-title">{status}</div>
           <div className="thumbnail-grid">
             {poses.map((pose, index) => (
-              <div
-                key={`${pose.poseId}-${index}-${pose.imageUrl || ""}`}
-                className={`thumb-card ${selectedImage === pose.imageUrl ? "selected" : ""}`}
-                onClick={() => pose.imageUrl && setSelectedImage(pose.imageUrl)}
-              >
+              <div key={`${pose.poseId}-${index}-${pose.imageUrl || ""}`} className={`thumb-card ${selectedImage === pose.imageUrl ? "selected" : ""}`} onClick={() => pose.imageUrl && setSelectedImage(pose.imageUrl)}>
                 <img src={pose.imageUrl || ""} alt={pose.poseId} />
                 <div className="pose-label">{pose.poseId.replace("_", " ")}</div>
               </div>
