@@ -1,18 +1,24 @@
-import { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { API_BASE } from "../../../config/api";
 import "./ecomOutput.css";
 
-type Pose = {
-  poseId: string;
-  imageUrl?: string;
-};
-
+type Pose = { poseId: string; imageUrl?: string };
 const POLL_MS = 4000;
 const MAX_POLLS = 120;
+const EXPECTED_ASSETS = 6;
+
+const labelForPose = (poseId: string) => {
+  const id = poseId.toLowerCase();
+  if (id === "front" || id === "hero") return "FRONT";
+  if (id === "back") return "BACK";
+  const match = id.match(/^pose_(\d+)$/);
+  return match ? `POSE ${match[1]}` : poseId.replace(/_/g, " ").toUpperCase();
+};
 
 export default function EcomOutputV1Page() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [poses, setPoses] = useState<Pose[]>([]);
   const [aspectRatio, setAspectRatio] = useState("2:3");
@@ -20,7 +26,10 @@ export default function EcomOutputV1Page() {
   const [error, setError] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
+  const [generatingReel, setGeneratingReel] = useState(false);
+  const [copying, setCopying] = useState(false);
   const [polls, setPolls] = useState(0);
+  const pollCountRef = useRef(0);
 
   useEffect(() => {
     if (!id) {
@@ -28,9 +37,9 @@ export default function EcomOutputV1Page() {
       setError("Lookbook run not found");
       return;
     }
-
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
+    pollCountRef.current = 0;
 
     const load = async () => {
       try {
@@ -40,7 +49,6 @@ export default function EcomOutputV1Page() {
         });
         const data = await res.json();
         if (cancelled) return;
-
         if (!res.ok) throw new Error(data?.error || "Failed to load Lookbook");
 
         const nextPoses: Pose[] = (data?.poses || []).map((p: any) => ({
@@ -62,7 +70,8 @@ export default function EcomOutputV1Page() {
           return;
         }
 
-        const nextPolls = polls + 1;
+        const nextPolls = pollCountRef.current + 1;
+        pollCountRef.current = nextPolls;
         setPolls(nextPolls);
         if (nextPolls >= MAX_POLLS) {
           setLoading(false);
@@ -72,7 +81,8 @@ export default function EcomOutputV1Page() {
         timer = setTimeout(load, POLL_MS);
       } catch (err: any) {
         if (cancelled) return;
-        const nextPolls = polls + 1;
+        const nextPolls = pollCountRef.current + 1;
+        pollCountRef.current = nextPolls;
         setPolls(nextPolls);
         if (nextPolls >= MAX_POLLS) {
           setLoading(false);
@@ -88,9 +98,10 @@ export default function EcomOutputV1Page() {
       cancelled = true;
       if (timer) clearTimeout(timer);
     };
-  }, [id, polls]);
+  }, [id]);
 
   const imagePoses = useMemo(() => poses.filter((p) => p.imageUrl), [poses]);
+  const selectedPose = useMemo(() => imagePoses.find((p) => p.imageUrl === selectedImage), [imagePoses, selectedImage]);
 
   const handleExport = async () => {
     if (!imagePoses.length) return;
@@ -99,10 +110,7 @@ export default function EcomOutputV1Page() {
       const token = localStorage.getItem("token");
       const res = await fetch(`${API_BASE}/api/p2m/lookbook-v1/export`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ images: imagePoses.map((p) => p.imageUrl).filter(Boolean) }),
       });
       if (!res.ok) throw new Error("Export failed");
@@ -123,60 +131,97 @@ export default function EcomOutputV1Page() {
     }
   };
 
-  const handleShare = () => {
+  const handleCopyLink = async () => {
     if (!shareId) return;
-    window.open(`${window.location.origin}/share/${shareId}`, "_blank");
+    setCopying(true);
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}/share/${shareId}`);
+    } catch (err) {
+      console.error("Lookbook link copy error", err);
+      alert("Unable to copy link");
+    } finally {
+      setCopying(false);
+    }
+  };
+
+  const handleCarouselReel = async () => {
+    if (!id) return;
+    setGeneratingReel(true);
+    try {
+      const response = await fetch(`${API_BASE}/api/p2m/reel/carousel`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lookbookId: id }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data?.success || !data?.reelId) throw new Error(data?.error || "Reel generation failed");
+      window.location.href = `/reel/${data.reelId}`;
+    } catch (err: any) {
+      console.error("Carousel Reel error", err);
+      alert(err?.message || "Failed to generate Carousel Reel");
+      setGeneratingReel(false);
+    }
+  };
+
+  const handlePublish = () => {
+    if (!selectedImage) return;
+    navigate(`/publish?assetUrl=${encodeURIComponent(selectedImage)}&assetType=image`);
   };
 
   if (loading) {
-    const progress = Math.min(100, Math.round((imagePoses.length / 8) * 100));
+    const progress = Math.min(100, Math.round((imagePoses.length / EXPECTED_ASSETS) * 100));
     return (
-      <div className="ecom-page" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ width: "min(620px, 92vw)", padding: 42, borderRadius: 30, background: "#0b0b0d", color: "white", textAlign: "center", boxShadow: "0 30px 90px rgba(0,0,0,.45)" }}>
-          <div style={{ fontSize: 12, letterSpacing: ".28em", opacity: .5 }}>MAGICREEL AI STUDIO</div>
-          <h1 style={{ margin: "16px 0 10px", fontSize: "clamp(30px, 6vw, 44px)", fontWeight: 600 }}>Creating Your Lookbook</h1>
-          <p style={{ color: "rgba(255,255,255,.68)", lineHeight: 1.6 }}>Creating 2 Hero images + 6 commercial Lookbook poses, including a close-in product detail.</p>
-          <div style={{ marginTop: 28, textAlign: "left" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 9, fontSize: 13 }}><span>Assets completed</span><strong>{imagePoses.length} / 8</strong></div>
-            <div style={{ height: 8, borderRadius: 99, background: "rgba(255,255,255,.08)", overflow: "hidden" }}><div style={{ width: `${progress}%`, height: "100%", background: "linear-gradient(90deg,#7c3aed,#ec4899)", transition: "width .4s ease" }} /></div>
-          </div>
-          <p style={{ marginTop: 24, fontSize: 12, color: "rgba(255,255,255,.42)" }}>Please keep this tab open. Images will appear automatically when ready.</p>
+      <div className="lookbook-v1-loading">
+        <div className="lookbook-v1-loading-card">
+          <div className="lookbook-v1-eyebrow">MAGICREEL AI STUDIO</div>
+          <h1>Creating Your Lookbook</h1>
+          <p>Creating 2 Hero images + 4 commercial Lookbook poses, including one close-in product detail.</p>
+          <div className="lookbook-v1-progress-head"><span>Assets completed</span><strong>{imagePoses.length} / {EXPECTED_ASSETS}</strong></div>
+          <div className="lookbook-v1-progress-track"><div className="lookbook-v1-progress-bar" style={{ width: `${progress}%` }} /></div>
+          <div className="lookbook-v1-poll">Checking generation status · {polls}</div>
+          <p className="lookbook-v1-hint">Please keep this tab open. Images will appear automatically when ready.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="lookbook-page">
-      <div className="lookbook-header">
-        <div className="header-left">MagicReel Lookbook · {aspectRatio}</div>
-        <div style={{ display: "flex", gap: 10 }}>
-          <button className="reel-btn" onClick={handleShare} disabled={!shareId}>🔗 Share</button>
-          <button className="export-btn" onClick={handleExport} disabled={exporting}>{exporting ? "Exporting..." : "Download ZIP"}</button>
+    <div className="lookbook-v1-page">
+      <header className="lookbook-v1-header">
+        <div className="lookbook-v1-title">MagicReel Lookbook · {aspectRatio}</div>
+        <div className="lookbook-v1-actions">
+          <button className="lookbook-v1-action" onClick={handleCarouselReel} disabled={generatingReel || imagePoses.length < EXPECTED_ASSETS}>{generatingReel ? "Creating Reel..." : "Carousel Reel"}</button>
+          <button className="lookbook-v1-action" onClick={handleCopyLink} disabled={!shareId || copying}>{copying ? "Copied ✓" : "Copy link"}</button>
+          <button className="lookbook-v1-action" onClick={handlePublish} disabled={!selectedImage}>Publish</button>
+          <button className="lookbook-v1-action lookbook-v1-download" onClick={handleExport} disabled={exporting || !imagePoses.length}>{exporting ? "Preparing..." : "Download ZIP"}</button>
         </div>
-      </div>
+      </header>
 
-      <div className="lookbook-main">
-        <div className="hero-column">
-          <div style={{ marginBottom: 12, fontWeight: 600 }}>Lookbook Preview · {aspectRatio}</div>
-          <div className="hero-frame">
-            {selectedImage && <img src={selectedImage} alt="Lookbook preview" />}
+      <main className="lookbook-v1-main">
+        <section className="lookbook-v1-preview-column">
+          <div className="lookbook-v1-section-label">LOOKBOOK PREVIEW · {aspectRatio}</div>
+          <div className="lookbook-v1-preview-frame">{selectedImage && <img src={selectedImage} alt="Selected Lookbook" />}</div>
+          {selectedPose && <div className="lookbook-v1-selected-label">{labelForPose(selectedPose.poseId)}</div>}
+        </section>
+
+        <section className="lookbook-v1-gallery">
+          {error && <div className="lookbook-v1-error">{error}</div>}
+          <div className="lookbook-v1-gallery-head">
+            <div>
+              <div className="lookbook-v1-gallery-title">{imagePoses.length} Images Generated</div>
+              <div className="lookbook-v1-gallery-subtitle">2 Hero references + 4 Lookbook poses</div>
+            </div>
           </div>
-        </div>
-
-        <div className="thumbnail-panel">
-          {error && <div style={{ color: "red", marginBottom: 12 }}>{error}</div>}
-          <div className="lookbook-section-title">{imagePoses.length} Images Generated</div>
-          <div className="thumbnail-grid">
+          <div className="lookbook-v1-grid">
             {imagePoses.map((pose, index) => (
-              <div key={`${pose.poseId}-${index}`} className={`thumb-card ${selectedImage === pose.imageUrl ? "selected" : ""}`} onClick={() => pose.imageUrl && setSelectedImage(pose.imageUrl)}>
-                <img src={pose.imageUrl || ""} alt={pose.poseId} />
-                <div className="pose-label">{pose.poseId.replace(/_/g, " ")}</div>
-              </div>
+              <button key={`${pose.poseId}-${index}`} type="button" className={`lookbook-v1-thumb ${selectedImage === pose.imageUrl ? "selected" : ""}`} onClick={() => pose.imageUrl && setSelectedImage(pose.imageUrl)}>
+                <img src={pose.imageUrl || ""} alt={labelForPose(pose.poseId)} />
+                <span>{labelForPose(pose.poseId)}</span>
+              </button>
             ))}
           </div>
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
   );
 }
