@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { API_BASE } from "../../../config/api";
-import "./ecomOutput.css";
+import "./ecomOutputV1.css";
 
 type Pose = { poseId: string; imageUrl?: string };
 const POLL_MS = 4000;
@@ -44,60 +44,33 @@ export default function EcomOutputV1Page() {
     const load = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch(`${API_BASE}/api/p2m/lookbook-v1/status/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch(`${API_BASE}/api/p2m/lookbook-v1/status/${id}`, { headers: { Authorization: `Bearer ${token}` } });
         const data = await res.json();
         if (cancelled) return;
         if (!res.ok) throw new Error(data?.error || "Failed to load Lookbook");
-
-        const nextPoses: Pose[] = (data?.poses || []).map((p: any) => ({
-          poseId: String(p.poseId || "").toLowerCase(),
-          imageUrl: p.imageUrl || p.resultImageUrl || undefined,
-        }));
+        const nextPoses: Pose[] = (data?.poses || []).map((p: any) => ({ poseId: String(p.poseId || "").toLowerCase(), imageUrl: p.imageUrl || p.resultImageUrl || undefined }));
         setPoses(nextPoses);
         if (nextPoses[0]?.imageUrl) setSelectedImage((current) => current || nextPoses[0].imageUrl!);
         if (data?.aspectRatio) setAspectRatio(String(data.aspectRatio));
         if (data?.shareId) setShareId(String(data.shareId));
-
-        if (data?.status === "completed") {
-          setLoading(false);
-          return;
-        }
-        if (data?.status === "failed") {
-          setLoading(false);
-          setError("Lookbook generation failed");
-          return;
-        }
-
+        if (data?.status === "completed") { setLoading(false); return; }
+        if (data?.status === "failed") { setLoading(false); setError("Lookbook generation failed"); return; }
         const nextPolls = pollCountRef.current + 1;
         pollCountRef.current = nextPolls;
         setPolls(nextPolls);
-        if (nextPolls >= MAX_POLLS) {
-          setLoading(false);
-          setError("Lookbook generation timed out. Please try again.");
-          return;
-        }
+        if (nextPolls >= MAX_POLLS) { setLoading(false); setError("Lookbook generation timed out. Please try again."); return; }
         timer = setTimeout(load, POLL_MS);
       } catch (err: any) {
         if (cancelled) return;
         const nextPolls = pollCountRef.current + 1;
         pollCountRef.current = nextPolls;
         setPolls(nextPolls);
-        if (nextPolls >= MAX_POLLS) {
-          setLoading(false);
-          setError(err?.message || "Unable to retrieve Lookbook results.");
-          return;
-        }
+        if (nextPolls >= MAX_POLLS) { setLoading(false); setError(err?.message || "Unable to retrieve Lookbook results."); return; }
         timer = setTimeout(load, POLL_MS);
       }
     };
-
     load();
-    return () => {
-      cancelled = true;
-      if (timer) clearTimeout(timer);
-    };
+    return () => { cancelled = true; if (timer) clearTimeout(timer); };
   }, [id]);
 
   const imagePoses = useMemo(() => poses.filter((p) => p.imageUrl), [poses]);
@@ -123,48 +96,33 @@ export default function EcomOutputV1Page() {
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error("Lookbook export error", err);
-      alert("Download failed");
-    } finally {
-      setExporting(false);
-    }
+    } catch (err) { console.error("Lookbook export error", err); alert("Download failed"); }
+    finally { setExporting(false); }
   };
 
   const handleCopyLink = async () => {
     if (!shareId) return;
     setCopying(true);
-    try {
-      await navigator.clipboard.writeText(`${window.location.origin}/share/${shareId}`);
-    } catch (err) {
-      console.error("Lookbook link copy error", err);
-      alert("Unable to copy link");
-    } finally {
-      setCopying(false);
-    }
+    try { await navigator.clipboard.writeText(`${window.location.origin}/share/${shareId}`); }
+    catch (err) { console.error("Lookbook link copy error", err); alert("Unable to copy link"); }
+    finally { setCopying(false); }
   };
 
   const handleCarouselReel = async () => {
     if (!id) return;
     setGeneratingReel(true);
     try {
-      const response = await fetch(`${API_BASE}/api/p2m/reel/carousel`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lookbookId: id }),
-      });
+      const response = await fetch(`${API_BASE}/api/p2m/reel/carousel`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lookbookId: id }) });
       const data = await response.json();
       if (!response.ok || !data?.success || !data?.reelId) throw new Error(data?.error || "Reel generation failed");
       window.location.href = `/reel/${data.reelId}`;
-    } catch (err: any) {
-      console.error("Carousel Reel error", err);
-      alert(err?.message || "Failed to generate Carousel Reel");
-      setGeneratingReel(false);
-    }
+    } catch (err: any) { console.error("Carousel Reel error", err); alert(err?.message || "Failed to generate Carousel Reel"); setGeneratingReel(false); }
   };
 
   const handlePublish = () => {
     if (!selectedImage) return;
+    // Hand off to the established Publishing workflow; its existing
+    // subscription gate owns the FeatureLockedModal and activation flow.
     navigate(`/publish?assetUrl=${encodeURIComponent(selectedImage)}&assetType=image`);
   };
 
