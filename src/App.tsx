@@ -108,8 +108,8 @@ function AppRoutes() {
       <Route path="/create/ai" element={<CreateAIPage />} />
       <Route path="/create-ai-hero" element={<CreateAIHero />} />
       <Route path="/pack/ecom" element={<EcomStudioPage />} />
-      <Route path="/pack/ecom/output/:id" element={<EcomOutputV1Page />} />
-      <Route path="/pack/ecom/output-v0/:id" element={<EcomOutputPage />} />
+      <Route path="/pack/ecom/output/:id" element={<EcomOutputPage />} />
+      <Route path="/pack/ecom/v1/output/:id" element={<EcomOutputV1Page />} />
       <Route path="/publish" element={<ProtectedRoute><PublishPage /></ProtectedRoute>} />
       <Route path="/campaign-engine" element={<CampaignV2Page />} />
       <Route path="/campaign/generating" element={<ProtectedRoute><CampaignGeneratingPage /></ProtectedRoute>} />
