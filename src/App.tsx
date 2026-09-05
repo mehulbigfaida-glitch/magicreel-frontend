@@ -57,6 +57,7 @@ import CreateAIHero from "./pages/create-ai-hero/CreateAIHero";
 import EcomStudioPage from "./pages/create-ai-hero/EcomStudioPage";
 import EcomOutputPage from "./pages/create-ai-hero/lookbook/EcomOutputPage";
 import EcomOutputV1Page from "./pages/create-ai-hero/lookbook/EcomOutputV1Page";
+import EcomLookbookV1OutputPage from "./pages/create-ai-hero/lookbook/EcomLookbookV1OutputPage";
 import ReelOutputPage from "./pages/reel/ReelOutputPage";
 import Reels360OutputPage from "./pages/reels360/Reels360OutputPage";
 import Create360ReelPage from "./pages/reels360/Create360ReelPage";
@@ -66,95 +67,9 @@ import CampaignGeneratingPage from "./pages/campaign/CampaignGeneratingPage";
 import SocialMediaPage from "./pages/social-media/SocialMediaPage";
 import { GenerateProvider } from "./context/GenerateContext";
 import "./App.css";
-
-function GlobalHeader() {
-  const location = useLocation();
-  const hideHeaderRoutes = ["/create-v2", "/cinematic", "/view", "/reel-viewer"];
-  if (hideHeaderRoutes.includes(location.pathname)) return null;
-  return <AppHeader />;
-}
-
-function AppRoutes() {
-  return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/create" element={<CreatePage />} />
-      <Route path="/admin/testing-credits" element={<TestingCreditRequestsPage />} />
-      <Route path="/docs" element={<DocumentationPage />} />
-      <Route path="/docs/hero" element={<AIHeroGuidePage />} />
-      <Route path="/docs/lookbook" element={<LookbookGuidePage />} />
-      <Route path="/docs/reels" element={<AIReelsGuidePage />} />
-      <Route path="/docs/image-quality" element={<ImageQualityGuidePage />} />
-      <Route path="/docs/publishing" element={<PublishingGuidePage />} />
-      <Route path="/docs/credits" element={<CreditsGuidePage />} />
-      <Route path="/docs/troubleshooting" element={<TroubleshootingGuidePage />} />
-      <Route path="/docs/faq" element={<FAQGuidePage />} />
-      <Route path="/policies" element={<PoliciesPage />} />
-      <Route path="/policies/terms" element={<TermsPage />} />
-      <Route path="/policies/privacy" element={<PrivacyPage />} />
-      <Route path="/policies/acceptable-use" element={<AcceptableUsePage />} />
-      <Route path="/policies/refund" element={<RefundPage />} />
-      <Route path="/policies/ai-content" element={<AIContentDisclaimerPage />} />
-      <Route path="/policies/cookies" element={<CookiePolicyPage />} />
-      <Route path="/support" element={<SupportPage />} />
-      <Route path="/support/contact" element={<ContactSupportPage />} />
-      <Route path="/support/report-bug" element={<ReportBugPage />} />
-      <Route path="/support/feature-request" element={<FeatureRequestPage />} />
-      <Route path="/support/billing" element={<BillingSupportPage />} />
-      <Route path="/support/ai-help" element={<AIHelpPage />} />
-      <Route path="/create-v2" element={<ProtectedRoute><CreateV2Page /></ProtectedRoute>} />
-      <Route path="/create/social-pack" element={<ProtectedRoute><SocialPackPage /></ProtectedRoute>} />
-      <Route path="/create/social-campaign" element={<SocialCampaignPage />} />
-      <Route path="/create/ai" element={<CreateAIPage />} />
-      <Route path="/create-ai-hero" element={<CreateAIHero />} />
-      <Route path="/pack/ecom" element={<EcomStudioPage />} />
-      <Route path="/pack/ecom/output/:id" element={<EcomOutputPage />} />
-      <Route path="/pack/ecom/v1/output/:id" element={<EcomOutputV1Page />} />
-      <Route path="/publish" element={<ProtectedRoute><PublishPage /></ProtectedRoute>} />
-      <Route path="/campaign-engine" element={<CampaignV2Page />} />
-      <Route path="/campaign/generating" element={<ProtectedRoute><CampaignGeneratingPage /></ProtectedRoute>} />
-      <Route path="/campaign/:id" element={<ProtectedRoute><CampaignOutputPage /></ProtectedRoute>} />
-      <Route path="/social-media" element={<SocialMediaPage />} />
-      <Route path="/lookbook" element={<LookbookPage />} />
-      <Route path="/cinematic" element={<CinematicPage />} />
-      <Route path="/editorial-v2" element={<EditorialStudio />} />
-      <Route path="/editorial/output" element={<EditorialOutputPage />} />
-      <Route path="/plans" element={<PlansPage />} />
-      <Route path="/tryon-demo" element={<TryOnDemo />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<SignupV2Page />} />
-      <Route path="/testing-credits/request" element={<RequestTestingCreditsPage />} />
-      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-      <Route path="/reset-password" element={<ResetPasswordPage />} />
-      <Route path="/onboarding" element={<ProtectedRoute><OnboardingWizard /></ProtectedRoute>} />
-      <Route path="/view" element={<ViewPage />} />
-      <Route path="/predictions" element={<ProtectedRoute><PredictionsPage /></ProtectedRoute>} />
-      <Route path="/reel/:renderId" element={<ReelOutputPage />} />
-      <Route path="/reels360/:runId" element={<Reels360OutputPage />} />
-      <Route path="/create/360-reel" element={<ProtectedRoute><Create360ReelPage /></ProtectedRoute>} />
-      <Route path="/reel/view" element={<ReelMobileView />} />
-      <Route path="/share/:id" element={<SharePage />} />
-      <Route path="/reel" element={<ReelViewerPage />} />
-      <Route path="/reel-viewer" element={<ReelViewerPage />} />
-      <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-      <Route path="/v3" element={<CreatePageV3 />} />
-      <Route path="/docs/getting-started" element={<GettingStartedPage />} />
-    </Routes>
-  );
-}
-
-function AppLayout() {
-  const fetchMe = useAuthStore((state) => state.fetchMe);
-  const setUser = useAuthStore((state) => state.setUser);
-  const location = useLocation();
-  React.useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) { setUser(null); return; }
-    fetchMe();
-  }, [location.pathname]);
-  return <div className="mr-app-wrapper"><GlobalHeader /><div className="mr-app-content"><AppRoutes /></div></div>;
-}
-
-export default function App() {
-  return <BrowserRouter><GenerateProvider><AppLayout /></GenerateProvider></BrowserRouter>;
-}
+function GlobalHeader(){const location=useLocation();const hideHeaderRoutes=["/create-v2","/cinematic","/view","/reel-viewer"];if(hideHeaderRoutes.includes(location.pathname))return null;return <AppHeader/>;}
+function AppRoutes(){return <Routes>
+<Route path="/" element={<HomePage/>}/><Route path="/create" element={<CreatePage/>}/><Route path="/admin/testing-credits" element={<TestingCreditRequestsPage/>}/><Route path="/docs" element={<DocumentationPage/>}/><Route path="/docs/hero" element={<AIHeroGuidePage/>}/><Route path="/docs/lookbook" element={<LookbookGuidePage/>}/><Route path="/docs/reels" element={<AIReelsGuidePage/>}/><Route path="/docs/image-quality" element={<ImageQualityGuidePage/>}/><Route path="/docs/publishing" element={<PublishingGuidePage/>}/><Route path="/docs/credits" element={<CreditsGuidePage/>}/><Route path="/docs/troubleshooting" element={<TroubleshootingGuidePage/>}/><Route path="/docs/faq" element={<FAQGuidePage/>}/><Route path="/policies" element={<PoliciesPage/>}/><Route path="/policies/terms" element={<TermsPage/>}/><Route path="/policies/privacy" element={<PrivacyPage/>}/><Route path="/policies/acceptable-use" element={<AcceptableUsePage/>}/><Route path="/policies/refund" element={<RefundPage/>}/><Route path="/policies/ai-content" element={<AIContentDisclaimerPage/>}/><Route path="/policies/cookies" element={<CookiePolicyPage/>}/><Route path="/support" element={<SupportPage/>}/><Route path="/support/contact" element={<ContactSupportPage/>}/><Route path="/support/report-bug" element={<ReportBugPage/>}/><Route path="/support/feature-request" element={<FeatureRequestPage/>}/><Route path="/support/billing" element={<BillingSupportPage/>}/><Route path="/support/ai-help" element={<AIHelpPage/>}/><Route path="/create-v2" element={<ProtectedRoute><CreateV2Page/></ProtectedRoute>}/><Route path="/create/social-pack" element={<ProtectedRoute><SocialPackPage/></ProtectedRoute>}/><Route path="/create/social-campaign" element={<SocialCampaignPage/>}/><Route path="/create/ai" element={<CreateAIPage/>}/><Route path="/create-ai-hero" element={<CreateAIHero/>}/><Route path="/pack/ecom" element={<EcomStudioPage/>}/><Route path="/pack/ecom/output/:id" element={<EcomOutputPage/>}/><Route path="/pack/ecom/v1/output/:id" element={<EcomLookbookV1OutputPage/>}/><Route path="/publish" element={<ProtectedRoute><PublishPage/></ProtectedRoute>}/><Route path="/campaign-engine" element={<CampaignV2Page/>}/><Route path="/campaign/generating" element={<ProtectedRoute><CampaignGeneratingPage/></ProtectedRoute>}/><Route path="/campaign/:id" element={<ProtectedRoute><CampaignOutputPage/></ProtectedRoute>}/><Route path="/social-media" element={<SocialMediaPage/>}/><Route path="/lookbook" element={<LookbookPage/>}/><Route path="/cinematic" element={<CinematicPage/>}/><Route path="/editorial-v2" element={<EditorialStudio/>}/><Route path="/editorial/output" element={<EditorialOutputPage/>}/><Route path="/plans" element={<PlansPage/>}/><Route path="/tryon-demo" element={<TryOnDemo/>}/><Route path="/login" element={<Login/>}/><Route path="/signup" element={<SignupV2Page/>}/><Route path="/testing-credits/request" element={<RequestTestingCreditsPage/>}/><Route path="/forgot-password" element={<ForgotPasswordPage/>}/><Route path="/reset-password" element={<ResetPasswordPage/>}/><Route path="/onboarding" element={<ProtectedRoute><OnboardingWizard/></ProtectedRoute>}/><Route path="/view" element={<ViewPage/>}/><Route path="/predictions" element={<ProtectedRoute><PredictionsPage/></ProtectedRoute>}/><Route path="/reel/:renderId" element={<ReelOutputPage/>}/><Route path="/reels360/:runId" element={<Reels360OutputPage/>}/><Route path="/create/360-reel" element={<ProtectedRoute><Create360ReelPage/></ProtectedRoute>}/><Route path="/reel/view" element={<ReelMobileView/>}/><Route path="/share/:id" element={<SharePage/>}/><Route path="/reel" element={<ReelViewerPage/>}/><Route path="/reel-viewer" element={<ReelViewerPage/>}/><Route path="/dashboard" element={<ProtectedRoute><DashboardPage/></ProtectedRoute>}/><Route path="/v3" element={<CreatePageV3/>}/><Route path="/docs/getting-started" element={<GettingStartedPage/>}/>
+</Routes>}
+function AppLayout(){const fetchMe=useAuthStore((state)=>state.fetchMe);const setUser=useAuthStore((state)=>state.setUser);const location=useLocation();React.useEffect(()=>{const token=localStorage.getItem("token");if(!token){setUser(null);return;}fetchMe();},[location.pathname]);return <div className="mr-app-wrapper"><GlobalHeader/><div className="mr-app-content"><AppRoutes/></div></div>}
+export default function App(){return <BrowserRouter><GenerateProvider><AppLayout/></GenerateProvider></BrowserRouter>;}
