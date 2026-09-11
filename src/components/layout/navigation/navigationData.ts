@@ -6,6 +6,7 @@ import {
   BookOpen,
   ShieldCheck,
   LifeBuoy,
+  Compass,
 } from "lucide-react";
 
 import type { NavigationItem } from "./navigationTypes";
@@ -37,14 +38,20 @@ export const CREATIVE_STUDIO_ITEMS: NavigationItem[] = [
     to: "/create/social-campaign",
   },
   {
-  title: "360° Reel",
-  description: "360° Product Reels",
-  icon: Sparkles,
-  to: "/create/360-reel",
-},
+    title: "360° Reel",
+    description: "360° Product Reels",
+    icon: Sparkles,
+    to: "/create/360-reel",
+  },
 ];
 
 export const RESOURCE_ITEMS: NavigationItem[] = [
+  {
+    title: "Quick Start Guide",
+    description: "7-step visual guide to MagicReel",
+    icon: Compass,
+    to: "/docs/quick-start",
+  },
   {
     title: "Documentation",
     description: "Guides, Tutorials & FAQs",
