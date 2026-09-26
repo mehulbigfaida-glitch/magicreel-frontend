@@ -3,8 +3,9 @@ import SiteFooter from "../../components/layout/SiteFooter";
 
 const HomePage = () => {
   return (
-    <main>
+    <main className="home-page">
       <Hero />
+      <SiteFooter />
     </main>
   );
 };
