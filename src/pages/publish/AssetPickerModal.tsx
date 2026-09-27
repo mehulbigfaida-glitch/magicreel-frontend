@@ -22,6 +22,21 @@ interface Props {
   ) => void;
 }
 
+function getCloudinaryThumbnail(url: string): string {
+  if (!url || !url.includes("res.cloudinary.com/")) return url;
+
+  const marker = "/upload/";
+  const index = url.indexOf(marker);
+  if (index === -1) return url;
+
+  const prefix = url.slice(0, index + marker.length);
+  const suffix = url.slice(index + marker.length);
+
+  if (suffix.startsWith("f_") || suffix.startsWith("w_")) return url;
+
+  return `${prefix}f_auto,q_auto,w_480,c_limit/${suffix}`;
+}
+
 export default function AssetPickerModal({
   open,
   onClose,
