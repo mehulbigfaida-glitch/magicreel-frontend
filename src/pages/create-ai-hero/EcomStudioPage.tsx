@@ -41,14 +41,14 @@ export default function EcomStudioPage(){
   const fromHero=useMemo(()=>!!incomingFront,[incomingFront]);
 
   async function handleGenerate(){
-    if(!frontHero){alert("Please select a Front Hero from your Assets.");return;}
+    if(!frontHero){alert("Please select a Front Hero from your Assets.");return;}if(!selectedCategory){alert("Garment category is missing. Please return to the Hero and open Generate Lookbook again.");return;}
     let timer:ReturnType<typeof setInterval>|undefined;
     try{
       setLoading(true);setElapsedTime(0);setLoadingMessage("✨ Understanding Garment...");
       const start=Date.now();
       timer=setInterval(()=>{const seconds=Math.floor((Date.now()-start)/1000);setElapsedTime(seconds);if(seconds<=30)setLoadingMessage("✨ Understanding Garment...");else if(seconds<=60)setLoadingMessage("🎨 Creating Commercial Lookbook Poses...");else if(seconds<=90)setLoadingMessage("☁️ Processing High-Resolution Images...");else setLoadingMessage("✅ Finalizing Lookbook...");},1000);
       const token=localStorage.getItem("token");
-      const res=await fetch(`${API_BASE}/api/p2m/lookbook-v1/generate`,{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${token}`},body:JSON.stringify({heroImageUrl:frontHero,backHeroImageUrl:backHero||undefined,lookbookWorld:selectedWorld,gender:selectedGender||"unisex",category:selectedCategory||"shirt",aspectRatio})});
+      const res=await fetch(`${API_BASE}/api/p2m/lookbook-v1/generate`,{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${token}`},body:JSON.stringify({heroImageUrl:frontHero,backHeroImageUrl:backHero||undefined,lookbookWorld:selectedWorld,gender:selectedGender||"unisex",category:selectedCategory,aspectRatio})});
       const data=await res.json();
       if(!res.ok){console.error(data);alert(data.error||"Lookbook generation failed");return;}
       if(timer)clearInterval(timer);
