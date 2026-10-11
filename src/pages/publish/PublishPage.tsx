@@ -54,6 +54,8 @@ const [
   const [publishing, setPublishing] =
   useState(false);
 
+  const [copyMessage, setCopyMessage] = useState("");
+
   const [platforms, setPlatforms] = useState({
   instagram: true,
   facebook: false,
@@ -164,123 +166,128 @@ const [
 
   }
 
-async function handlePublish() {
-
+async function copyText(value: string, label: string) {
   try {
-
-    setPublishing(true);
-
-    const selectedPlatforms: ("instagram" | "facebook")[] = [];
-
-    if (platforms.instagram) {
-      selectedPlatforms.push("instagram");
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(value);
+    } else {
+      const textarea = document.createElement("textarea");
+      textarea.value = value;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      const copied = document.execCommand("copy");
+      document.body.removeChild(textarea);
+      if (!copied) throw new Error("Clipboard access is unavailable.");
     }
 
-    if (platforms.facebook) {
-      selectedPlatforms.push("facebook");
-    }
+    setCopyMessage(`${label} copied.`);
+  } catch (err) {
+    console.error("COPY ERROR:", err);
+    setCopyMessage("Copy was blocked by the browser. Please select and copy the text manually.");
+  }
+}
 
-    if (selectedPlatforms.length === 0) {
-      throw new Error("Please select at least one platform.");
-    }
-
-    const publishAssetType =
-      assetType === "video" ||
-      assetType === "reel"
-        ? "video"
-        : "image";
-
-    console.log("PUBLISH DEBUG", {
-      assetType,
-      publishAssetType,
-      previewUrl,
-      selectedPlatforms,
-    });
-
-    const token = localStorage.getItem("token");
-
-    for (const platform of selectedPlatforms) {
-
-      const response = await fetch(
-        `${API_BASE}/api/publish/publish`,
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-
-          body: JSON.stringify({
-
-            platform,
-
-            assetUrl: previewUrl,
-
-            assetType: publishAssetType,
-
-            caption:
-              caption +
-              "\n\n" +
-              hashtags,
-
-          }),
-
-        }
-      );
-
-      const data = await response.json();
-
-      if (!data.success) {
-
-  if (
-    data.error === "PUBLISHING_SUBSCRIPTION_REQUIRED" ||
-    data.error === "PLAN_NOT_ALLOWED"
-  ) {
-    setShowUpgradeModal(true);
+function handleDownloadMedia() {
+  if (!previewUrl) {
+    setCopyMessage("Select an image or video first.");
     return;
   }
 
-  throw new Error(
-    `${platform}: ${data.error || "Publish failed"}`
-  );
+  const link = document.createElement("a");
+  link.href = previewUrl;
+  link.download = assetType === "video" || assetType === "reel"
+    ? "magicreel-instagram-video"
+    : "magicreel-instagram-image";
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  setCopyMessage("Download requested. If the file opens instead, use your browser's Save or Download option.");
 }
 
-    }
-
-    setStatusTitle("Published Successfully");
-
-setStatusDescription(
-  `Your content has been published to ${selectedPlatforms.join(" & ")}.`
-);
-
-setShowStatusModal(true);
-
-  } catch (err: any) {
-
-    console.error(
-      "PUBLISH ERROR:",
-      err
-    );
-
-    if (
-  err?.message?.includes("PUBLISHING_SUBSCRIPTION_REQUIRED") ||
-  err?.message?.includes("PLAN_NOT_ALLOWED")
-) {
-  setShowUpgradeModal(true);
-} else {
-  alert(
-    err.message ||
-    "Publish failed"
-  );
-}
-
-  } finally {
-
-    setPublishing(false);
-
+async function handlePublish() {
+  if (!platforms.instagram) {
+    alert("For this Instagram handoff test, select Instagram only.");
+    return;
   }
 
+  if (platforms.facebook) {
+    alert("This experimental test supports Instagram handoff only. Please unselect Facebook. The original Zernio publishing flow remains available on the production version.");
+    return;
+  }
+
+  if (!previewUrl) {
+    alert("Please select an image or video first.");
+    return;
+  }
+
+  setPublishing(true);
+  setCopyMessage("");
+
+  const shareText = [caption.trim(), hashtags.trim()]
+    .filter(Boolean)
+    .join("\n\n");
+
+  try {
+    const response = await fetch(previewUrl);
+    if (!response.ok) {
+      throw new Error("The media file could not be downloaded for sharing.");
+    }
+
+    const blob = await response.blob();
+    const fallbackType = assetType === "video" || assetType === "reel"
+      ? "video/mp4"
+      : "image/jpeg";
+    const mimeType = blob.type || fallbackType;
+    const extension = mimeType.includes("video")
+      ? "mp4"
+      : mimeType.includes("png")
+        ? "png"
+        : mimeType.includes("webp")
+          ? "webp"
+          : "jpg";
+    const file = new File([blob], `magicreel-instagram.${extension}`, {
+      type: mimeType,
+    });
+
+    const canShareFile = typeof navigator.share === "function"
+      && typeof navigator.canShare === "function"
+      && navigator.canShare({ files: [file] });
+
+    if (!canShareFile) {
+      handleDownloadMedia();
+      setStatusTitle("Media Ready to Share");
+      setStatusDescription("Your media download has been requested. Open Instagram using the Open Instagram button below, upload the downloaded file, and use Copy Caption or Copy All if the text did not transfer.");
+      setShowStatusModal(true);
+      return;
+    }
+
+    await navigator.share({
+      files: [file],
+      ...(shareText ? { text: shareText } : {}),
+      title: "MagicReel Instagram",
+    });
+
+    setStatusTitle("Instagram Share Sheet Opened");
+    setStatusDescription("Choose Instagram in your device's share sheet if it is available. Instagram may not accept the caption or hashtags automatically, so use the copy buttons on MagicReel if needed. This handoff does not publish automatically.");
+    setShowStatusModal(true);
+  } catch (err: any) {
+    if (err?.name === "AbortError") {
+      setCopyMessage("Sharing was cancelled. Your media and edited text are still available here.");
+      return;
+    }
+
+    console.error("INSTAGRAM HANDOFF ERROR:", err);
+    handleDownloadMedia();
+    setStatusTitle("Manual Instagram Share");
+    setStatusDescription("Direct sharing was unavailable, often because of browser or media-host permissions. Your download has been requested. Open Instagram, upload the downloaded media, and use the copy buttons for your caption and hashtags.");
+    setShowStatusModal(true);
+  } finally {
+    setPublishing(false);
+  }
 }
 
   return (
@@ -581,6 +588,22 @@ setShowStatusModal(true);
           }
         />
 
+        <div className="publish-copy-actions" aria-label="Caption and hashtag copy tools">
+          <button type="button" onClick={() => copyText(caption, "Caption")}>Copy Caption</button>
+          <button type="button" onClick={() => copyText(hashtags, "Hashtags")}>Copy Hashtags</button>
+          <button
+            type="button"
+            onClick={() => copyText([caption.trim(), hashtags.trim()].filter(Boolean).join("\n\n"), "Caption and hashtags")}
+          >
+            Copy All
+          </button>
+          <button type="button" onClick={handleDownloadMedia}>Download Media</button>
+          <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer">
+            Open Instagram
+          </a>
+        </div>
+        {copyMessage && <p className="publish-copy-message" role="status">{copyMessage}</p>}
+
         {
           hashtags && (
 
@@ -614,8 +637,8 @@ setShowStatusModal(true);
 
     {
       publishing
-        ? "Publishing..."
-        : "Publish Now"
+        ? "Preparing Share..."
+        : "Share to Instagram"
     }
 
   </button>

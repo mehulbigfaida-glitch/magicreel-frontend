@@ -1105,3 +1105,51 @@
   }
 
 }
+
+
+/* Experimental Instagram handoff controls — isolated to Publish page */
+.publish-copy-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.publish-copy-actions button,
+.publish-copy-actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 15px;
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.055);
+  color: #f7f5fa;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.publish-copy-actions button:hover,
+.publish-copy-actions a:hover {
+  border-color: rgba(168,85,247,0.65);
+  background: rgba(168,85,247,0.13);
+}
+
+.publish-copy-message {
+  margin: 10px 0 0;
+  color: rgba(255,255,255,0.72);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+  .publish-copy-actions button,
+  .publish-copy-actions a {
+    flex: 1 1 calc(50% - 10px);
+  }
+}
