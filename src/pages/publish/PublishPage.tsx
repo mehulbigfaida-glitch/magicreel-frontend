@@ -637,8 +637,8 @@ async function handlePublish() {
 
     {
       publishing
-        ? "Publishing..."
-        : "Publish Now"
+        ? "Preparing Share..."
+        : "Share to Instagram"
     }
 
   </button>
