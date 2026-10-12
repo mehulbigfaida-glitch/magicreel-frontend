@@ -115,7 +115,7 @@ useEffect(() => {
     }
 
     window.location.href =
-      `${API_BASE}/api/social/connect/instagram?token=${encodeURIComponent(token)}`;
+      `${API_BASE}/api/social/meta/connect?token=${encodeURIComponent(token)}`;
 
   };
 
@@ -157,8 +157,7 @@ useEffect(() => {
               <h2>Instagram</h2>
 
               <p>
-                Connect your Instagram account once and publish directly to
-                Feed, Stories and Reels from MagicReel.
+                Connect an eligible Instagram professional account to publish Feed images and Reels directly from MagicReel.
               </p>
 
             </div>
