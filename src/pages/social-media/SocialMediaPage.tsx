@@ -62,15 +62,27 @@ export default function SocialMediaPage() {
       .catch(console.error);
   }, []);
 
-  const handleConnectInstagram = () => {
+  const handleConnectInstagram = async () => {
     const token = localStorage.getItem("token");
     if (!token) {
       alert("Please login again.");
       return;
     }
 
-    window.location.href =
-      `${API_BASE}/api/social/meta/connect?token=${encodeURIComponent(token)}`;
+    try {
+      const response = await fetch(`${API_BASE}/api/social/meta/connect`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (!response.ok || !data.authorizationUrl) {
+        throw new Error(data.message || data.error || "Could not start Instagram connection.");
+      }
+      window.location.assign(data.authorizationUrl);
+    } catch (error) {
+      console.error("Instagram connection could not start:", error);
+      alert("Could not start Instagram connection. Please try again.");
+    }
   };
 
   return (
