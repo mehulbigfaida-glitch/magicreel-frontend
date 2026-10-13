@@ -38,6 +38,10 @@ export default function SocialMediaPage() {
     import.meta.env.VITE_API_BASE_URL ||
     import.meta.env.VITE_API_URL ||
     "http://localhost:5003";
+  // Keep only the experimental direct-Meta OAuth calls on the staging backend.
+  // This avoids changing the shared API variables used by Production.
+  const META_INSTAGRAM_API_BASE =
+    import.meta.env.VITE_META_INSTAGRAM_API_BASE_URL || API_BASE;
 
   const [instagram, setInstagram] = useState<{
     username: string;
@@ -70,7 +74,7 @@ export default function SocialMediaPage() {
     }
 
     try {
-      const response = await fetch(`${API_BASE}/api/social/meta/connect`, {
+      const response = await fetch(`${META_INSTAGRAM_API_BASE}/api/social/meta/connect`, {
         method: "POST",
         credentials: "include",
         headers: { Authorization: `Bearer ${token}` },
