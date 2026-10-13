@@ -86,7 +86,8 @@ export default function SocialMediaPage() {
       window.location.assign(data.authorizationUrl);
     } catch (error) {
       console.error("Instagram connection could not start:", error);
-      alert("Could not start Instagram connection. Please try again.");
+      const message = error instanceof Error ? error.message : String(error);
+      alert(`Instagram connection failed: ${message}`);
     }
   };
 
