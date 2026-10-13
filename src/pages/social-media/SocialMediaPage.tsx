@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "./SocialMediaPage.css";
 import { useAuthStore } from "../../store/authStore";
-import FeatureLockedModal from "../../components/FeatureLockedModal";
 
 type Platform = {
   name: string;
@@ -44,18 +43,6 @@ export default function SocialMediaPage() {
     (state) => state.user
   );
 
-  const publishingExpiry =
-    user?.publishingSubscriptionEnd
-      ? new Date(user.publishingSubscriptionEnd)
-      : null;
-
-  const publishingActive =
-    !!publishingExpiry &&
-    publishingExpiry > new Date();
-
-  const [showUpgradeModal, setShowUpgradeModal] =
-    useState(false);
-
 
   const API_BASE =
     import.meta.env.VITE_API_BASE_URL ||
@@ -95,17 +82,6 @@ useEffect(() => {
 }, []);
 
     const handleConnectInstagram = () => {
-
-    /*
-     * Publishing entitlement is required before a social
-     * account can be connected.
-     *
-     * PRO / ADVANCE membership by itself is not sufficient.
-     */
-    if (!publishingActive) {
-      setShowUpgradeModal(true);
-      return;
-    }
 
     const token = localStorage.getItem("token");
 
@@ -199,7 +175,6 @@ useEffect(() => {
 <button
   className="connect-btn"
   onClick={handleConnectInstagram}
-  disabled={!publishingActive}
 >
 
   {
@@ -258,16 +233,7 @@ useEffect(() => {
       </footer>
 
 
-      <FeatureLockedModal
-        open={showUpgradeModal}
-        title="Publish Subscription Required"
-        description="Social Accounts are available after you activate the Social Publishing plan. Activate Publishing to connect Instagram and publish your MagicReel creations."
-        featureName="Social Publishing"
-        primaryLabel="Activate Publishing"
-        onClose={() =>
-          setShowUpgradeModal(false)
-        }
-      />
+
 
     </div>
   );
