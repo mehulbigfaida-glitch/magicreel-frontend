@@ -72,6 +72,7 @@ export default function SocialMediaPage() {
     try {
       const response = await fetch(`${API_BASE}/api/social/meta/connect`, {
         method: "POST",
+        credentials: "include",
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
