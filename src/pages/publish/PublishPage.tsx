@@ -7,10 +7,7 @@ import PublishToolbar
 from "./PublishToolbar";
 import FeatureLockedModal from "../../components/FeatureLockedModal";
 import StatusModal from "../../components/StatusModal";
-const API_BASE =
-  import.meta.env.VITE_API_BASE_URL ||
-  import.meta.env.VITE_API_URL ||
-  "http://localhost:5003";
+import { API_BASE } from "../../config/api";
 
 export default function PublishPage() {
 
