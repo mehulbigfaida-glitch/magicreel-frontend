@@ -6,7 +6,6 @@ import { useState, useEffect, useRef } from "react";
 import CreativeStudioMenu from "./CreativeStudioMenu";
 import ResourcesMenu from "./ResourcesMenu";
 import useClickOutside from "../../../hooks/useClickOutside";
-import FeatureLockedModal from "../../FeatureLockedModal";
 import { useAuthStore } from "../../../store/authStore";
 
 type OpenMenu = "creative" | "resources" | null;
@@ -14,12 +13,6 @@ type OpenMenu = "creative" | "resources" | null;
 export default function DesktopNav() {
   const location = useLocation();
   const user = useAuthStore((state) => state.user);
-
-  const [showPublishLock, setShowPublishLock] = useState(false);
-
-  const publishingActive =
-    !!user?.publishingSubscriptionEnd &&
-    new Date(user.publishingSubscriptionEnd) > new Date();
 
   const [openMenu, setOpenMenu] = useState<OpenMenu>(null);
 
@@ -100,41 +93,15 @@ export default function DesktopNav() {
       </Link>
 
 
-      {/* Social Accounts */}
-
-      {publishingActive ? (
-        <Link
-          to="/social-media"
-          className={`mr-nav-link ${
-            isActive("/social-media") ? "active" : ""
-          }`}
-        >
-          Social Accounts
-        </Link>
-      ) : (
-        <button
-          type="button"
-          className="mr-nav-link"
-          onClick={() => setShowPublishLock(true)}
-          style={{
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            font: "inherit",
-          }}
-        >
-          Social Accounts
-        </button>
-      )}
-
-      <FeatureLockedModal
-        open={showPublishLock}
-        title="Publishing is not activated"
-        description="Connect your social accounts and publish your MagicReel content by activating the Publishing plan."
-        featureName="Social Accounts"
-        primaryLabel="Activate Publishing"
-        onClose={() => setShowPublishLock(false)}
-      />
+      {/* Social Accounts: publishing is free; no subscription gate. */}
+      <Link
+        to="/social-media"
+        className={`mr-nav-link ${
+          isActive("/social-media") ? "active" : ""
+        }`}
+      >
+        Social Accounts
+      </Link>
 
       {/* Resources */}
 
