@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { API_BASE } from "../config/api";
 
 interface Prediction {
   id: string;
@@ -112,7 +113,7 @@ export default function PredictionsPage() {
         if (!token) return;
 
         const res = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/api/predictions`,
+          `${API_BASE}/api/predictions`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
