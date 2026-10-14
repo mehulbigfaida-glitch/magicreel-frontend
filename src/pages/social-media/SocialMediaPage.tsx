@@ -35,6 +35,7 @@ const platforms: Platform[] = [
 
 export default function SocialMediaPage() {
   const API_BASE =
+    import.meta.env.VITE_META_INSTAGRAM_API_BASE_URL ||
     import.meta.env.VITE_API_BASE_URL ||
     import.meta.env.VITE_API_URL ||
     "http://localhost:5003";
