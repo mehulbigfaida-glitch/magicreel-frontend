@@ -51,6 +51,8 @@ const [
   const [publishing, setPublishing] =
   useState(false);
 
+const [showMetaConfirm, setShowMetaConfirm] = useState(false);
+
   const [platforms, setPlatforms] = useState({
   instagram: true,
   facebook: false,
@@ -161,7 +163,7 @@ const [
 
   }
 
-async function handlePublish() {
+async function executePublish() {
 
   try {
 
@@ -231,7 +233,7 @@ async function handlePublish() {
       if (!data.success) {
 
   if (
-    data.error === "PUBLISHING_SUBSCRIPTION_REQUIRED" ||
+    data.error === "ACTIVE_MAGICREEL_PLAN_REQUIRED" ||
     data.error === "PLAN_NOT_ALLOWED"
   ) {
     setShowUpgradeModal(true);
@@ -261,7 +263,7 @@ setShowStatusModal(true);
     );
 
     if (
-  err?.message?.includes("PUBLISHING_SUBSCRIPTION_REQUIRED") ||
+  err?.message?.includes("ACTIVE_MAGICREEL_PLAN_REQUIRED") ||
   err?.message?.includes("PLAN_NOT_ALLOWED")
 ) {
   setShowUpgradeModal(true);
@@ -278,6 +280,22 @@ setShowStatusModal(true);
 
   }
 
+}
+
+function handlePublish() {
+  if (!previewUrl) {
+    setStatusTitle("Choose an asset");
+    setStatusDescription("Select an image or video before publishing.");
+    setShowStatusModal(true);
+    return;
+  }
+  if (!platforms.instagram || platforms.facebook) {
+    setStatusTitle("Instagram only");
+    setStatusDescription("Direct Meta publishing is currently available for Instagram only. Select Instagram and deselect Facebook to continue.");
+    setShowStatusModal(true);
+    return;
+  }
+  setShowMetaConfirm(true);
 }
 
   return (
@@ -640,12 +658,40 @@ setShowStatusModal(true);
 }}
 />
 
+<div
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="meta-publish-confirm-title"
+  style={{
+    display: showMetaConfirm ? "flex" : "none",
+    position: "fixed",
+    inset: 0,
+    zIndex: 10000,
+    alignItems: "center",
+    justifyContent: "center",
+    background: "rgba(0,0,0,0.55)",
+    padding: 20,
+  }}
+>
+  <div style={{ background: "#fff", borderRadius: 16, padding: 24, maxWidth: 440, width: "100%" }}>
+    <h2 id="meta-publish-confirm-title">Publish via Meta to Instagram?</h2>
+    <p>Your selected content, caption and hashtags will be published to the Instagram account connected to MagicReel.</p>
+    <p>No separate publishing fee or generation-credit deduction applies. Your MagicReel plan and Instagram connection must be active.</p>
+    <div style={{ display: "flex", gap: 12, justifyContent: "flex-end", marginTop: 20 }}>
+      <button type="button" onClick={() => setShowMetaConfirm(false)} disabled={publishing}>Cancel</button>
+      <button type="button" onClick={() => { setShowMetaConfirm(false); void executePublish(); }} disabled={publishing}>
+        {publishing ? "Publishing..." : "Confirm & Publish"}
+      </button>
+    </div>
+  </div>
+</div>
+
 <FeatureLockedModal
   open={showUpgradeModal}
-  title="Publishing Is Not Activated"
-  description="Your account does not have an active Publishing subscription. Activate Publishing to connect your social accounts and publish your MagicReel content."
+  title="Active MagicReel Plan Required"
+  description="An active Basic, Pro, Advance or Enterprise MagicReel plan is required to publish. Renew or activate your MagicReel plan, then try again."
   featureName="Social Publishing"
-  primaryLabel="Activate Publishing"
+  primaryLabel="View Plans"
   onClose={() =>
     setShowUpgradeModal(false)
   }
