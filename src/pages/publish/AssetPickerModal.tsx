@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { API_BASE } from "../../config/api";
 
 interface Prediction {
   id: string;
@@ -55,7 +56,7 @@ export default function AssetPickerModal({
           localStorage.getItem("token");
 
         const res = await fetch(
-          "https://magicreel-backend-production.up.railway.app/api/predictions",
+          `${API_BASE}/api/predictions`,
           {
             headers: {
               Authorization:
