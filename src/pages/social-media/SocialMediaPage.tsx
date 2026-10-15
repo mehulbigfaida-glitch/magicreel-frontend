@@ -126,6 +126,17 @@ export default function SocialMediaPage() {
                 ? `@${instagram.username}`
                 : "Your account isn't connected yet."}
             </div>
+            {!instagram?.connected && (
+              <div className="instagram-requirements" role="note" aria-label="Instagram connection requirements">
+                <strong>Before you connect</strong>
+                <ul>
+                  <li>Use an Instagram <strong>Business or Creator</strong> account. Personal accounts aren't supported.</li>
+                  <li>A public account is recommended; being public alone does not make a Personal account eligible.</li>
+                  <li>Sign in through Instagram and approve the permissions requested for MagicReel.</li>
+                </ul>
+                <p>You do not need to give MagicReel your Instagram password.</p>
+              </div>
+            )}
             <button className="connect-btn" onClick={handleConnectInstagram}>
               {instagram?.connected
                 ? "Reconnect Instagram"
