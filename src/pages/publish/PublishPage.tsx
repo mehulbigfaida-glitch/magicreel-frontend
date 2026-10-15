@@ -439,21 +439,10 @@ function handlePublish() {
 
     <button
       type="button"
-      className={
-        "publish-destination-card " +
-        (
-          platforms.facebook
-            ? "publish-destination-active"
-            : ""
-        )
-      }
-      aria-pressed={platforms.facebook}
-      onClick={() =>
-        setPlatforms({
-          ...platforms,
-          facebook: !platforms.facebook,
-        })
-      }
+      className="publish-destination-card publish-destination-coming"
+      aria-pressed={false}
+      disabled
+      title="Facebook publishing is not part of this release"
     >
 
       <div className="publish-destination-top">
@@ -481,11 +470,11 @@ function handlePublish() {
       <div className="publish-destination-content">
 
         <div className="publish-destination-name">
-          Facebook
+          Facebook — Coming Soon
         </div>
 
         <div className="publish-destination-description">
-          Posts, campaigns and social content
+          Direct publishing is currently available for Instagram only.
         </div>
 
       </div>
@@ -494,9 +483,7 @@ function handlePublish() {
       <div className="publish-destination-footer">
 
         <span>
-          {platforms.facebook
-            ? "READY TO PUBLISH"
-            : "SELECT DESTINATION"}
+          {"COMING SOON"}
         </span>
 
       </div>
