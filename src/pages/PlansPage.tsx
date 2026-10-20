@@ -1295,58 +1295,6 @@ export default function PlansPage() {
 
           <section className="commercial-grid">
 
-            <article className="commercial-card publishing-card">
-
-              <div className="commercial-eyebrow">
-                SOCIAL PUBLISHING
-              </div>
-
-              <h2>
-                Publish your approved creations
-              </h2>
-
-              <p>
-                Publish approved MagicReel
-                images and videos to connected
-                social platforms.
-              </p>
-
-              <div className="commercial-price">
-                ₹900
-                <span>
-                  + GST / month
-                </span>
-              </div>
-
-              <div className="commercial-usd">
-                $9 / month
-              </div>
-
-              <div className="commercial-status">
-                {publishingActive
-                  ? `Active until ${formattedPublishingExpiry}`
-                  : "Not active"}
-              </div>
-
-              <button
-                className="publishing-btn"
-                disabled={
-                  publishingBusy
-                }
-                onClick={
-                  openPublishingCheckout
-                }
-              >
-                {publishingBusy
-                  ? "Opening checkout…"
-                  : publishingActive
-                    ? "Extend Publishing"
-                    : "Activate Publishing"}
-              </button>
-
-            </article>
-
-
             <article className="commercial-card topup-card">
 
               <div className="commercial-eyebrow">
@@ -1464,9 +1412,7 @@ export default function PlansPage() {
               </h2>
 
               <p>
-                Your recent plan,
-                top-up and publishing
-                payments.
+                Your recent plan and top-up payments.
               </p>
             </div>
 
