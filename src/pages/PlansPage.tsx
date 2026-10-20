@@ -1014,10 +1014,8 @@ export default function PlansPage() {
         </h1>
 
         <p>
-          Create premium fashion
-          content with credits that
-          work across your MagicReel
-          creative studio.
+          From marketplace-ready fashion images to campaign creatives and motion.
+          Choose a plan by what you want to create—not just by the number of credits.
         </p>
 
       </div>
@@ -1096,7 +1094,7 @@ export default function PlansPage() {
               </h2>
 
               <p>
-                2K-quality fashion creatives, with marketplace-oriented Lookbook formats and transparent credit costs.
+                Every plan includes the same creative toolkit. The difference is how many Lookbook Packs you can make.
               </p>
             </div>
 
@@ -1155,33 +1153,58 @@ export default function PlansPage() {
                       </div>
 
                       <div className="plan-credit-count">
-                        {plan.credits}
-                        {" "}
-                        Credits
+                        {plan.credits} Credits
                       </div>
 
                       <p className="plan-description">
                         {plan.description}
                       </p>
 
-                      <div className="plan-feature">
-                        ✓ 2K-quality AI fashion images
+                      <div className="plan-outcome">
+                        <span className="plan-outcome-label">YOUR CREATIVE OUTPUT</span>
+                        <strong>Up to {Math.floor(plan.credits / 2)} Lookbook Packs</strong>
+                        <span>{Math.floor(plan.credits / 2)} × 15-second Carousel Reels included</span>
+                        <small>When all credits are used for complete Packs.</small>
                       </div>
 
                       <div className="plan-feature">
-                        ✓ Lookbooks designed around leading marketplace image guidelines, including Myntra and Amazon
+                        ✓ Each Pack: 2 Hero views + 6 Lookbook poses
                       </div>
 
                       <div className="plan-feature">
-                        ✓ Supported formats: 3:4 (1500 × 2000), 4:5, 2:3 and square (2000 × 2000)
+                        ✓ 2K images · No watermarks
                       </div>
 
                       <div className="plan-feature">
-                        ✓ Hero: 1 credit · Lookbook: 1 credit
+                        ✓ Marketplace-oriented Lookbooks: Myntra and Amazon guidelines
                       </div>
 
                       <div className="plan-feature">
-                        ✓ Complete Hero + Lookbook: 2 credits
+                        ✓ Formats: 2:3 (1240 × 1860), 3:4 (1500 × 2000), 4:5 (1856 × 2304), 1:1 (2000 × 2000)
+                      </div>
+
+                      <div className="plan-feature">
+                        ✓ Hero set: 1 credit · 6-pose Lookbook: 1 credit
+                      </div>
+
+                      <div className="plan-feature">
+                        ✓ Marketing Campaign creative: 1 credit
+                      </div>
+
+                      <div className="plan-feature">
+                        ✓ Editorial Photo Shoot / Campaign: 1 credit
+                      </div>
+
+                      <div className="plan-feature">
+                        ✓ 360° video: 3 credits
+                      </div>
+
+                      <div className="plan-feature">
+                        ✓ Instagram captions and hashtags included
+                      </div>
+
+                      <div className="plan-feature">
+                        ✓ Kids models coming soon
                       </div>
 
                       <div className="plan-feature">
@@ -1262,27 +1285,37 @@ export default function PlansPage() {
               </div>
               <div>
                 <strong>Credit consumption guide</strong>
-                <p>
-                  AI Hero generation: 1 credit per generation. When front and back garment views are both supplied, the corresponding Hero outputs are generated in the same generation workflow. Lookbook generation: 1 additional credit. A complete Hero + Lookbook workflow therefore costs 2 credits.
+                <p className="credit-guide-intro">
+                  <strong>One credit system. Clear creative outcomes.</strong> Use credits across Hero images, Lookbooks, campaigns and video.
                 </p>
-                <p>
-                  <strong>2 Master Hero Images</strong><br />
-                  Based on the user's front and back garment image uploads, MagicReel generates two Master Hero images: Front Hero + Back Hero.
-                </p>
-                <p>
-                  <strong>6 Lookbook Poses</strong><br />
-                  Six poses, including front and back views, regenerated according to the user's Lookbook world / criteria and marketplace image requirements.
-                </p>
-                <p>
-                  <strong>15-Second Carousel Reel</strong><br />
-                  A short fashion video showcasing the Lookbook content.
-                </p>
-                <p>
-                  <strong>Clear Credit Consumption</strong><br />
-                  Hero generation: 1 credit. Lookbook generation: 1 credit. The 15-second Carousel Reel is complimentary.
-                </p>
-                <p>
-                  Marketplace formats are designed with leading marketplace image guidelines in mind; final acceptance is determined by each marketplace.
+                <div className="credit-guide-grid">
+                  <div className="credit-guide-item">
+                    <strong>1 credit · Hero set</strong>
+                    <span>Upload front and back garment views to generate the Front Hero and Back Hero.</span>
+                  </div>
+                  <div className="credit-guide-item">
+                    <strong>1 credit · Lookbook</strong>
+                    <span>Generate six poses, including front and back views, for your selected Lookbook world and criteria.</span>
+                  </div>
+                  <div className="credit-guide-item">
+                    <strong>2 credits · Complete Pack</strong>
+                    <span>One Hero set + six Lookbook poses + one complimentary 15-second Carousel Reel.</span>
+                  </div>
+                  <div className="credit-guide-item">
+                    <strong>3 credits · 360° video</strong>
+                    <span>Create a 360-degree fashion video.</span>
+                  </div>
+                  <div className="credit-guide-item">
+                    <strong>1 credit each · Campaigns</strong>
+                    <span>Marketing Campaign creative or Editorial Photo Shoot / Campaign.</span>
+                  </div>
+                  <div className="credit-guide-item">
+                    <strong>Reuse your Hero set</strong>
+                    <span>Generate four Lookbooks in four aspect ratios for 5 credits total: 1 Hero set + 4 Lookbook generations.</span>
+                  </div>
+                </div>
+                <p className="credit-guide-footnote">
+                  Output dimensions are designed around leading marketplace image guidelines. Marketplace acceptance is determined by each marketplace. Kids models are coming soon.
                 </p>
               </div>
             </section>
