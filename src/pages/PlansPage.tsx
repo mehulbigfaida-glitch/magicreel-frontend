@@ -24,26 +24,26 @@ const plans: Plan[] = [
     priceUSD: 9,
     museCount: 0,
     description:
-      "A solid starting plan for fashion content creation.",
+      "A practical starting point for independent sellers and small fashion brands. Includes 10 credits for AI Hero creation, Lookbooks, and other eligible creative workflows.",
   },
   {
     name: "PRO",
-    credits: 30,
+    credits: 32,
     priceINR: 2400,
-    priceUSD: 27,
-    museCount: 2,
+    priceUSD: 24,
+    museCount: 0,
     popular: true,
     description:
-      "More credits plus personalized Muses for growing brands.",
+      "For growing fashion brands that need more creative output. Includes 32 credits, with a lower effective cost per complete Lookbook than BASIC.",
   },
   {
     name: "ADVANCE",
-    credits: 60,
+    credits: 72,
     priceINR: 3600,
-    priceUSD: 39,
-    museCount: 4,
+    priceUSD: 36,
+    museCount: 0,
     description:
-      "High-volume creation with the strongest credit value.",
+      "Best value for high-volume fashion content creation. Includes 72 credits and the lowest effective cost per complete Lookbook among the standard plans.",
   },
 ];
 
@@ -52,8 +52,8 @@ const topupRateINR: Record<
   number
 > = {
   BASIC: 90,
-  PRO: 80,
-  ADVANCE: 60,
+  PRO: 75,
+  ADVANCE: 50,
 };
 
 declare global {
