@@ -1266,7 +1266,13 @@ export default function PlansPage() {
                   AI Hero generation: 1 credit per generation. When front and back garment views are both supplied, the corresponding Hero outputs are generated in the same generation workflow. Lookbook generation: 1 additional credit. A complete Hero + Lookbook workflow therefore costs 2 credits.
                 </p>
                 <p>
-                  Other formats and video workflows can have different credit costs. The credit amount shown for each action in MagicReel should be checked before generating. Marketplace formats are designed with leading marketplace image guidelines in mind; final acceptance is determined by each marketplace.
+                  A complete Lookbook Pack contains 8 images: 1 Front Hero, 1 Back Hero and 6 generated poses, plus a 15-second Carousel Reel. The Hero workflow can generate corresponding front and back Hero outputs in one generation workflow when both garment views are supplied.
+                </p>
+                <p>
+                  Hero generation: 1 credit. Lookbook pose generation: 1 credit. A complete Hero + Lookbook image workflow therefore costs 2 credits. Carousel Reel credit treatment must follow the applicable offer shown in MagicReel; other video workflows may have different credit costs.
+                </p>
+                <p>
+                  Marketplace formats are designed with leading marketplace image guidelines in mind; final acceptance is determined by each marketplace.
                 </p>
               </div>
             </section>
