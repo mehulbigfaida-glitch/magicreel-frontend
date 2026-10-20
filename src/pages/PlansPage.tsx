@@ -1,10 +1,7 @@
 import "./PlansPage.css";
 import { useEffect, useMemo, useState } from "react";
 
-type PaidPlan =
-  | "BASIC"
-  | "PRO"
-  | "ADVANCE";
+type PaidPlan = "PRO";
 
 type Plan = {
   name: PaidPlan;
@@ -18,42 +15,19 @@ type Plan = {
 
 const plans: Plan[] = [
   {
-    name: "BASIC",
-    credits: 10,
+    name: "PRO",
+    credits: 27,
     priceINR: 900,
     priceUSD: 9,
     museCount: 0,
-    description:
-      "A solid starting plan for fashion content creation.",
-  },
-  {
-    name: "PRO",
-    credits: 30,
-    priceINR: 2400,
-    priceUSD: 27,
-    museCount: 2,
     popular: true,
     description:
-      "More credits plus personalized Muses for growing brands.",
-  },
-  {
-    name: "ADVANCE",
-    credits: 60,
-    priceINR: 3600,
-    priceUSD: 39,
-    museCount: 4,
-    description:
-      "High-volume creation with the strongest credit value.",
+      "Create 9 fashion lookbooks, each with 8 images, plus 9 included 15-second Carousel Reels.",
   },
 ];
 
-const topupRateINR: Record<
-  PaidPlan,
-  number
-> = {
-  BASIC: 90,
-  PRO: 80,
-  ADVANCE: 60,
+const topupRateINR: Record<PaidPlan, number> = {
+  PRO: 35,
 };
 
 declare global {
@@ -736,192 +710,6 @@ export default function PlansPage() {
 
   }
 
-  async function openPublishingCheckout() {
-
-    try {
-
-      const profileComplete =
-        await ensureBusinessProfileComplete();
-
-      if (!profileComplete) {
-        setPublishingBusy(
-          false
-        );
-        return;
-      }
-
-      setPublishingBusy(
-        true
-      );
-
-      const loaded =
-        await loadRazorpayScript();
-
-      if (!loaded) {
-        throw new Error(
-          "Failed to load payment system."
-        );
-      }
-
-      const orderRes =
-        await fetch(
-          `${BACKEND_URL}/api/payments/create-publishing-order`,
-          {
-            method:
-              "POST",
-
-            headers: {
-              Authorization:
-                `Bearer ${token}`,
-            },
-          }
-        );
-
-      const orderData =
-        await orderRes.json();
-
-      if (
-        !orderRes.ok ||
-        !orderData?.success
-      ) {
-        throw new Error(
-          orderData?.error ||
-            "Failed to create publishing order."
-        );
-      }
-
-      const options = {
-
-        key:
-          orderData.key,
-
-        amount:
-          orderData.amount,
-
-        currency:
-          orderData.currency,
-
-        name:
-          "MagicReel",
-
-        description:
-          "Social Publishing — 30 Days",
-
-        order_id:
-          orderData.orderId,
-
-        method: {
-          netbanking: true,
-          card: true,
-          upi: true,
-          wallet: true,
-          paylater: false,
-        },
-
-        handler:
-          async (
-            response: any
-          ) => {
-
-            try {
-
-              const verifyRes =
-                await fetch(
-                  `${BACKEND_URL}/api/payments/verify-publishing`,
-                  {
-                    method:
-                      "POST",
-
-                    headers: {
-                      "Content-Type":
-                        "application/json",
-
-                      Authorization:
-                        `Bearer ${token}`,
-                    },
-
-                    body:
-                      JSON.stringify(
-                        response
-                      ),
-                  }
-                );
-
-              const verifyData =
-                await verifyRes.json();
-
-              if (
-                !verifyRes.ok ||
-                !verifyData?.success
-              ) {
-                throw new Error(
-                  verifyData?.error ||
-                    "Publishing payment verification failed."
-                );
-              }
-
-              showMessage(
-                "Publishing activated successfully."
-              );
-
-              await refreshAccount();
-
-            } catch (error: any) {
-
-              console.error(
-                "PUBLISHING VERIFY ERROR:",
-                error
-              );
-
-              showMessage(
-                error?.message ||
-                  "Publishing activation failed."
-              );
-
-            } finally {
-
-              setPublishingBusy(
-                false
-              );
-
-            }
-
-          },
-
-        theme: {
-          color:
-            "#D4AF37",
-        },
-
-      };
-
-      const razorpay =
-        new window.Razorpay(
-          options
-        );
-
-      razorpay.open();
-
-    } catch (error: any) {
-
-      console.error(
-        "PUBLISHING CHECKOUT ERROR:",
-        error
-      );
-
-      showMessage(
-        error?.message ||
-          "Unable to start publishing payment."
-      );
-
-      setPublishingBusy(
-        false
-      );
-
-    }
-
-  }
-
   const currentPlan =
     userInfo?.plan;
 
@@ -937,17 +725,6 @@ export default function PlansPage() {
           userInfo.creditsValidUntil
         )
       : null;
-
-  const publishingExpiry =
-    userInfo?.publishingSubscriptionEnd
-      ? new Date(
-          userInfo.publishingSubscriptionEnd
-        )
-      : null;
-
-  const publishingActive =
-    !!publishingExpiry &&
-    publishingExpiry > new Date();
 
   const currentTopupRate =
     currentPlan &&
@@ -967,21 +744,6 @@ export default function PlansPage() {
   const formattedCreditExpiry =
     creditExpiry
       ? creditExpiry.toLocaleDateString(
-          "en-IN",
-          {
-            day:
-              "2-digit",
-            month:
-              "short",
-            year:
-              "numeric",
-          }
-        )
-      : "—";
-
-  const formattedPublishingExpiry =
-    publishingExpiry
-      ? publishingExpiry.toLocaleDateString(
           "en-IN",
           {
             day:
@@ -1070,18 +832,6 @@ export default function PlansPage() {
               </strong>
             </div>
 
-            <div>
-              <span className="summary-label">
-                PUBLISHING
-              </span>
-
-              <strong>
-                {publishingActive
-                  ? `Active · ${formattedPublishingExpiry}`
-                  : "Not active"}
-              </strong>
-            </div>
-
           </section>
 
           <section className="pricing-section">
@@ -1092,13 +842,11 @@ export default function PlansPage() {
               </span>
 
               <h2>
-                Choose your generation plan
+                PRO — your complete fashion content workflow
               </h2>
 
               <p>
-                Credits are used across
-                eligible MagicReel AI
-                generation workflows.
+                ₹900 + GST for 27 credits: 9 lookbooks with 72 images and 9 included 15-second Carousel Reels. Lookbooks are designed with major fashion marketplace image guidelines in mind; marketplace acceptance requirements can change.
               </p>
             </div>
 
@@ -1152,10 +900,6 @@ export default function PlansPage() {
                         </span>
                       </div>
 
-                      <div className="plan-usd">
-                        ${plan.priceUSD}
-                      </div>
-
                       <div className="plan-credit-count">
                         {plan.credits}
                         {" "}
@@ -1166,23 +910,18 @@ export default function PlansPage() {
                         {plan.description}
                       </p>
 
-                      {plan.museCount > 0 ? (
-                        <div className="plan-feature highlight">
-                          ✦{" "}
-                          {plan.museCount}
-                          {" "}
-                          Personalized Muse
-                          {plan.museCount ===
-                          1
-                            ? ""
-                            : "s"}
-                        </div>
-                      ) : (
-                        <div className="plan-feature">
-                          ✓ Standard Muse
-                          Library
-                        </div>
-                      )}
+                      <div className="plan-feature">
+                        ✓ 9 lookbooks × 8 images (Hero Front, Hero Back + 6 poses)
+                      </div>
+                      <div className="plan-feature">
+                        ✓ 9 included 15-second Carousel Reels
+                      </div>
+                      <div className="plan-feature">
+                        ✓ Direct Instagram publishing included — no publishing fee or credit deduction
+                      </div>
+                      <div className="plan-feature">
+                        ✓ 360° Reel generation: 4 credits each
+                      </div>
 
                       <div className="plan-feature">
                         ✓ Credits valid for
@@ -1205,8 +944,8 @@ export default function PlansPage() {
                         plan.name
                           ? "Opening checkout…"
                           : isCurrent
-                            ? "Buy Plan Credits"
-                            : `Choose ${plan.name}`}
+                            ? "Buy PRO Credits"
+                            : "Choose PRO"}
                       </button>
 
                     </article>
@@ -1270,172 +1009,40 @@ export default function PlansPage() {
               </strong>
 
               <p>
-                Credits are valid for 90 days
-                from your latest credit purchase.
-                Purchasing additional credits
-                refreshes the validity period for
-                your available credit balance.
+                Credits are valid for 90 days from your latest credit purchase. Buying additional credits refreshes the validity period for your available balance.
               </p>
             </div>
           </section>
 
           <section className="commercial-grid">
-
-            <article className="commercial-card publishing-card">
-
-              <div className="commercial-eyebrow">
-                SOCIAL PUBLISHING
-              </div>
-
-              <h2>
-                Publish your approved creations
-              </h2>
-
-              <p>
-                Publish approved MagicReel
-                images and videos to connected
-                social platforms.
-              </p>
-
-              <div className="commercial-price">
-                ₹900
-                <span>
-                  + GST / month
-                </span>
-              </div>
-
-              <div className="commercial-usd">
-                $9 / month
-              </div>
-
-              <div className="commercial-status">
-                {publishingActive
-                  ? `Active until ${formattedPublishingExpiry}`
-                  : "Not active"}
-              </div>
-
-              <button
-                className="publishing-btn"
-                disabled={
-                  publishingBusy
-                }
-                onClick={
-                  openPublishingCheckout
-                }
-              >
-                {publishingBusy
-                  ? "Opening checkout…"
-                  : publishingActive
-                    ? "Extend Publishing"
-                    : "Activate Publishing"}
-              </button>
-
-            </article>
-
-
             <article className="commercial-card topup-card">
-
-              <div className="commercial-eyebrow">
-                BUY MORE CREDITS
-              </div>
-
-              <h2>
-                Top up at your current plan rate
-              </h2>
-
-              <p>
-                Buy credits in multiples of 10.
-                Your current plan determines the
-                price per credit.
-              </p>
-
+              <div className="commercial-eyebrow">BUY MORE CREDITS</div>
+              <h2>Top up your PRO plan</h2>
+              <p>Buy additional credits in multiples of 10 at ₹35 per credit, plus GST. Top-ups refresh the 90-day validity period.</p>
               <div className="topup-controls">
-
                 <label>
                   Credits
-                  <select
-                    value={
-                      topupCredits
-                    }
-                    disabled={
-                      topupBusy ||
-                      !currentTopupRate
-                    }
-                    onChange={(e) =>
-                      setTopupCredits(
-                        Number(
-                          e.target.value
-                        )
-                      )
-                    }
-                  >
-                    {[10,20,30,40,50,60,70,80,90,100].map(
-                      (value) => (
-                        <option
-                          key={value}
-                          value={value}
-                        >
-                          {value} Credits
-                        </option>
-                      )
-                    )}
+                  <select value={topupCredits} disabled={topupBusy} onChange={(e) => setTopupCredits(Number(e.target.value))}>
+                    {[10,20,30,40,50,60,70,80,90,100].map((value) => <option key={value} value={value}>{value} Credits</option>)}
                   </select>
                 </label>
-
                 <div className="topup-price">
-
-                  {topupPriceINR !== null ? (
-                    <>
-                      <strong>
-                        ₹
-                        {topupPriceINR.toLocaleString(
-                          "en-IN"
-                        )}
-                      </strong>
-
-                      <span>
-                        + GST
-                      </span>
-                    </>
-                  ) : (
-                    <strong>
-                      Select a paid plan
-                    </strong>
-                  )}
-
+                  <strong>₹{topupPriceINR?.toLocaleString("en-IN") ?? "—"}</strong>
+                  <span>+ GST</span>
                 </div>
-
               </div>
-
-              <div className="topup-rate">
-                {currentTopupRate
-                  ? `${currentPlan} rate: ₹${currentTopupRate} / credit`
-                  : "Top-ups become available after choosing a paid plan."}
-              </div>
-
-              <div className="topup-note">
-                Every top-up adds to your existing
-                balance and refreshes the 90-day
-                credit validity period.
-              </div>
-
-              <button
-                className="topup-btn"
-                disabled={
-                  topupBusy ||
-                  !currentTopupRate
-                }
-                onClick={
-                  openTopupCheckout
-                }
-              >
-                {topupBusy
-                  ? "Opening checkout…"
-                  : `Buy ${topupCredits} Credits`}
+              <div className="topup-rate">PRO rate: ₹35 / credit</div>
+              <button className="topup-btn" disabled={topupBusy} onClick={openTopupCheckout}>
+                {topupBusy ? "Opening checkout…" : `Buy ${topupCredits} Credits`}
               </button>
-
             </article>
-
+            <article className="commercial-card enterprise-card">
+              <div className="commercial-eyebrow">ENTERPRISE</div>
+              <h2>Built around your business</h2>
+              <div className="enterprise-price">Custom</div>
+              <p>Custom credit allocation, tailored commercial requirements, and dedicated support.</p>
+              <button className="enterprise-btn" onClick={() => (window.location.href = "mailto:sales@magicreel.in")}>Contact Sales</button>
+            </article>
           </section>
 
           <section className="payment-history-section">
