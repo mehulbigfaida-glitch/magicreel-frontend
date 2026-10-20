@@ -1173,7 +1173,7 @@ export default function PlansPage() {
                       </div>
 
                       <div className="plan-feature">
-                        ✓ Supported formats: 3:4 (1500 × 2000), 4:5 and square (2000 × 2000)
+                        ✓ Supported formats: 3:4 (1500 × 2000), 4:5, 2:3 and square (2000 × 2000)
                       </div>
 
                       <div className="plan-feature">
