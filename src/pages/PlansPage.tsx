@@ -1166,23 +1166,9 @@ export default function PlansPage() {
                         {plan.description}
                       </p>
 
-                      {plan.museCount > 0 ? (
-                        <div className="plan-feature highlight">
-                          ✦{" "}
-                          {plan.museCount}
-                          {" "}
-                          Personalized Muse
-                          {plan.museCount ===
-                          1
-                            ? ""
-                            : "s"}
-                        </div>
-                      ) : (
-                        <div className="plan-feature">
-                          ✓ Standard Muse
-                          Library
-                        </div>
-                      )}
+                      <div className="plan-feature">
+                        ✓ AI Hero and Lookbook creation
+                      </div>
 
                       <div className="plan-feature">
                         ✓ Credits valid for
