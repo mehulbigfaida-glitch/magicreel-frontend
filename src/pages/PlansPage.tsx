@@ -1036,13 +1036,6 @@ export default function PlansPage() {
                 {topupBusy ? "Opening checkout…" : `Buy ${topupCredits} Credits`}
               </button>
             </article>
-            <article className="commercial-card enterprise-card">
-              <div className="commercial-eyebrow">ENTERPRISE</div>
-              <h2>Built around your business</h2>
-              <div className="enterprise-price">Custom</div>
-              <p>Custom credit allocation, tailored commercial requirements, and dedicated support.</p>
-              <button className="enterprise-btn" onClick={() => (window.location.href = "mailto:sales@magicreel.in")}>Contact Sales</button>
-            </article>
           </section>
 
           <section className="payment-history-section">
