@@ -1266,10 +1266,20 @@ export default function PlansPage() {
                   AI Hero generation: 1 credit per generation. When front and back garment views are both supplied, the corresponding Hero outputs are generated in the same generation workflow. Lookbook generation: 1 additional credit. A complete Hero + Lookbook workflow therefore costs 2 credits.
                 </p>
                 <p>
-                  A complete Lookbook Pack contains 8 images: 1 Front Hero, 1 Back Hero and 6 generated poses, plus a 15-second Carousel Reel. The Hero workflow can generate corresponding front and back Hero outputs in one generation workflow when both garment views are supplied.
+                  <strong>2 Master Hero Images</strong><br />
+                  Based on the user's front and back garment image uploads, MagicReel generates two Master Hero images: Front Hero + Back Hero.
                 </p>
                 <p>
-                  Hero generation: 1 credit. Lookbook pose generation: 1 credit. A complete Hero + Lookbook image workflow therefore costs 2 credits. Carousel Reel credit treatment must follow the applicable offer shown in MagicReel; other video workflows may have different credit costs.
+                  <strong>6 Lookbook Poses</strong><br />
+                  Six poses, including front and back views, regenerated according to the user's Lookbook world / criteria and marketplace image requirements.
+                </p>
+                <p>
+                  <strong>15-Second Carousel Reel</strong><br />
+                  A short fashion video showcasing the Lookbook content.
+                </p>
+                <p>
+                  <strong>Clear Credit Consumption</strong><br />
+                  Hero generation: 1 credit. Lookbook generation: 1 credit. The 15-second Carousel Reel is complimentary.
                 </p>
                 <p>
                   Marketplace formats are designed with leading marketplace image guidelines in mind; final acceptance is determined by each marketplace.
