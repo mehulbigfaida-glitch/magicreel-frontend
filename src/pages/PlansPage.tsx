@@ -1096,9 +1096,7 @@ export default function PlansPage() {
               </h2>
 
               <p>
-                Credits are used across
-                eligible MagicReel AI
-                generation workflows.
+                2K-quality fashion creatives, with marketplace-oriented Lookbook formats and transparent credit costs.
               </p>
             </div>
 
@@ -1167,12 +1165,27 @@ export default function PlansPage() {
                       </p>
 
                       <div className="plan-feature">
-                        ✓ AI Hero and Lookbook creation
+                        ✓ 2K-quality AI fashion images
                       </div>
 
                       <div className="plan-feature">
-                        ✓ Credits valid for
-                        90 days
+                        ✓ Lookbooks designed around leading marketplace image guidelines, including Myntra and Amazon
+                      </div>
+
+                      <div className="plan-feature">
+                        ✓ Supported formats: 3:4 (1500 × 2000), 4:5 and square (2000 × 2000)
+                      </div>
+
+                      <div className="plan-feature">
+                        ✓ Hero: 1 credit · Lookbook: 1 credit
+                      </div>
+
+                      <div className="plan-feature">
+                        ✓ Complete Hero + Lookbook: 2 credits
+                      </div>
+
+                      <div className="plan-feature">
+                        ✓ Credits valid for 90 days
                       </div>
 
                       <button
@@ -1242,6 +1255,21 @@ export default function PlansPage() {
               </article>
 
             </div>
+
+            <section className="billing-rule" style={{ marginTop: "20px" }}>
+              <div className="billing-rule-icon">
+                ✦
+              </div>
+              <div>
+                <strong>Credit consumption guide</strong>
+                <p>
+                  AI Hero generation: 1 credit per generation. When front and back garment views are both supplied, the corresponding Hero outputs are generated in the same generation workflow. Lookbook generation: 1 additional credit. A complete Hero + Lookbook workflow therefore costs 2 credits.
+                </p>
+                <p>
+                  Other formats and video workflows can have different credit costs. The credit amount shown for each action in MagicReel should be checked before generating. Marketplace formats are designed with leading marketplace image guidelines in mind; final acceptance is determined by each marketplace.
+                </p>
+              </div>
+            </section>
 
           </section>
 
