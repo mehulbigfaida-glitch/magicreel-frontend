@@ -938,17 +938,6 @@ export default function PlansPage() {
         )
       : null;
 
-  const publishingExpiry =
-    userInfo?.publishingSubscriptionEnd
-      ? new Date(
-          userInfo.publishingSubscriptionEnd
-        )
-      : null;
-
-  const publishingActive =
-    !!publishingExpiry &&
-    publishingExpiry > new Date();
-
   const currentTopupRate =
     currentPlan &&
     topupRateINR[
@@ -967,21 +956,6 @@ export default function PlansPage() {
   const formattedCreditExpiry =
     creditExpiry
       ? creditExpiry.toLocaleDateString(
-          "en-IN",
-          {
-            day:
-              "2-digit",
-            month:
-              "short",
-            year:
-              "numeric",
-          }
-        )
-      : "—";
-
-  const formattedPublishingExpiry =
-    publishingExpiry
-      ? publishingExpiry.toLocaleDateString(
           "en-IN",
           {
             day:
@@ -1068,17 +1042,6 @@ export default function PlansPage() {
               </strong>
             </div>
 
-            <div>
-              <span className="summary-label">
-                PUBLISHING
-              </span>
-
-              <strong>
-                {publishingActive
-                  ? `Active · ${formattedPublishingExpiry}`
-                  : "Not active"}
-              </strong>
-            </div>
 
           </section>
 
