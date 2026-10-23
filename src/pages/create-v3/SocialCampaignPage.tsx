@@ -216,6 +216,9 @@ export default function SocialCampaignPage() {
   const [generating, setGenerating] =
     useState(false);
 
+  const [popupBlocked, setPopupBlocked] =
+    useState(false);
+
   const [generationSeconds, setGenerationSeconds] =
   useState(0);
 
@@ -335,6 +338,7 @@ useEffect(() => {
       }
 
       setGenerating(true);
+      setPopupBlocked(false);
 
       setGenerationSeconds(0);
 
@@ -421,10 +425,14 @@ useAuthStore
   })
 );
 
-window.open(
+const outputTab = window.open(
   "/editorial/output",
   "_blank"
 );
+
+if (!outputTab) {
+  setPopupBlocked(true);
+}
 }
     } catch (error) {
       console.error(
@@ -1249,6 +1257,52 @@ window.open(
 )}
   </button>
 </div>
+
+{popupBlocked && (
+  <div
+    role="status"
+    style={{
+      marginTop: 18,
+      padding: 24,
+      borderRadius: 22,
+      background: "rgba(24,32,40,0.96)",
+      border: "1px solid rgba(125,145,170,0.35)",
+    }}
+  >
+    <div style={{ color: "#ffffff", fontWeight: 700, fontSize: 20, marginBottom: 8 }}>
+      Editorial Generated Successfully
+    </div>
+    <div style={{ color: "#c2cbd6", lineHeight: 1.7, marginBottom: 18 }}>
+      Your browser blocked the automatic new tab. Your output is ready—open it here without changing your browser settings.
+    </div>
+    <button
+      type="button"
+      onClick={() => window.location.assign("/editorial/output")}
+      style={{
+        width: "100%", padding: "15px 20px", borderRadius: 999,
+        border: "none", background: "#D4AF37", color: "#111111",
+        fontWeight: 700, cursor: "pointer", marginBottom: 10,
+      }}
+    >
+      View Generated Output
+    </button>
+    <button
+      type="button"
+      onClick={() => {
+        void navigator.clipboard.writeText(window.location.origin + "/editorial/output");
+      }}
+      style={{
+        width: "100%", padding: "13px 20px", borderRadius: 999,
+        border: "1px solid rgba(255,255,255,0.18)",
+        background: "rgba(255,255,255,0.05)", color: "#ffffff",
+        fontWeight: 600, cursor: "pointer",
+      }}
+    >
+      Copy Output Link
+    </button>
+  </div>
+)}
+
       </div>
     <CampaignHeroPickerModal
   open={pickerOpen}
