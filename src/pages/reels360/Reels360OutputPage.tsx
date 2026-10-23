@@ -58,7 +58,7 @@ const [statusModal, setStatusModal] =
 
         if (
           Date.now() - startedAt >
-          600000
+          1200000
         ) {
 
           clearInterval(interval);
@@ -232,7 +232,7 @@ const [statusModal, setStatusModal] =
     lineHeight: 1.8
   }}
 >
-  High-quality AI video generation typically takes 2–3 minutes.
+  High-quality AI video generation can take several minutes.
 
   <br />
   <br />
