@@ -454,6 +454,44 @@ if (!outputTab) {
         padding: "70px 22px 120px",
       }}
     >
+      {popupBlocked && (
+        <div
+          role="alert"
+          style={{
+            position: "fixed",
+            top: 16,
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "min(680px, calc(100vw - 32px))",
+            boxSizing: "border-box",
+            zIndex: 9999,
+            padding: "16px 18px",
+            borderRadius: 18,
+            background: "rgba(18, 24, 30, 0.98)",
+            border: "1px solid rgba(212,175,55,0.65)",
+            boxShadow: "0 12px 40px rgba(0,0,0,0.55)",
+            color: "#ffffff",
+          }}
+        >
+          <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 6 }}>
+            Editorial generated successfully
+          </div>
+          <div style={{ color: "#c2cbd6", fontSize: 13, lineHeight: 1.5, marginBottom: 12 }}>
+            Your browser blocked the new tab. Your output is ready.
+          </div>
+          <button
+            type="button"
+            onClick={() => window.location.assign("/editorial/output")}
+            style={{
+              width: "100%", padding: "12px 16px", borderRadius: 999,
+              border: "none", background: "#D4AF37", color: "#111111",
+              fontWeight: 700, cursor: "pointer",
+            }}
+          >
+            View Generated Output
+          </button>
+        </div>
+      )}
       <div
         style={{
           width: "100%",
