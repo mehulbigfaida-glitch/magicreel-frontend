@@ -71,7 +71,7 @@
   margin: 0 auto 46px;
   display: grid;
   grid-template-columns:
-    repeat(4, minmax(0, 1fr));
+    repeat(3, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -130,14 +130,47 @@
 .plans-grid {
   display: grid;
   grid-template-columns:
-    repeat(4, minmax(0, 1fr));
+    repeat(3, minmax(0, 1fr));
   gap: 18px;
+}
+
+.plan-credit-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 10px;
+}
+
+.plan-credit-row .plan-credit-count {
+  margin-top: 0;
+}
+
+.plan-validity-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(212,175,55,.35);
+  background: rgba(212,175,55,.1);
+  color: #f0d77b;
+  font-size: 10px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.lookbook-format-list {
+  display: block;
+  margin-top: 5px;
+  color: rgba(255,255,255,.7);
+  font-size: 12px;
+  line-height: 1.55;
 }
 
 .plan-card {
   position: relative;
   padding: 28px;
-  min-height: 480px;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   border-radius: 26px;
@@ -211,9 +244,44 @@
 }
 
 .plan-credit-count {
-  margin-top: 20px;
+  margin-top: 14px;
   font-size: 25px;
-  font-weight: 600;
+  font-weight: 650;
+}
+
+.plan-outcome {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 4px 0 12px;
+  padding: 18px;
+  border: 1px solid rgba(212,175,55,.28);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(212,175,55,.12), rgba(124,58,237,.09));
+}
+
+.plan-outcome-label {
+  color: rgba(255,255,255,.55);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .15em;
+}
+
+.plan-outcome strong {
+  font-size: 23px;
+  line-height: 1.2;
+  color: #f4dc88;
+}
+
+.plan-outcome span:not(.plan-outcome-label) {
+  color: rgba(255,255,255,.86);
+  font-size: 13px;
+}
+
+.plan-outcome small {
+  color: rgba(255,255,255,.52);
+  font-size: 11px;
+  line-height: 1.5;
 }
 
 .plan-description {
@@ -314,9 +382,48 @@
   line-height: 1.65;
 }
 
+.credit-guide-intro {
+  margin-bottom: 18px !important;
+}
+
+.credit-guide-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.credit-guide-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 15px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.035);
+  border: 1px solid rgba(255,255,255,.07);
+}
+
+.credit-guide-item strong {
+  margin: 0;
+  font-size: 13px;
+  color: #f0d77b;
+}
+
+.credit-guide-item span {
+  color: rgba(255,255,255,.62);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.billing-rule .credit-guide-footnote {
+  margin-top: 12px;
+  font-size: 11px;
+  color: rgba(255,255,255,.46);
+}
+
 .commercial-grid {
   max-width: 1180px;
-  margin: 0 auto 72px;
+  margin: 24px auto 32px;
   display: grid;
   grid-template-columns:
     repeat(2, minmax(0, 1fr));
@@ -324,8 +431,8 @@
 }
 
 .commercial-card {
-  min-height: 420px;
-  padding: 30px;
+  min-height: 0;
+  padding: 26px;
   border-radius: 26px;
   border: 1px solid rgba(255,255,255,.09);
   background: rgba(255,255,255,.035);
@@ -542,8 +649,24 @@
     min-height: 0;
   }
 
+  .plan-card {
+    padding: 22px;
+  }
+
+  .plan-outcome {
+    padding: 15px;
+  }
+
+  .plan-outcome strong {
+    font-size: 21px;
+  }
+
   .billing-rule {
     margin-top: 20px;
+  }
+
+  .credit-guide-grid {
+    grid-template-columns: 1fr;
   }
 
   .topup-controls {
