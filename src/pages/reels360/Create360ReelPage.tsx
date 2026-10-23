@@ -121,6 +121,7 @@ export default function Create360ReelPage() {
         data?.error === "Insufficient credits" ||
         data?.error === "No credits left"
       ) {
+        progressWindow?.close();
         setGenerating(false);
 
         setLockedFeature("360° Reel Generation");
@@ -156,6 +157,8 @@ export default function Create360ReelPage() {
       }
 
     } catch (err: any) {
+
+      if (progressWindow && !progressWindow.closed) progressWindow.close();
 
       console.error(
         "360° REEL ERROR:",
