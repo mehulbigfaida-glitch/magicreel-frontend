@@ -24,26 +24,26 @@ const plans: Plan[] = [
     priceUSD: 9,
     museCount: 0,
     description:
-      "A solid starting plan for fashion content creation.",
+      "A practical starting point for independent sellers and small fashion brands. Includes 10 credits for AI Hero creation, Lookbooks, and other eligible creative workflows.",
   },
   {
     name: "PRO",
-    credits: 30,
+    credits: 32,
     priceINR: 2400,
-    priceUSD: 27,
-    museCount: 2,
+    priceUSD: 24,
+    museCount: 0,
     popular: true,
     description:
-      "More credits plus personalized Muses for growing brands.",
+      "For growing fashion brands that need more creative output. Includes 32 credits, with a lower effective cost per complete Lookbook than BASIC.",
   },
   {
     name: "ADVANCE",
-    credits: 60,
+    credits: 72,
     priceINR: 3600,
-    priceUSD: 39,
-    museCount: 4,
+    priceUSD: 36,
+    museCount: 0,
     description:
-      "High-volume creation with the strongest credit value.",
+      "Best value for high-volume fashion content creation. Includes 72 credits and the lowest effective cost per complete Lookbook among the standard plans.",
   },
 ];
 
@@ -52,8 +52,8 @@ const topupRateINR: Record<
   number
 > = {
   BASIC: 90,
-  PRO: 80,
-  ADVANCE: 60,
+  PRO: 75,
+  ADVANCE: 50,
 };
 
 declare global {
@@ -938,17 +938,6 @@ export default function PlansPage() {
         )
       : null;
 
-  const publishingExpiry =
-    userInfo?.publishingSubscriptionEnd
-      ? new Date(
-          userInfo.publishingSubscriptionEnd
-        )
-      : null;
-
-  const publishingActive =
-    !!publishingExpiry &&
-    publishingExpiry > new Date();
-
   const currentTopupRate =
     currentPlan &&
     topupRateINR[
@@ -967,21 +956,6 @@ export default function PlansPage() {
   const formattedCreditExpiry =
     creditExpiry
       ? creditExpiry.toLocaleDateString(
-          "en-IN",
-          {
-            day:
-              "2-digit",
-            month:
-              "short",
-            year:
-              "numeric",
-          }
-        )
-      : "—";
-
-  const formattedPublishingExpiry =
-    publishingExpiry
-      ? publishingExpiry.toLocaleDateString(
           "en-IN",
           {
             day:
@@ -1014,10 +988,8 @@ export default function PlansPage() {
         </h1>
 
         <p>
-          Create premium fashion
-          content with credits that
-          work across your MagicReel
-          creative studio.
+          From marketplace-ready fashion images to campaign creatives and motion.
+          Choose a plan by what you want to create—not just by the number of credits.
         </p>
 
       </div>
@@ -1070,37 +1042,10 @@ export default function PlansPage() {
               </strong>
             </div>
 
-            <div>
-              <span className="summary-label">
-                PUBLISHING
-              </span>
-
-              <strong>
-                {publishingActive
-                  ? `Active · ${formattedPublishingExpiry}`
-                  : "Not active"}
-              </strong>
-            </div>
 
           </section>
 
           <section className="pricing-section">
-
-            <div className="section-heading">
-              <span>
-                AI CREATION
-              </span>
-
-              <h2>
-                Choose your generation plan
-              </h2>
-
-              <p>
-                Credits are used across
-                eligible MagicReel AI
-                generation workflows.
-              </p>
-            </div>
 
             <div className="plans-grid">
 
@@ -1156,37 +1101,63 @@ export default function PlansPage() {
                         ${plan.priceUSD}
                       </div>
 
-                      <div className="plan-credit-count">
-                        {plan.credits}
-                        {" "}
-                        Credits
+                      <div className="plan-credit-row">
+                        <div className="plan-credit-count">
+                          {plan.credits} Credits
+                        </div>
+                        <span className="plan-validity-badge">90 Days Validity</span>
                       </div>
 
                       <p className="plan-description">
                         {plan.description}
                       </p>
 
-                      {plan.museCount > 0 ? (
-                        <div className="plan-feature highlight">
-                          ✦{" "}
-                          {plan.museCount}
-                          {" "}
-                          Personalized Muse
-                          {plan.museCount ===
-                          1
-                            ? ""
-                            : "s"}
-                        </div>
-                      ) : (
-                        <div className="plan-feature">
-                          ✓ Standard Muse
-                          Library
-                        </div>
-                      )}
+                      <div className="plan-outcome">
+                        <span className="plan-outcome-label">YOUR CREATIVE OUTPUT</span>
+                        <strong>Up to {Math.floor(plan.credits / 2)} Lookbook Packs</strong>
+                        <span>{Math.floor(plan.credits / 2)} × 15-second Carousel Reels included</span>
+                        <small>When all credits are used for complete Packs.</small>
+                      </div>
 
                       <div className="plan-feature">
-                        ✓ Credits valid for
-                        90 days
+                        ✓ Each Pack: 2 Hero views + 6 Lookbook poses
+                      </div>
+
+                      <div className="plan-feature">
+                        ✓ 2K images · No watermarks
+                      </div>
+
+                      <div className="plan-feature">
+                        ✓ Marketplace-oriented Lookbooks: Myntra and Amazon guidelines
+                      </div>
+
+                      <div className="plan-feature">
+                        <strong>✓ Lookbook Formats</strong>
+                        <span className="lookbook-format-list">2:3 (1240 × 1860) · 3:4 (1500 × 2000) · 4:5 (1856 × 2304) · 1:1 (2000 × 2000)</span>
+                      </div>
+
+                      <div className="plan-feature">
+                        ✓ Hero set: 1 credit · 6-pose Lookbook: 1 credit
+                      </div>
+
+                      <div className="plan-feature">
+                        ✓ Marketing Campaign creative: 1 credit
+                      </div>
+
+                      <div className="plan-feature">
+                        ✓ Editorial Photo Shoot / Campaign: 1 credit
+                      </div>
+
+                      <div className="plan-feature">
+                        ✓ 360° video: 3 credits
+                      </div>
+
+                      <div className="plan-feature">
+                        ✓ Instagram Publishing, Captions &amp; Hashtags
+                      </div>
+
+                      <div className="plan-feature">
+                        ✓ Kids models coming soon
                       </div>
 
                       <button
@@ -1215,123 +1186,26 @@ export default function PlansPage() {
                 }
               )}
 
-              <article className="plan-card enterprise-card">
-
-                <div className="plan-name">
-                  ENTERPRISE
-                </div>
-
-                <div className="enterprise-price">
-                  Custom
-                </div>
-
-                <p className="plan-description">
-                  High-volume generation,
-                  custom commercial
-                  requirements and support.
-                </p>
-
-                <div className="plan-feature">
-                  ✓ Custom credit allocation
-                </div>
-
-                <div className="plan-feature">
-                  ✓ Custom Muse requirements
-                </div>
-
-                <div className="plan-feature">
-                  ✓ Dedicated support
-                </div>
-
-                <button
-                  className="enterprise-btn"
-                  onClick={() =>
-                    (window.location.href =
-                      "mailto:sales@magicreel.in")
-                  }
-                >
-                  Contact Sales
-                </button>
-
-              </article>
-
             </div>
 
-          </section>
-
-          <section className="billing-rule">
-            <div className="billing-rule-icon">
-              ⏳
-            </div>
-
-            <div>
-              <strong>
-                Credit validity
-              </strong>
-
-              <p>
-                Credits are valid for 90 days
-                from your latest credit purchase.
-                Purchasing additional credits
-                refreshes the validity period for
-                your available credit balance.
-              </p>
-            </div>
           </section>
 
           <section className="commercial-grid">
 
-            <article className="commercial-card publishing-card">
-
-              <div className="commercial-eyebrow">
-                SOCIAL PUBLISHING
-              </div>
-
-              <h2>
-                Publish your approved creations
-              </h2>
-
-              <p>
-                Publish approved MagicReel
-                images and videos to connected
-                social platforms.
-              </p>
-
-              <div className="commercial-price">
-                ₹900
-                <span>
-                  + GST / month
-                </span>
-              </div>
-
-              <div className="commercial-usd">
-                $9 / month
-              </div>
-
-              <div className="commercial-status">
-                {publishingActive
-                  ? `Active until ${formattedPublishingExpiry}`
-                  : "Not active"}
-              </div>
-
+            <article className="commercial-card enterprise-card"> 
+              <div className="commercial-eyebrow">ENTERPRISE PLAN</div>
+              <h2>Custom</h2>
+              <p>High-volume generation, custom commercial requirements and dedicated support tailored to your business.</p>
+              <div className="plan-feature">✓ Custom credit allocation</div>
+              <div className="plan-feature">✓ Custom Muse requirements</div>
+              <div className="plan-feature">✓ Dedicated support</div>
               <button
-                className="publishing-btn"
-                disabled={
-                  publishingBusy
-                }
-                onClick={
-                  openPublishingCheckout
-                }
+                className="enterprise-btn"
+                onClick={() => (window.location.href = "mailto:sales@magicreel.in")}
               >
-                {publishingBusy
-                  ? "Opening checkout…"
-                  : publishingActive
-                    ? "Extend Publishing"
-                    : "Activate Publishing"}
+                Contact Sales
               </button>
-
             </article>
-
 
             <article className="commercial-card topup-card">
 
@@ -1438,6 +1312,45 @@ export default function PlansPage() {
 
           </section>
 
+          <section className="billing-rule credit-guide-panel" style={{ marginTop: "24px" }}>
+            <div className="billing-rule-icon">✦</div>
+            <div>
+              <strong>Credit consumption guide</strong>
+              <p className="credit-guide-intro">
+                <strong>One credit system. Clear creative outcomes.</strong> Use credits across Hero images, Lookbooks, campaigns and video.
+              </p>
+              <div className="credit-guide-grid">
+                <div className="credit-guide-item">
+                  <strong>1 credit · Hero set</strong>
+                  <span>Upload front and back garment views to generate the Front Hero and Back Hero.</span>
+                </div>
+                <div className="credit-guide-item">
+                  <strong>1 credit · Lookbook</strong>
+                  <span>Generate six poses, including front and back views, for your selected Lookbook world and criteria.</span>
+                </div>
+                <div className="credit-guide-item">
+                  <strong>2 credits · Complete Pack</strong>
+                  <span>One Hero set + six Lookbook poses + one complimentary 15-second Carousel Reel.</span>
+                </div>
+                <div className="credit-guide-item">
+                  <strong>3 credits · 360° video</strong>
+                  <span>Create a 360-degree fashion video.</span>
+                </div>
+                <div className="credit-guide-item">
+                  <strong>1 credit each · Campaigns</strong>
+                  <span>Marketing Campaign creative or Editorial Photo Shoot / Campaign.</span>
+                </div>
+                <div className="credit-guide-item">
+                  <strong>Reuse your Hero set</strong>
+                  <span>Generate four Lookbooks in four aspect ratios for 5 credits total: 1 Hero set + 4 Lookbook generations.</span>
+                </div>
+              </div>
+              <p className="credit-guide-footnote">
+                Output dimensions are designed around leading marketplace image guidelines. Marketplace acceptance is determined by each marketplace. Kids models are coming soon.
+              </p>
+            </div>
+          </section>
+
           <section className="payment-history-section">
 
             <div className="section-heading">
@@ -1450,9 +1363,7 @@ export default function PlansPage() {
               </h2>
 
               <p>
-                Your recent plan,
-                top-up and publishing
-                payments.
+                Your recent plan and top-up payments.
               </p>
             </div>
 
