@@ -73,7 +73,12 @@ export default function Create360ReelPage() {
       return;
     }
 
+    let progressWindow: Window | null = null;
+
     try {
+
+      // Open synchronously inside the click handler so browsers do not block the tab.
+      progressWindow = window.open("about:blank", "_blank");
 
       setGenerating(true);
       setError("");
@@ -140,11 +145,15 @@ export default function Create360ReelPage() {
 
       }
 
-      window.open(
-        `/reels360/${data.runId}`,
-        "_blank",
-        "noopener,noreferrer"
-      );
+      const progressUrl = `/reels360/${data.runId}`;
+
+      if (progressWindow && !progressWindow.closed) {
+        progressWindow.opener = null;
+        progressWindow.location.href = progressUrl;
+      } else {
+        // If popups are blocked, keep the user in the current tab rather than losing the job page.
+        navigate(progressUrl);
+      }
 
     } catch (err: any) {
 
@@ -509,7 +518,7 @@ export default function Create360ReelPage() {
                 12,
             }}
           >
-            3 ⚡ · ~4–5 min
+            4 ⚡ · typically several minutes
           </div>
 
           <button
