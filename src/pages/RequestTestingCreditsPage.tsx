@@ -17,6 +17,7 @@ export default function RequestTestingCreditsPage() {
   const [tests, setTests] = useState<string[]>([]);
 
   const [submitted, setSubmitted] = useState(false);
+  const [submittedEmail, setSubmittedEmail] = useState("");
 
   const updateField = (
     field: keyof typeof form,
@@ -88,6 +89,7 @@ export default function RequestTestingCreditsPage() {
       data
     );
 
+    setSubmittedEmail(form.email.trim());
     setSubmitted(true);
 
   } catch (error: any) {
