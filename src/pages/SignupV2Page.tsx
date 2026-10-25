@@ -264,7 +264,7 @@ const SignupV2Page: React.FC = () => {
 
             <input
               style={styles.input}
-              placeholder="Business Email"
+              placeholder="Email Address"
               type="email"
               value={form.email}
               onChange={(e) =>
