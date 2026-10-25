@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { CSSProperties } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { API_BASE } from "../config/api";
 
@@ -29,7 +30,7 @@ export default function VerifyEmailPage() {
     return () => { active = false; };
   }, [params]);
 
-  const box: React.CSSProperties = { maxWidth: 560, margin: "10vh auto", padding: 32, borderRadius: 18, background: "#fff", boxShadow: "0 20px 60px rgba(15,23,42,.10)", fontFamily: "Arial,sans-serif", color: "#111827", lineHeight: 1.6 };
+  const box: CSSProperties = { maxWidth: 560, margin: "10vh auto", padding: 32, borderRadius: 18, background: "#fff", boxShadow: "0 20px 60px rgba(15,23,42,.10)", fontFamily: "Arial,sans-serif", color: "#111827", lineHeight: 1.6 };
   return <main style={{ minHeight: "100vh", padding: 20, background: "#f8fafc", boxSizing: "border-box" }}>
     <section style={box}>
       <div style={{ fontWeight: 800, fontSize: 26, marginBottom: 8 }}>MagicReel</div>
