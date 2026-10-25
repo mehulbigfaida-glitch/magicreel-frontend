@@ -71,20 +71,7 @@ export default function Hero() {
 
           </div>
 
-<p className="hero-trust">
-  ✨ Want to test MagicReel?{" "}
-  <a
-    href="/testing-credits/request"
-    style={{
-      color: "inherit",
-      fontWeight: 700,
-      textDecoration: "underline",
-      cursor: "pointer",
-    }}
-  >
-    Request free testing credits.
-  </a>
-</p>
+
 
                 </div>
 
@@ -307,6 +294,8 @@ export default function Hero() {
 </a>
 
   <div className="closing-features"></div>
+
+      </div>
 
     </section>
   );
