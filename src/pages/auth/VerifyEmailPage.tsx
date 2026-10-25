@@ -4,6 +4,7 @@ import { API_BASE } from "../config/api";
 
 export default function VerifyEmailPage() {
   const [params] = useSearchParams();
+  const setAuth = useAuthStore((s) => s.setAuth);
   const token = params.get("token") || "";
   const [status, setStatus] = useState<"checking"|"success"|"error">("checking");
   const [message, setMessage] = useState("Verifying your email…");
@@ -12,7 +13,7 @@ export default function VerifyEmailPage() {
     if (!token) { setStatus("error"); setMessage("This verification link is missing its token."); return; }
     fetch(`${API_BASE}/api/auth/verify-email`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({token}) })
       .then(async r => { const d = await r.json().catch(()=>({})); if (!r.ok) throw new Error(d.error || "This link is invalid or has expired."); return d; })
-      .then(() => { if(active){setStatus("success");setMessage("Your email is verified. Welcome to MagicReel!");} })
+      .then((data) => { if(active){ if(data.token && data.user) setAuth(data.token, data.user); setStatus("success");setMessage("Your email is verified. Welcome to MagicReel!");} })
       .catch(e => { if(active){setStatus("error");setMessage(e.message || "Verification failed.");} });
     return () => { active = false; };
   }, [token]);
