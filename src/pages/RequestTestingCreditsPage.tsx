@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./RequestTestingCreditsPage.css";
+import { API_BASE } from "../config/api";
 
 export default function RequestTestingCreditsPage() {
   const navigate = useNavigate();
@@ -54,7 +55,7 @@ export default function RequestTestingCreditsPage() {
 
   try {
     const res = await fetch(
-      "https://api.magicreel.in/api/testing-credits/request",
+      `${API_BASE}/api/testing-credits/request`,
       {
         method: "POST",
 
