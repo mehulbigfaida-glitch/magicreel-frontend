@@ -49,14 +49,14 @@ export default function SignupV2Page() {
             <input style={styles.input} type="password" autoComplete="new-password" minLength={8} required value={password} onChange={e=>setPassword(e.target.value)} placeholder="At least 8 characters" />
             <label style={styles.check}><input type="checkbox" checked={accepted} onChange={e=>setAccepted(e.target.checked)} /> <span>I agree to the <a href="/policies/terms">Terms of Service</a> and <a href="/policies/privacy">Privacy Policy</a>.</span></label>
             {error && <p role="alert" style={styles.error}>{error}</p>}
-            <button style={{...styles.button, opacity:loading?.65:1}} disabled={loading}>{loading ? "Sending verification…" : "Create account"}</button>
+            <button style={{...styles.button, opacity: loading ? 0.65 : 1}} disabled={loading}>{loading ? "Sending verification…" : "Create account"}</button>
           </form>
           <p style={styles.login}>Already have an account? <Link to="/login">Log in</Link></p>
         </> : <>
           <div style={styles.mailIcon}>✉</div>
           <h2 style={styles.title}>Check your inbox</h2>
           <p style={styles.subtitle}>If registration was accepted, a MagicReel verification link is on its way to <strong>{email}</strong>. Open it to verify your email and continue.</p>
-          <button style={styles.button} onClick={()=>{setSubmitted(false);setError("");}}>Back to sign up</button>
+          <button style={styles.button} disabled={loading} onClick={async()=>{setLoading(true);setError("");try{const r=await fetch(`${API_BASE}/api/auth/resend-verification`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:email.trim().toLowerCase()})});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||"Could not resend the email.");setError("If your account is awaiting verification, a fresh link has been sent.");}catch(e:any){setError(e.message||"Could not resend the email.");}finally{setLoading(false);}}}>{loading?"Sending…":"Resend verification email"}</button><button style={{...styles.button,background:"#475569"}} onClick={()=>{setSubmitted(false);setError("");}}>Back to sign up</button>{error && <p role="status" style={styles.error}>{error}</p>}
           <p style={styles.login}>Already verified? <Link to="/login">Log in</Link></p>
         </>}
       </div>
