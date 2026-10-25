@@ -1,5 +1,3 @@
-export const API_BASE =
-  import.meta.env.VITE_META_INSTAGRAM_API_BASE_URL ||
-  import.meta.env.VITE_API_BASE ||
-  import.meta.env.VITE_API_BASE_URL ||
-  "https://magicreel-backend-production.up.railway.app";
+// Preview-only override: keep this experiment isolated from production data and APIs.
+// Restore the environment-based API selection before merging to the production branch.
+export const API_BASE = "https://magicreel-instagram-backend-staging-staging.up.railway.app";

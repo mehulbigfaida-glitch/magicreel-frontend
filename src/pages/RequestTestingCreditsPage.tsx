@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./RequestTestingCreditsPage.css";
+import { API_BASE } from "../config/api";
 
 export default function RequestTestingCreditsPage() {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ export default function RequestTestingCreditsPage() {
   const [tests, setTests] = useState<string[]>([]);
 
   const [submitted, setSubmitted] = useState(false);
+  const [submittedEmail, setSubmittedEmail] = useState("");
 
   const updateField = (
     field: keyof typeof form,
@@ -53,7 +55,7 @@ export default function RequestTestingCreditsPage() {
 
   try {
     const res = await fetch(
-      "https://api.magicreel.in/api/testing-credits/request",
+      `${API_BASE}/api/testing-credits/request`,
       {
         method: "POST",
 
@@ -88,6 +90,7 @@ export default function RequestTestingCreditsPage() {
       data
     );
 
+    setSubmittedEmail(form.email.trim());
     setSubmitted(true);
 
   } catch (error: any) {
@@ -301,9 +304,28 @@ export default function RequestTestingCreditsPage() {
               </p>
 
               <p style={styles.successText}>
-                We've received your testing credit
-                request and will review it shortly.
+                We've sent a verification link to <strong>{submittedEmail}</strong>. Verify your company email before your request can be reviewed.
               </p>
+              <button
+                type="button"
+                style={styles.button}
+                onClick={async () => {
+                  try {
+                    const response = await fetch(`${API_BASE}/api/auth/resend-verification`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ email: submittedEmail, purpose: "testing" }),
+                    });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error || "Unable to resend verification email.");
+                    alert("If your request is pending verification, a fresh verification email has been sent.");
+                  } catch (error: any) {
+                    alert(error?.message || "Unable to resend verification email.");
+                  }
+                }}
+              >
+                Resend verification email
+              </button>
 
               <button
                 type="button"
