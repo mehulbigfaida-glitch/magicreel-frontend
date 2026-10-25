@@ -406,6 +406,8 @@ const SignupV2Page: React.FC = () => {
               </Link>
             </div>
           </div>
+          </>
+          )}
         </div>
       </div>
     </div>
