@@ -355,14 +355,8 @@ export default function PlansPage() {
 
     try {
 
-      const profileComplete =
-        await ensureBusinessProfileComplete();
-
-      if (!profileComplete) {
-        setBusyPlan(null);
-        return;
-      }
-
+      // Checkout must come before optional brand/billing onboarding.
+      // Profile setup can be completed later from the dashboard.
       setBusyPlan(plan);
 
       const loaded =
