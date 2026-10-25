@@ -22,6 +22,7 @@ const SignupV2Page: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   const [error, setError] = useState("");
+  const [verificationSent, setVerificationSent] = useState(false);
 
   const [form, setForm] = useState<FormState>({
     fullName: "",
@@ -219,6 +220,36 @@ const SignupV2Page: React.FC = () => {
             Fashion Workspace.
           </div>
 
+          {verificationSent ? (
+            <div style={{ ...styles.form, lineHeight: 1.6 }}>
+              <div style={{ fontSize: 42 }}>✉️</div>
+              <h3 style={{ margin: 0 }}>Verify your email</h3>
+              <p style={{ color: "#475569", margin: 0 }}>
+                We sent a verification link to <strong>{form.email.trim()}</strong>.
+                Open that email and click the link to activate your account. The link expires in 30 minutes.
+              </p>
+              <button
+                type="button"
+                style={styles.button}
+                onClick={async () => {
+                  try {
+                    setError("");
+                    const response = await fetch(`${API_BASE}/api/auth/resend-verification`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ email: form.email.trim(), purpose: "signup" }),
+                    });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error || "Unable to resend email.");
+                    setError(result.message || "If the account is pending verification, a fresh link has been sent.");
+                  } catch (e: any) { setError(e.message || "Unable to resend email."); }
+                }}
+              >Resend verification email</button>
+              {error && <div style={{ ...styles.error, lineHeight: 1.5 }}>{error}</div>}
+              <div style={styles.loginText}>Already verified? <Link to="/login" style={styles.loginLink}>Sign in</Link></div>
+            </div>
+          ) : (
+          <>
           {/* Remaining JSX continues in Part 2 */}
 
                     <div style={styles.form}>
