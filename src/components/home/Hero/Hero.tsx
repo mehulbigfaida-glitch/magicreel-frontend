@@ -71,22 +71,7 @@ export default function Hero() {
 
           </div>
 
-<p className="hero-trust">
-  ✨ Want to test MagicReel?{" "}
-  <a
-    href="/testing-credits/request"
-    style={{
-      color: "inherit",
-      fontWeight: 700,
-      textDecoration: "underline",
-      cursor: "pointer",
-    }}
-  >
-    Request free testing credits.
-  </a>
-</p>
-
-                </div>
+</div>
 
         {/* Fashion Intelligence Pipeline */}
 
@@ -306,27 +291,7 @@ export default function Hero() {
   <ArrowRight size={18} />
 </a>
 
-  <div className="closing-features">
-
-    <div>
-  <CheckCircle2 size={18} />
-  <span>
-    ✨ Want to test MagicReel?{" "}
-    <a
-      href="/testing-credits/request"
-      style={{
-        color: "inherit",
-        fontWeight: 700,
-        textDecoration: "underline",
-        cursor: "pointer",
-      }}
-    >
-      Request free testing credits.
-    </a>
-  </span>
-</div>
-
-      </div>
+  <div className="closing-features"></div>
 
 </div>
 
