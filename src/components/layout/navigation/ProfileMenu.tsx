@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import {
   LayoutDashboard,
   CreditCard,
+  UserRound,
   LogOut,
 } from "lucide-react";
 
@@ -33,6 +34,15 @@ export default function ProfileMenu({
       >
         <LayoutDashboard size={18} />
         <span>Dashboard</span>
+      </Link>
+
+      <Link
+        to="/account"
+        className="mr-profile-item"
+        onClick={onClose}
+      >
+        <UserRound size={18} />
+        <span>My Account</span>
       </Link>
 
       <Link
