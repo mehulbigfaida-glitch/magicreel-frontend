@@ -46,13 +46,16 @@ const OnboardingWizard: React.FC =
         "required"
       ) === "1";
 
+    const billingOnlyMode =
+      searchParams.get("billingOnly") === "1";
+
     const returnTo =
       searchParams.get(
         "returnTo"
       ) || "/plans";
 
     const [step, setStep] =
-      useState(1);
+      useState(billingOnlyMode ? 4 : 1);
 
     const [
       businessProfile,
@@ -125,6 +128,11 @@ const OnboardingWizard: React.FC =
            *   go directly to Billing.
            */
           if (
+            billingOnlyMode
+          ) {
+            // Purchasing requires billing details only; do not force brand setup.
+            setStep(4);
+          } else if (
             requiredMode
           ) {
             if (
@@ -207,21 +215,19 @@ const OnboardingWizard: React.FC =
 
     const completeOnboarding =
       async () => {
-        await saveBusinessProfile({
-          completed: true,
-          onboardingStep: 4,
-        });
+        // BillingDetailsStep has already persisted the billing profile.
+        // Billing-only mode must not mark brand onboarding complete.
+        if (!billingOnlyMode) {
+          await saveBusinessProfile({
+            completed: true,
+            onboardingStep: 4,
+          });
 
-        window.dispatchEvent(
-          new Event(
-            "businessProfileUpdated"
-          )
-        );
+          window.dispatchEvent(
+            new Event("businessProfileUpdated")
+          );
+        }
 
-        /*
-         * Both new users and testing users
-         * arrive at Plans after onboarding.
-         */
         navigate(
           requiredMode
             ? returnTo || "/plans"
