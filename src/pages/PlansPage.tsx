@@ -355,9 +355,17 @@ export default function PlansPage() {
 
     try {
 
-      // Checkout must come before optional brand/billing onboarding.
-      // Profile setup can be completed later from the dashboard.
+      // First paid purchase must have a complete billing profile before checkout.
+      // Existing customers with saved details proceed directly to Razorpay.
       setBusyPlan(plan);
+
+      const profileComplete =
+        await ensureBusinessProfileComplete();
+
+      if (!profileComplete) {
+        setBusyPlan(null);
+        return;
+      }
 
       const loaded =
         await loadRazorpayScript();
