@@ -250,101 +250,37 @@ export default function PlansPage() {
 
   async function ensureBusinessProfileComplete(): Promise<boolean> {
     try {
-      const businessRes =
-        await fetch(
-          `${BACKEND_URL}/api/business-profile`,
-          {
-            headers: {
-              Authorization:
-                `Bearer ${token}`,
-            },
-          }
-        );
+      // Billing is mandatory for purchase; brand/social onboarding is not.
+      const billingRes = await fetch(
+        `${BACKEND_URL}/api/billing-profile`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-      if (
-        businessRes.status === 404 ||
-        !businessRes.ok
-      ) {
-        window.location.href =
-          "/onboarding?required=1&returnTo=/plans";
-
+      if (!billingRes.ok) {
+        window.location.href = "/onboarding?required=1&billingOnly=1&returnTo=/plans";
         return false;
       }
 
-      const businessData =
-        await businessRes.json();
-
-      const businessProfile =
-        businessData?.profile ??
-        businessData;
-
-      if (
-        businessProfile?.completed !== true
-      ) {
-        window.location.href =
-          "/onboarding?required=1&returnTo=/plans";
-
-        return false;
-      }
-
-      const billingRes =
-        await fetch(
-          `${BACKEND_URL}/api/billing-profile`,
-          {
-            headers: {
-              Authorization:
-                `Bearer ${token}`,
-            },
-          }
-        );
-
-      if (
-        billingRes.status === 404 ||
-        !billingRes.ok
-      ) {
-        window.location.href =
-          "/onboarding?required=1&returnTo=/plans";
-
-        return false;
-      }
-
-      const billingData =
-        await billingRes.json();
-
-      const billing =
-        billingData?.profile ??
-        billingData;
-
-      const billingComplete =
-        Boolean(
-          billing?.billingName?.trim() &&
-          billing?.addressLine1?.trim() &&
-          billing?.city?.trim() &&
-          billing?.state?.trim() &&
-          billing?.postalCode?.trim() &&
-          billing?.country?.trim()
-        );
+      const billingData = await billingRes.json();
+      const billing = billingData?.profile ?? billingData;
+      const billingComplete = Boolean(
+        billing?.fullName?.trim() &&
+        billing?.addressLine1?.trim() &&
+        billing?.city?.trim() &&
+        billing?.state?.trim() &&
+        billing?.postalCode?.trim() &&
+        billing?.country?.trim()
+      );
 
       if (!billingComplete) {
-        window.location.href =
-          "/onboarding?required=1&returnTo=/plans";
-
+        window.location.href = "/onboarding?required=1&billingOnly=1&returnTo=/plans";
         return false;
       }
 
       return true;
-
     } catch (error) {
-
-      console.error(
-        "BUSINESS/BILLING PROFILE CHECK ERROR:",
-        error
-      );
-
-      showMessage(
-        "Unable to verify your account details."
-      );
-
+      console.error("BILLING PROFILE CHECK ERROR:", error);
+      showMessage("Unable to verify your billing details. Please try again.");
       return false;
     }
   }
