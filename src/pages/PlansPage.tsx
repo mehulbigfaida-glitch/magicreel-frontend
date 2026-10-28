@@ -317,7 +317,7 @@ export default function PlansPage() {
 
       const billingComplete =
         Boolean(
-          billing?.fullName?.trim() &&
+          billing?.billingName?.trim() &&
           billing?.addressLine1?.trim() &&
           billing?.city?.trim() &&
           billing?.state?.trim() &&
