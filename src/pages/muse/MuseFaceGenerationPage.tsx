@@ -108,7 +108,7 @@ export default function MuseFaceGenerationPage() {
           <img src={preview} alt="Uploaded source portrait preview"/>
           <div className="muse-source-overlay"><span><Check size={14}/> Image selected</span><button onClick={reset} aria-label="Remove image"><X size={16}/></button></div>
           <div className="muse-source-meta">{file?.name} · {fileSize} MB</div>
-        </div> : <button className="muse-upload-drop" onClick={() => fileRef.current?.click()}>
+        </div> : <button className="muse-upload-drop" onClick={() => fileRef.current?.click()} onDragOver={(e) => { e.preventDefault(); }} onDrop={(e) => { e.preventDefault(); onFile(e.dataTransfer.files?.[0]); }}>
           <span className="muse-upload-icon"><ImagePlus size={25}/></span><strong>Choose your source photo</strong><span>Click to browse or drag an image here</span><small>JPG, PNG or WebP · Maximum 10 MB</small>
         </button>}
         <input ref={fileRef} className="muse-hidden-input" type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => onFile(e.target.files?.[0])}/>
