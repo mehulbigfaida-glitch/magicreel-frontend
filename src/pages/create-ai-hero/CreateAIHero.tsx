@@ -1596,6 +1596,45 @@ transform:"scale(1.02)"
   </button>
 </div>
 
+            {selectedAvatar && (
+              <div style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                padding: 10,
+                marginBottom: 12,
+                borderRadius: 14,
+                border: "1px solid rgba(168,85,247,.65)",
+                background: "rgba(168,85,247,.10)",
+              }}>
+                <img
+                  src={selectedAvatar.previewImage}
+                  alt="Selected personal Avatar"
+                  style={{ width: 48, height: 64, objectFit: "cover", borderRadius: 8 }}
+                />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700 }}>Personal Avatar selected</div>
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.6)" }}>
+                    {selectedAvatar.id.replace(/_/g, " ")}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsAvatarPickerOpen(true)}
+                  style={{
+                    border: "1px solid rgba(255,255,255,.18)",
+                    borderRadius: 999,
+                    padding: "7px 12px",
+                    color: "#fff",
+                    background: "rgba(255,255,255,.06)",
+                    cursor: "pointer",
+                  }}
+                >
+                  Change
+                </button>
+              </div>
+            )}
+
             <div
               style={{
                 display:"grid",
