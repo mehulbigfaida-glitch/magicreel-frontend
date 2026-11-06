@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAvatarStore } from "../../store/avatarStore";
 import type { Avatar } from "../../store/avatarStore";
 import "./AvatarPickerDrawer.css";
@@ -9,6 +10,7 @@ type Props = {
 };
 
 export default function AvatarPickerDrawer({ open, onClose }: Props) {
+  const navigate = useNavigate();
   const { getAvatars, selectAvatar } = useAvatarStore();
   const avatars = getAvatars();
 
@@ -29,6 +31,7 @@ export default function AvatarPickerDrawer({ open, onClose }: Props) {
       <div className="avatar-drawer">
         <div className="avatar-drawer-header">
           <h3>Select Avatar</h3>
+          <button className="avatar-create-muse" onClick={() => { onClose(); navigate("/create-muse/face"); }}>＋ Create My Muse</button>
         </div>
 
         <div className="avatar-grid">
