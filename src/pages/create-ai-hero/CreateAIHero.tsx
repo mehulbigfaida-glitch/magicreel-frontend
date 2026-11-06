@@ -922,58 +922,49 @@ style={{
               }}
             >
 
-              <select
-                value={
-                  selectedCategory
-                }
-
-                onChange={(e) => {
-
-                  const value =
-                    e.target
-                      .value as GarmentCategory;
-
-                  clearSelectedAvatar();
-                  setSelectedCategory(
-                    value
-                  );
-
-                  setSelectedSubType(
-                    ""
-                  );
-
-                  setSelectedPill(
-                    ""
-                  );
-
-                }}
-
+              <div
+                role="group"
+                aria-label="Select gender"
                 style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
                   height: 46,
+                  padding: 4,
                   borderRadius: 12,
-                  background:
-                    "#111",
-
-                  color:
-                    "white"
+                  border: "1px solid rgba(255,255,255,.16)",
+                  background: "#111",
                 }}
               >
-
-                <option value="">
-                  Select Gender
-                </option>
-
-                {Object.keys(GARMENTS).map((category) => (
-  <option
-    key={category}
-    value={category}
-    disabled={category === "Kids"}
-  >
-    {category}
-  </option>
-))}
-
-              </select>
+                {(["Women", "Men"] as const).map((gender) => (
+                  <button
+                    key={gender}
+                    type="button"
+                    aria-pressed={selectedCategory === gender}
+                    onClick={() => {
+                      clearSelectedAvatar();
+                      setSelectedCategory(gender);
+                      setSelectedSubType("");
+                      setSelectedPill("");
+                    }}
+                    style={{
+                      flex: 1,
+                      height: "100%",
+                      border: "none",
+                      borderRadius: 8,
+                      background: selectedCategory === gender
+                        ? "linear-gradient(110deg,#7c3aed,#ec4899)"
+                        : "transparent",
+                      color: "#fff",
+                      fontWeight: 600,
+                      fontSize: 13,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {gender}
+                  </button>
+                ))}
+              </div>     </select>
 
 
               <select
