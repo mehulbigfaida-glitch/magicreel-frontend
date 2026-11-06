@@ -964,7 +964,7 @@ style={{
                     {gender}
                   </button>
                 ))}
-              </div>     </select>
+              </div>
 
 
               <select
