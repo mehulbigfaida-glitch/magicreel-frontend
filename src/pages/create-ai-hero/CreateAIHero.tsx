@@ -46,6 +46,7 @@ export default function CreateAIHero() {
   const navigate = useNavigate();
   const selectedAvatar = useAvatarStore((state) => state.selectedAvatar);
   const setAvatarCategory = useAvatarStore((state) => state.setCategory);
+  const clearSelectedAvatar = useAvatarStore((state) => state.clearSelectedAvatar);
   const [isAvatarPickerOpen, setIsAvatarPickerOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(
     window.innerWidth < 980
@@ -932,6 +933,7 @@ style={{
                     e.target
                       .value as GarmentCategory;
 
+                  clearSelectedAvatar();
                   setSelectedCategory(
                     value
                   );
@@ -1547,6 +1549,7 @@ transform:"scale(1.02)"
 >
   <button
     type="button"
+    onClick={() => clearSelectedAvatar()}
     style={{
       padding: "8px 18px",
       borderRadius: 999,
