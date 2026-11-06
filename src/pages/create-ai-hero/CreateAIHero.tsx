@@ -952,8 +952,6 @@ style={{
                   </option>
                 ))}
               </select>
-            </div>
-
 
               <select
   value={selectedSubType}
