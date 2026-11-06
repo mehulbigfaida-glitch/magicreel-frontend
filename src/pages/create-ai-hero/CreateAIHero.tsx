@@ -951,7 +951,8 @@ style={{
                     {category}
                   </option>
                 ))}
-              </select>        </div>
+              </select>
+            </div>
 
 
               <select
