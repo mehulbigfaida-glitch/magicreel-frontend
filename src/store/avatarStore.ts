@@ -26,6 +26,7 @@ interface AvatarState {
 
   setCategory: (category: AvatarCategory) => void;
   selectAvatar: (a: Avatar) => void;
+  clearSelectedAvatar: () => void;
   getAvatars: () => Avatar[];
 }
 
