@@ -922,49 +922,36 @@ style={{
               }}
             >
 
-              <div
-                role="group"
-                aria-label="Select gender"
+              <select
+                value={selectedCategory}
+                onChange={(e) => {
+                  const value = e.target.value as GarmentCategory;
+                  clearSelectedAvatar();
+                  setSelectedCategory(value);
+                  setSelectedSubType("");
+                  setSelectedPill("");
+                }}
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
                   height: 46,
-                  padding: 4,
                   borderRadius: 12,
-                  border: "1px solid rgba(255,255,255,.16)",
                   background: "#111",
+                  color: "white",
+                  width: "100%",
+                  padding: "0 10px",
+                  cursor: "pointer",
                 }}
               >
-                {(["Women", "Men"] as const).map((gender) => (
-                  <button
-                    key={gender}
-                    type="button"
-                    aria-pressed={selectedCategory === gender}
-                    onClick={() => {
-                      clearSelectedAvatar();
-                      setSelectedCategory(gender);
-                      setSelectedSubType("");
-                      setSelectedPill("");
-                    }}
-                    style={{
-                      flex: 1,
-                      height: "100%",
-                      border: "none",
-                      borderRadius: 8,
-                      background: selectedCategory === gender
-                        ? "linear-gradient(110deg,#7c3aed,#ec4899)"
-                        : "transparent",
-                      color: "#fff",
-                      fontWeight: 600,
-                      fontSize: 13,
-                      cursor: "pointer",
-                    }}
+                <option value="">Select Gender</option>
+                {Object.keys(GARMENTS).map((category) => (
+                  <option
+                    key={category}
+                    value={category}
+                    disabled={category === "Kids"}
                   >
-                    {gender}
-                  </button>
+                    {category}
+                  </option>
                 ))}
-              </div>
+              </select>        </div>
 
 
               <select
