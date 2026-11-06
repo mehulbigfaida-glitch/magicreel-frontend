@@ -6,6 +6,8 @@ import { API_BASE } from "../../config/api";
 import FeatureLockedModal from "../../components/FeatureLockedModal";
 import StatusModal from "../../components/StatusModal";
 import { UploadCloud } from "lucide-react";
+import AvatarPickerDrawer from "../create-v2/AvatarPickerDrawer";
+import { useAvatarStore } from "../../store/avatarStore";
 import {
   GARMENTS,
   ETHNIC_SET_SUBTYPES,
@@ -42,6 +44,9 @@ const getMuseGender = (museId: string): "female" | "male" | null => {
 
 export default function CreateAIHero() {
   const navigate = useNavigate();
+  const selectedAvatar = useAvatarStore((state) => state.selectedAvatar);
+  const setAvatarCategory = useAvatarStore((state) => state.setCategory);
+  const [isAvatarPickerOpen, setIsAvatarPickerOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(
     window.innerWidth < 980
   );
@@ -361,11 +366,11 @@ categoryKey:
 selectedSubType,
 
 avatarGender:
-selectedCategory,
+selectedAvatar?.gender || selectedCategory,
 
 avatarFaceImageUrl:
 
-MUSE_REGISTRY[
+selectedAvatar?.modelImage || MUSE_REGISTRY[
 selectedMuse
 ].processingImageUrl,
 
@@ -377,7 +382,7 @@ avatarBackImageUrl:
 backImageUrl
 ?
 
-MUSE_REGISTRY[
+selectedAvatar?.backModelImage || MUSE_REGISTRY[
 selectedMuse
 ].processingBackImageUrl
 
@@ -532,7 +537,7 @@ const generate360Reel = async () => {
 };
 
   const canGenerate =
-!!selectedMuse &&
+!!(selectedAvatar || selectedMuse) &&
 !!selectedCategory &&
 !!selectedSubType &&
 !!selectedPill &&
@@ -1559,15 +1564,19 @@ transform:"scale(1.02)"
 
   <button
     type="button"
-    onClick={() =>
-  setStatusModal({
-    open: true,
-    type: "info",
-    title: "Coming Soon",
-    description:
-  "Coming Soon!\n\nUpload a passport-style photo and MagicReel will create your personal AI Avatar.\n\nUse it instantly across Hero Images, Lookbooks and AI Fashion Reels."
-  })
-}
+    onClick={() => {
+      if (!selectedCategory) {
+        setStatusModal({
+          open: true,
+          type: "warning",
+          title: "Select Gender First",
+          description: "Please select Men or Women before choosing a personal Avatar.",
+        });
+        return;
+      }
+      setAvatarCategory(selectedCategory === "Women" ? "female" : "male");
+      setIsAvatarPickerOpen(true);
+    }}
     style={{
       padding: "8px 18px",
       borderRadius: 999,
@@ -2082,6 +2091,10 @@ Download Back Hero
   }
 />
 
+  <AvatarPickerDrawer
+    open={isAvatarPickerOpen}
+    onClose={() => setIsAvatarPickerOpen(false)}
+  />
 </div>
 
 );
