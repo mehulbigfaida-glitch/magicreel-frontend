@@ -162,6 +162,11 @@ export const useAvatarStore = create<AvatarState>((set, get) => ({
       selectedAvatar: avatar,
     }),
 
+  clearSelectedAvatar: () =>
+    set({
+      selectedAvatar: undefined,
+    }),
+
   getAvatars: () => {
     const { gender, build } = get();
     return AVATARS.filter(
