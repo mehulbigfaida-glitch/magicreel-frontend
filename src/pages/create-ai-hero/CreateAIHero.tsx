@@ -2097,6 +2097,7 @@ Download Back Hero
   }
   onClose={() => setLockedFeature(null)}
 />
+</div>
 
 <StatusModal
   open={statusModal.open}
@@ -2115,7 +2116,6 @@ Download Back Hero
     open={isAvatarPickerOpen}
     onClose={() => setIsAvatarPickerOpen(false)}
   />
-</div>
 </div>
 
 );
