@@ -138,6 +138,8 @@ export default function MuseFaceGenerationPage() {
   const [consent, setConsent] = useState(false);
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
+  const [referencePublicId, setReferencePublicId] = useState("");
+  const [generatedImageUrl, setGeneratedImageUrl] = useState("");
 
   const onFile = (next?: File) => {
     setNotice("");
@@ -163,22 +165,46 @@ export default function MuseFaceGenerationPage() {
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Your session has expired. Please sign in again.");
+      const apiBase = API_BASE.replace(/\/$/, "");
 
-      const form = new FormData();
-      form.append("image", file);
-      const uploadResponse = await fetch(`${API_BASE.replace(/\/$/, "")}/api/muse/upload-reference`, {
-        method: "POST",
-        body: form,
-        credentials: "include",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const uploaded = await uploadResponse.json().catch(() => ({}));
-      if (!uploadResponse.ok) {
-        throw new Error(uploaded?.message || "Reference photo upload failed. Please try again.");
+      // First action uploads the reference only. Generation requires a second, explicit click.
+      if (!referencePublicId) {
+        const form = new FormData();
+        form.append("image", file);
+        const uploadResponse = await fetch(`${apiBase}/api/muse/upload-reference`, {
+          method: "POST",
+          body: form,
+          credentials: "include",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const uploaded = await uploadResponse.json().catch(() => ({}));
+        if (!uploadResponse.ok) {
+          throw new Error(uploaded?.message || "Reference photo upload failed. Please try again.");
+        }
+        const publicId = uploaded?.data?.publicId;
+        if (!publicId) throw new Error("The upload response did not include a reference ID.");
+        setReferencePublicId(publicId);
+        setNotice("Reference photo uploaded successfully. Click Generate My Muses again when you are ready to create the eight faces.");
+        return;
       }
-      const referenceImageUrl = uploaded?.data?.imageUrl || uploaded?.imageUrl;
-      if (!referenceImageUrl) throw new Error("The upload response did not include an image URL.");
-      setNotice("Reference photo uploaded successfully. Muse generation will be enabled in the next phase.");
+
+      const generationResponse = await fetch(`${apiBase}/api/muse/generate-faces`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ referencePublicId, age, gender, consent: true }),
+      });
+      const generated = await generationResponse.json().catch(() => ({}));
+      if (!generationResponse.ok) {
+        throw new Error(generated?.message || "Muse generation failed. Please try again.");
+      }
+      const imageUrl = generated?.data?.imageUrl;
+      if (!imageUrl) throw new Error("Generation completed without returning a collage image.");
+      setGeneratedImageUrl(imageUrl);
+      setNotice("Your eight Muse faces have been generated successfully.");
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Something went wrong. Please try again.");
     } finally {
@@ -228,8 +254,9 @@ export default function MuseFaceGenerationPage() {
         </div>
         <div className="muse-candidate-summary"><span className="muse-candidate-icon"><Sparkles size={18}/></span><div><strong>8 distinctive Muse candidates</strong><p>One high-resolution collage · 4 columns × 2 rows</p></div><span className="muse-fixed-count">8</span></div>
         <label className="muse-consent"><input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)}/><span>I confirm that I have the right and necessary consent to use this photograph and the depicted adult person's likeness for AI-generated commercial fashion content.</span></label>
-        <button className="muse-generate-button" disabled={!file || !consent || busy} onClick={requestGeneration}><Sparkles size={17}/>{busy ? "Preparing generation…" : "Generate My Muses"}</button>
+        <button className="muse-generate-button" disabled={!file || !consent || busy} onClick={requestGeneration}><Sparkles size={17}/>{busy ? "Preparing…" : referencePublicId ? "Generate My Muses" : "Upload Reference Photo"}</button>
         {notice && <div className="muse-status-note" role="status">{notice}</div>}
+        {generatedImageUrl && <div className="muse-generated-result"><img src={generatedImageUrl} alt="Eight generated Muse fashion-model faces in a four-column, two-row collage" /></div>}
         <p className="muse-privacy-note">Your source photo is used as a visual reference for this generation. It is not a public profile image.</p>
       </section>
     </div>
