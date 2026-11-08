@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Check, ImagePlus, Info, Sparkles, X } from "lucide-react";
 import "./MuseFaceGenerationPage.css";
+import { API_BASE } from "../../config/api";
 
 type Gender = "auto" | "female" | "male";
 
@@ -160,24 +161,29 @@ export default function MuseFaceGenerationPage() {
     setBusy(true);
     setNotice("");
     try {
-      const base = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Your session has expired. Please sign in again.");
+
       const form = new FormData();
       form.append("image", file);
-      const uploadResponse = await fetch(`${base}/api/muse/upload-reference`, { method: "POST", body: form, credentials: "include" });
-      if (!uploadResponse.ok) throw new Error("Reference photo upload failed. Please try again.");
-      const uploaded = await uploadResponse.json();
+      const uploadResponse = await fetch(`${API_BASE.replace(/\\/$/, "")}/api/muse/upload-reference`, {
+        method: "POST",
+        body: form,
+        credentials: "include",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const uploaded = await uploadResponse.json().catch(() => ({}));
+      if (!uploadResponse.ok) {
+        throw new Error(uploaded?.message || "Reference photo upload failed. Please try again.");
+      }
       const referenceImageUrl = uploaded?.data?.imageUrl || uploaded?.imageUrl;
       if (!referenceImageUrl) throw new Error("The upload response did not include an image URL.");
-      const generationResponse = await fetch(`${base}/api/muse/generate-faces`, {
-        method: "POST", credentials: "include", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ referenceImageUrl, age, gender, prompt: buildMusePrompt(age, gender), candidateCount: 8, layout: "4x2", promptVersion: "distinctive-muse-v1" })
-      });
-      const generated = await generationResponse.json().catch(() => ({}));
-      if (!generationResponse.ok) throw new Error(generated?.message || "Muse generation could not be started.");
-      setNotice("Generation request accepted. Your eight-face collage is being prepared.");
+      setNotice("Reference photo uploaded successfully. Muse generation will be enabled in the next phase.");
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Something went wrong. Please try again.");
-    } finally { setBusy(false); }
+    } finally {
+      setBusy(false);
+    }
   };
 
   return <main className="muse-face-page">
