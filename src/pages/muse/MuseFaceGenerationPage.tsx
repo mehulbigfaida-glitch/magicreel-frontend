@@ -143,6 +143,8 @@ export default function MuseFaceGenerationPage() {
 
   const onFile = (next?: File) => {
     setNotice("");
+    setReferencePublicId("");
+    setGeneratedImageUrl("");
     if (!next) return;
     if (!["image/jpeg", "image/png", "image/webp"].includes(next.type)) { setNotice("Please select a JPG, PNG or WebP image."); return; }
     if (next.size > 10 * 1024 * 1024) { setNotice("The image must be 10 MB or smaller."); return; }
@@ -153,6 +155,8 @@ export default function MuseFaceGenerationPage() {
 
   const reset = () => {
     setFile(null);
+    setReferencePublicId("");
+    setGeneratedImageUrl("");
     setPreview((old) => { if (old) URL.revokeObjectURL(old); return ""; });
     if (fileRef.current) fileRef.current.value = "";
     setNotice("");
