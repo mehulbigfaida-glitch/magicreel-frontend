@@ -166,7 +166,7 @@ export default function MuseFaceGenerationPage() {
 
       const form = new FormData();
       form.append("image", file);
-      const uploadResponse = await fetch(`${API_BASE.replace(/\\/$/, "")}/api/muse/upload-reference`, {
+      const uploadResponse = await fetch(`${API_BASE.replace(/\/$/, "")}/api/muse/upload-reference`, {
         method: "POST",
         body: form,
         credentials: "include",
