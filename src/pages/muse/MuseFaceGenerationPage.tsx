@@ -151,6 +151,8 @@ export default function MuseFaceGenerationPage() {
     setGeneratedImageUrl("");
     setCandidates([]);
     setSelectedCandidateNumber(null);
+    sessionStorage.removeItem("magicreel.muse.candidates");
+    sessionStorage.removeItem("magicreel.selectedMuseCandidate");
     if (!next) return;
     if (!["image/jpeg", "image/png", "image/webp"].includes(next.type)) { setNotice("Please select a JPG, PNG or WebP image."); return; }
     if (next.size > 10 * 1024 * 1024) { setNotice("The image must be 10 MB or smaller."); return; }
@@ -165,6 +167,8 @@ export default function MuseFaceGenerationPage() {
     setGeneratedImageUrl("");
     setCandidates([]);
     setSelectedCandidateNumber(null);
+    sessionStorage.removeItem("magicreel.muse.candidates");
+    sessionStorage.removeItem("magicreel.selectedMuseCandidate");
     setPreview((old) => { if (old) URL.revokeObjectURL(old); return ""; });
     if (fileRef.current) fileRef.current.value = "";
     setNotice("");
@@ -221,6 +225,13 @@ export default function MuseFaceGenerationPage() {
       }
       setGeneratedImageUrl(imageUrl);
       setCandidates(extractedCandidates);
+      sessionStorage.setItem("magicreel.muse.candidates", JSON.stringify({
+        age,
+        gender,
+        promptVersion: "distinctive-muse-v1",
+        candidates: extractedCandidates,
+      }));
+      sessionStorage.removeItem("magicreel.selectedMuseCandidate");
       setSelectedCandidateNumber(null);
       setNotice("Your eight Muse faces have been generated and separated into individual candidates. Select your preferred Muse.");
     } catch (error) {
@@ -281,7 +292,15 @@ export default function MuseFaceGenerationPage() {
               type="button"
               key={candidate.candidateNumber}
               className={`muse-candidate-card ${selectedCandidateNumber === candidate.candidateNumber ? "is-selected" : ""}`}
-              onClick={() => setSelectedCandidateNumber(candidate.candidateNumber)}
+              onClick={() => {
+                setSelectedCandidateNumber(candidate.candidateNumber);
+                sessionStorage.setItem("magicreel.selectedMuseCandidate", JSON.stringify({
+                  ...candidate,
+                  age,
+                  gender,
+                  promptVersion: "distinctive-muse-v1",
+                }));
+              }}
               aria-pressed={selectedCandidateNumber === candidate.candidateNumber}
             >
               <img src={candidate.imageUrl} alt={`Muse candidate ${candidate.candidateNumber}`} />
@@ -292,7 +311,7 @@ export default function MuseFaceGenerationPage() {
             </button>)}
           </div>
           {selectedCandidateNumber !== null && <div className="muse-selection-note" role="status">
-            Muse {selectedCandidateNumber} selected. Your choice is held in this Muse Studio session for the next development step.
+            Muse {selectedCandidateNumber} selected. Your choice is saved in this browser session for the next Muse Studio step.
           </div>}
           <details className="muse-original-collage">
             <summary>View original 8-face collage</summary>
