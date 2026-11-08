@@ -6,6 +6,8 @@ import { API_BASE } from "../../config/api";
 
 type Gender = "auto" | "female" | "male";
 
+type MuseCandidate = { candidateNumber: number; imageUrl: string; publicId: string; width?: number; height?: number };
+
 const MASTER_PROMPT = `# MAGICREEL – DISTINCTIVE MUSE GENERATION
 ## Eight Unique Virtual Fashion Model Identities
 
@@ -140,11 +142,15 @@ export default function MuseFaceGenerationPage() {
   const [busy, setBusy] = useState(false);
   const [referencePublicId, setReferencePublicId] = useState("");
   const [generatedImageUrl, setGeneratedImageUrl] = useState("");
+  const [candidates, setCandidates] = useState<MuseCandidate[]>([]);
+  const [selectedCandidateNumber, setSelectedCandidateNumber] = useState<number | null>(null);
 
   const onFile = (next?: File) => {
     setNotice("");
     setReferencePublicId("");
     setGeneratedImageUrl("");
+    setCandidates([]);
+    setSelectedCandidateNumber(null);
     if (!next) return;
     if (!["image/jpeg", "image/png", "image/webp"].includes(next.type)) { setNotice("Please select a JPG, PNG or WebP image."); return; }
     if (next.size > 10 * 1024 * 1024) { setNotice("The image must be 10 MB or smaller."); return; }
@@ -157,6 +163,8 @@ export default function MuseFaceGenerationPage() {
     setFile(null);
     setReferencePublicId("");
     setGeneratedImageUrl("");
+    setCandidates([]);
+    setSelectedCandidateNumber(null);
     setPreview((old) => { if (old) URL.revokeObjectURL(old); return ""; });
     if (fileRef.current) fileRef.current.value = "";
     setNotice("");
@@ -206,9 +214,15 @@ export default function MuseFaceGenerationPage() {
         throw new Error(generated?.message || "Muse generation failed. Please try again.");
       }
       const imageUrl = generated?.data?.imageUrl;
+      const extractedCandidates = generated?.data?.candidates;
       if (!imageUrl) throw new Error("Generation completed without returning a collage image.");
+      if (!Array.isArray(extractedCandidates) || extractedCandidates.length !== 8 || extractedCandidates.some((candidate) => !candidate?.imageUrl || !candidate?.publicId)) {
+        throw new Error("The collage was generated, but eight individual candidate portraits were not returned. Please contact support before retrying.");
+      }
       setGeneratedImageUrl(imageUrl);
-      setNotice("Your eight Muse faces have been generated successfully.");
+      setCandidates(extractedCandidates);
+      setSelectedCandidateNumber(null);
+      setNotice("Your eight Muse faces have been generated and separated into individual candidates. Select your preferred Muse.");
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Something went wrong. Please try again.");
     } finally {
@@ -260,7 +274,31 @@ export default function MuseFaceGenerationPage() {
         <label className="muse-consent"><input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)}/><span>I confirm that I have the right and necessary consent to use this photograph and the depicted adult person's likeness for AI-generated commercial fashion content.</span></label>
         <button className="muse-generate-button" disabled={!file || !consent || busy} onClick={requestGeneration}><Sparkles size={17}/>{busy ? "Preparing…" : referencePublicId ? "Generate My Muses" : "Upload Reference Photo"}</button>
         {notice && <div className="muse-status-note" role="status">{notice}</div>}
-        {generatedImageUrl && <div className="muse-generated-result"><img src={generatedImageUrl} alt="Eight generated Muse fashion-model faces in a four-column, two-row collage" /></div>}
+        {generatedImageUrl && <div className="muse-generated-result">
+          <div className="muse-result-heading"><strong>Choose your Muse</strong><span>8 individual candidates</span></div>
+          <div className="muse-candidate-grid">
+            {candidates.map((candidate) => <button
+              type="button"
+              key={candidate.candidateNumber}
+              className={`muse-candidate-card ${selectedCandidateNumber === candidate.candidateNumber ? "is-selected" : ""}`}
+              onClick={() => setSelectedCandidateNumber(candidate.candidateNumber)}
+              aria-pressed={selectedCandidateNumber === candidate.candidateNumber}
+            >
+              <img src={candidate.imageUrl} alt={`Muse candidate ${candidate.candidateNumber}`} />
+              <span className="muse-candidate-card-footer">
+                <strong>Muse {candidate.candidateNumber}</strong>
+                <span>{selectedCandidateNumber === candidate.candidateNumber ? "Selected" : "Select"}</span>
+              </span>
+            </button>)}
+          </div>
+          {selectedCandidateNumber !== null && <div className="muse-selection-note" role="status">
+            Muse {selectedCandidateNumber} selected. Your choice is held in this Muse Studio session for the next development step.
+          </div>}
+          <details className="muse-original-collage">
+            <summary>View original 8-face collage</summary>
+            <img src={generatedImageUrl} alt="Original eight-face Muse generation collage" />
+          </details>
+        </div>}
         <p className="muse-privacy-note">Your source photo is used as a visual reference for this generation. It is not a public profile image.</p>
       </section>
     </div>
