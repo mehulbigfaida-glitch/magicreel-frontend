@@ -54,6 +54,8 @@ export default function CreateAIHero() {
 
   const [selectedPill, setSelectedPill] =
     useState("");
+  const [bodyType, setBodyType] =
+    useState<"Slim" | "Athletic" | "Curvy" | "Plus Size">("Athletic");
 
   const [productImageUrl, setProductImageUrl] =
     useState("");
@@ -389,7 +391,9 @@ backImageUrl ||
 undefined,
 
 styling:
-selectedPill || null
+selectedPill || null,
+
+bodyType
 
 })
 
@@ -1700,6 +1704,28 @@ display:"block"
 
         </div>
 
+
+                <div
+          style={{
+            marginTop: 18,
+            marginBottom: 18,
+            padding: 18,
+            borderRadius: 18,
+            background: "rgba(15,15,15,.96)",
+            border: "1px solid rgba(255,255,255,.08)",
+          }}
+        >
+          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 5 }}>Model Body Type</div>
+          <div style={{ fontSize: 12, opacity: 0.65, marginBottom: 12 }}>Choose the body presentation for this Hero only. This does not change your Muse.</div>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            {(["Slim", "Athletic", "Curvy", "Plus Size"] as const).map((option) => (
+              <button key={option} type="button" aria-pressed={bodyType === option} onClick={() => setBodyType(option)}
+                style={{ padding: "10px 18px", borderRadius: 999, border: bodyType === option ? "1px solid rgba(255,255,255,.3)" : "1px solid rgba(255,255,255,.08)", color: "white", background: bodyType === option ? "linear-gradient(90deg,#7c3aed,#ec4899)" : "#111", cursor: "pointer", fontSize: 13, fontWeight: 600 }}>
+                {option}
+              </button>
+            ))}
+          </div>
+        </div>
 
                 <div
 
