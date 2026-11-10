@@ -30,15 +30,15 @@ MUSE_REGISTRY
 }
 from "../create-ai/museRegistry";
 
-const getMuseGender = (museId: string): "female" | "male" | null => {
-  if (museId.startsWith("FS") || museId.startsWith("FP")) {
-    return "female";
-  }
+type SelectableMuse = (typeof MUSE_REGISTRY)[string] & {
+  gender?: "female" | "male" | "auto";
+  name?: string;
+};
 
-  if (museId.startsWith("MS") || museId.startsWith("MP")) {
-    return "male";
-  }
-
+const getMuseGender = (museId: string, gender?: string): "female" | "male" | null => {
+  if (gender === "female" || gender === "male") return gender;
+  if (museId.startsWith("FS") || museId.startsWith("FP")) return "female";
+  if (museId.startsWith("MS") || museId.startsWith("MP")) return "male";
   return null;
 };
 
@@ -92,17 +92,47 @@ hoveredMuse,
 setHoveredMuse
 ]=useState("");
 
-const visibleMuses = Object.values(MUSE_REGISTRY).filter((muse) => {
-  if (selectedCategory === "Women") {
-    return getMuseGender(muse.id) === "female";
-  }
+const [privateMuses, setPrivateMuses] = useState<SelectableMuse[]>([]);
 
-  if (selectedCategory === "Men") {
-    return getMuseGender(muse.id) === "male";
-  }
+useEffect(() => {
+  const loadPrivateMuses = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setPrivateMuses([]);
+      return;
+    }
+    try {
+      const apiBase = API_BASE.endsWith("/") ? API_BASE.slice(0, -1) : API_BASE;
+      const response = await fetch(`${apiBase}/api/muse/my-muses`, {
+        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include"
+      });
+      if (!response.ok) return;
+      const result = await response.json();
+      const saved = Array.isArray(result?.data?.muses) ? result.data.muses : [];
+      setPrivateMuses(saved.filter((muse: any) =>
+        muse?.id && muse?.placeholderImageUrl && muse?.processingImageUrl && muse?.processingBackImageUrl
+      ));
+    } catch (error) {
+      console.error("Could not load private Muses:", error);
+    }
+  };
+  void loadPrivateMuses();
+}, []);
 
+const allMuses: SelectableMuse[] = [
+  ...Object.values(MUSE_REGISTRY),
+  ...privateMuses
+];
+
+const visibleMuses = allMuses.filter((muse) => {
+  const gender = getMuseGender(muse.id, muse.gender);
+  if (selectedCategory === "Women") return gender === "female" || gender === null;
+  if (selectedCategory === "Men") return gender === "male" || gender === null;
   return true;
 });
+const selectedMuseData = allMuses.find((muse) => muse.id === selectedMuse);
+const hoveredMuseData = allMuses.find((muse) => muse.id === hoveredMuse);
 
 useEffect(() => {
   if (!selectedCategory || visibleMuses.length === 0) {
@@ -371,9 +401,7 @@ selectedAvatar?.gender || selectedCategory,
 
 avatarFaceImageUrl:
 
-selectedAvatar?.modelImage || MUSE_REGISTRY[
-selectedMuse
-].processingImageUrl,
+selectedAvatar?.modelImage || selectedMuseData?.processingImageUrl,
 
 garmentFrontImageUrl:
 productImageUrl,
@@ -383,9 +411,7 @@ avatarBackImageUrl:
 backImageUrl
 ?
 
-selectedAvatar?.backModelImage || MUSE_REGISTRY[
-selectedMuse
-].processingBackImageUrl
+selectedAvatar?.backModelImage || selectedMuseData?.processingBackImageUrl
 
 :undefined,
 
@@ -1493,9 +1519,7 @@ pointerEvents:"none"
 
 <img
 src={
-MUSE_REGISTRY[
-hoveredMuse
-]?.placeholderImageUrl
+hoveredMuseData?.placeholderImageUrl
 }
 
 style={{
