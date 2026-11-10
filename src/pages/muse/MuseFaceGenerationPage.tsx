@@ -7,128 +7,7 @@ import { API_BASE } from "../../config/api";
 type Gender = "auto" | "female" | "male";
 
 type MuseCandidate = { candidateNumber: number; imageUrl: string; publicId: string; width?: number; height?: number };
-
-const MASTER_PROMPT = `# MAGICREEL – DISTINCTIVE MUSE GENERATION
-## Eight Unique Virtual Fashion Model Identities
-
-### PRIMARY OBJECTIVE
-Use the uploaded photograph as a source of visual inspiration to create EIGHT DISTINCTIVE, FICTIONAL, {{AGE}}-YEAR-OLD ADULT FASHION MODEL IDENTITIES.
-This is a creative identity transformation task, NOT a conventional portrait retouching, beautification or hairstyle-changing task.
-The objective is to create eight different virtual fashion models who retain a broad visual connection to the reference person but do NOT look like photographic replicas or simply younger versions of the original person.
-
-### 1. REFERENCE IMAGE ANALYSIS
-Study the uploaded photograph and identify:
-- Broad facial character.
-- General facial proportions.
-- Natural skin-tone family.
-- Hair-colour characteristics.
-- General visual appearance.
-Use these as broad creative reference characteristics.
-Do not attempt to reproduce the exact facial geometry of the original person.
-
-### 2. FACIAL IDENTITY TRANSFORMATION
-This is the most important instruction.
-Create a NEW and DISTINCTIVE fictional fashion-model face inspired by the reference photograph.
-Retain broad visual characteristics, but introduce meaningful and harmonious changes to:
-- Eye shape, definition and appearance.
-- Eyebrow structure.
-- Nose shape and detailing.
-- Lip shape and proportions.
-- Cheekbone definition.
-- Chin and jawline detailing.
-- Facial proportions and feature relationships.
-The resulting face must look like a professionally developed fashion-model identity rather than an edited photograph of the original person.
-Do not make all eight faces identical. Each candidate must have its own distinctive facial design.
-Avoid extreme facial distortion, exaggerated beauty standards, artificial symmetry and plastic-looking skin.
-
-### 3. AGE TRANSFORMATION
-Every model must appear approximately {{AGE}} years old.
-Create a convincing adult appearance appropriate to the selected age. Reconstruct age-appropriate facial characteristics naturally rather than merely smoothing wrinkles or applying a beauty filter.
-Do not make the models look like teenagers or children.
-
-### 4. COMMON APPEARANCE REQUIREMENTS
-- Retain the broad skin-tone family of the reference person.
-- Hair colour should remain broadly consistent unless a particular editorial treatment calls for a subtle variation.
-- Create appropriate hairstyles for each fashion direction.
-- Use natural, realistic skin texture.
-- Use professional fashion-model grooming.
-- Create attractive, harmonious and distinctive facial features.
-- Maintain photorealism.
-
-### 5. GENERATE EIGHT DIFFERENT FASHION-MODEL IDENTITIES
-IMAGE 1 – INDIAN CONTEMPORARY FASHION MODEL
-A sophisticated contemporary Indian fashion-editorial aesthetic. Refined facial features, expressive eyes, balanced proportions, elegant grooming and versatile commercial-fashion appeal.
-
-IMAGE 2 – KOREAN CONTEMPORARY FASHION MODEL
-Inspired by contemporary Korean fashion campaigns. Polished grooming, sophisticated facial detailing, clean styling, refined makeup and elegant presentation.
-
-IMAGE 3 – AMERICAN COMMERCIAL FASHION MODEL
-A confident international commercial-fashion appearance. Distinctive facial character, expressive eyes, contemporary grooming and strong campaign presence.
-
-IMAGE 4 – AUSTRALIAN FASHION MODEL
-A fresh, naturally sophisticated appearance. Relaxed editorial grooming, effortless hairstyle, natural skin presentation and confident youthful character.
-
-IMAGE 5 – MEDITERRANEAN FASHION MODEL
-Warm, sophisticated editorial aesthetics. Harmonious facial features, expressive eyes, defined facial detailing and elegant contemporary grooming.
-
-IMAGE 6 – EUROPEAN HIGH-FASHION MODEL
-A refined luxury-fashion appearance. Distinctive facial structure, sophisticated proportions, minimalist grooming and premium designer-campaign aesthetics.
-
-IMAGE 7 – EAST ASIAN CONTEMPORARY FASHION MODEL
-A modern editorial appearance with sophisticated grooming, carefully balanced facial detailing, elegant presentation and distinctive visual character.
-
-IMAGE 8 – INTERNATIONAL RUNWAY FASHION MODEL
-A bold and distinctive high-fashion identity. More experimental facial styling, striking editorial character, sophisticated grooming and memorable runway presence.
-
-### 6. DIFFERENTIATION REQUIREMENT
-The eight outputs must represent EIGHT DIFFERENT FICTIONAL FACES.
-Do not generate eight versions of the same face with different hairstyles, clothing, facial hair, makeup or lighting.
-Introduce meaningful differences in facial feature design between the candidates while retaining broad visual inspiration from the source.
-Do not copy any identifiable celebrity, public figure or existing fashion model.
-
-### 7. PORTRAIT COMPOSITION
-Generate each model as an individual professional fashion-editorial portrait.
-- Straight-on, front-facing view.
-- Head and shoulders visible.
-- Eyes looking directly into the camera.
-- Natural, confident expression.
-- Simple, neutral studio background.
-- Consistent camera angle and portrait scale.
-- No hats, scarves, sunglasses or distracting accessories.
-- No elaborate costumes.
-- Simple, understated clothing.
-- Face must remain the primary subject.
-
-### 8. FINAL COLLAGE
-Create ONE high-resolution collage containing exactly eight individual portraits.
-Layout: 4 columns × 2 rows.
-Each cell must contain one complete portrait.
-All eight portraits must have equal dimensions and consistent framing.
-Maintain clean separation between the images.
-Do not overlap or merge portraits.
-Do not repeat faces.
-Do not crop heads, chins or shoulders.
-Do not include text, numbers, captions, logos or watermarks.
-
-### FINAL QUALITY TEST
-Before producing the final collage, ensure:
-1. All eight models look approximately {{AGE}} years old.
-2. All eight have genuinely different facial identities.
-3. Each face has meaningful facial-feature refinement, not merely a hairstyle change.
-4. The models retain broad visual inspiration from the reference.
-5. Skin tone and natural appearance remain plausible.
-6. Each model looks suitable for professional commercial fashion photography.
-7. The result does not resemble eight photographs of the original person.
-
-### FINAL CREATIVE DIRECTION
-Think of this as a premium fashion agency creating eight new virtual model identities inspired by one person's photograph.
-The reference person is the inspiration, not the identity to be copied.
-Create eight distinctive, attractive, photorealistic virtual fashion models.`;
-
-export function buildMusePrompt(age: number, gender: Gender) {
-  const genderInstruction = gender === "auto" ? "" : `\n\n### OPTIONAL GENDER PRESENTATION\nCreate the fictional fashion-model identities with a ${gender} presentation, while retaining broad visual inspiration from the uploaded reference.`;
-  return MASTER_PROMPT.replaceAll("{{AGE}}", String(age)) + genderInstruction;
-}
+type SavedMuse = { id: string; name: string; masterPortraitUrl: string; placeholderImageUrl: string; processingImageUrl: string; processingBackImageUrl: string; status: string; };
 
 export default function MuseFaceGenerationPage() {
   const navigate = useNavigate();
@@ -144,6 +23,9 @@ export default function MuseFaceGenerationPage() {
   const [generatedImageUrl, setGeneratedImageUrl] = useState("");
   const [candidates, setCandidates] = useState<MuseCandidate[]>([]);
   const [selectedCandidateNumber, setSelectedCandidateNumber] = useState<number | null>(null);
+  const [museName, setMuseName] = useState("My Muse");
+  const [savingMuse, setSavingMuse] = useState(false);
+  const [savedMuse, setSavedMuse] = useState<SavedMuse | null>(null);
 
   const onFile = (next?: File) => {
     setNotice("");
@@ -241,6 +123,34 @@ export default function MuseFaceGenerationPage() {
     }
   };
 
+  const createSelectedMuse = async () => {
+    if (savingMuse || selectedCandidateNumber === null) return;
+    const selectedCandidate = candidates.find((candidate) => candidate.candidateNumber === selectedCandidateNumber);
+    if (!selectedCandidate) { setNotice("Please select one of the eight Muse faces first."); return; }
+    setSavingMuse(true);
+    setNotice("");
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Your session has expired. Please sign in again.");
+      const apiBase = API_BASE.endsWith("/") ? API_BASE.slice(0, -1) : API_BASE;
+      const response = await fetch(`${apiBase}/api/muse/create-from-candidate`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ candidatePublicId: selectedCandidate.publicId, candidateNumber: selectedCandidate.candidateNumber, age, gender, consent: true, name: museName.trim() || `My Muse ${selectedCandidate.candidateNumber}` }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result?.message || "Could not create your Muse. Please try again.");
+      if (!result?.data?.id || !result?.data?.placeholderImageUrl || !result?.data?.processingImageUrl || !result?.data?.processingBackImageUrl || !result?.data?.masterPortraitUrl) {
+        throw new Error("Muse generation completed without all four required assets. Please contact support before retrying.");
+      }
+      setSavedMuse(result.data as SavedMuse);
+      setNotice("Your four Muse assets have been generated and saved to your private account.");
+      sessionStorage.removeItem("magicreel.selectedMuseCandidate");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Muse asset generation failed. Please try again.");
+    } finally { setSavingMuse(false); }
+  };
   return <main className="muse-face-page">
     <header className="muse-face-topbar">
       <button className="muse-back" onClick={() => navigate(-1)}><ArrowLeft size={17}/> Back</button>
@@ -318,6 +228,25 @@ export default function MuseFaceGenerationPage() {
             <img src={generatedImageUrl} alt="Original eight-face Muse generation collage" />
           </details>
         </div>}
+        {selectedCandidateNumber !== null && !savedMuse && <div className="muse-save-panel">
+          <label className="muse-name-field">Name your Muse
+            <input value={museName} maxLength={48} onChange={(event) => setMuseName(event.target.value)} placeholder="e.g. Anaya" />
+          </label>
+          <button className="muse-generate-button" disabled={savingMuse} onClick={createSelectedMuse}>
+            <Sparkles size={17}/>{savingMuse ? "Creating four Muse assets…" : "Create My Muse"}
+          </button>
+          <p className="muse-helper">This creates the master portrait, customer-facing placeholder, front Hero and back Hero using the selected face.</p>
+        </div>}
+        {savedMuse && <section className="muse-saved-assets" aria-live="polite">
+          <div className="muse-result-heading"><strong>{savedMuse.name} is ready</strong><span>4 assets saved</span></div>
+          <div className="muse-saved-assets-grid">
+            <figure><img src={savedMuse.masterPortraitUrl} alt="Master Muse portrait"/><figcaption>Master Muse Portrait</figcaption></figure>
+            <figure><img src={savedMuse.placeholderImageUrl} alt="Muse placeholder in blue T-shirt"/><figcaption>Customer Placeholder</figcaption></figure>
+            <figure><img src={savedMuse.processingImageUrl} alt="Front Hero reference"/><figcaption>Front Hero</figcaption></figure>
+            <figure><img src={savedMuse.processingBackImageUrl} alt="Back Hero reference"/><figcaption>Back Hero</figcaption></figure>
+          </div>
+          <button className="muse-generate-button" onClick={() => navigate("/create-ai-hero")}>Use My Muse in MagicReel</button>
+        </section>}
         <p className="muse-privacy-note">Your source photo is used as a visual reference for this generation. It is not a public profile image.</p>
       </section>
     </div>
