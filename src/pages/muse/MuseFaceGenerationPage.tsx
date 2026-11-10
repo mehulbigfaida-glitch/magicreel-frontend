@@ -33,6 +33,8 @@ export default function MuseFaceGenerationPage() {
     setGeneratedImageUrl("");
     setCandidates([]);
     setSelectedCandidateNumber(null);
+    setSavedMuse(null);
+    setMuseName("My Muse");
     sessionStorage.removeItem("magicreel.muse.candidates");
     sessionStorage.removeItem("magicreel.selectedMuseCandidate");
     if (!next) return;
@@ -49,6 +51,8 @@ export default function MuseFaceGenerationPage() {
     setGeneratedImageUrl("");
     setCandidates([]);
     setSelectedCandidateNumber(null);
+    setSavedMuse(null);
+    setMuseName("My Muse");
     sessionStorage.removeItem("magicreel.muse.candidates");
     sessionStorage.removeItem("magicreel.selectedMuseCandidate");
     setPreview((old) => { if (old) URL.revokeObjectURL(old); return ""; });
@@ -182,13 +186,13 @@ export default function MuseFaceGenerationPage() {
         <div className="muse-section-heading"><div><span className="muse-eyebrow">02 · PERSONALISE</span><h2>Set your model preferences</h2><p>We take care of the creative direction and all eight fashion identities.</p></div></div>
         <div className="muse-control-block">
           <div className="muse-control-title"><label htmlFor="muse-age">Target age</label><strong>{age} <small>years</small></strong></div>
-          <input id="muse-age" className="muse-age-slider" type="range" min="18" max="60" value={age} onChange={(e) => setAge(Number(e.target.value))}/>
+          <input id="muse-age" className="muse-age-slider" type="range" min="18" max="60" disabled={!!generatedImageUrl || savingMuse || !!savedMuse} value={age} onChange={(e) => setAge(Number(e.target.value))}/>
           <div className="muse-range-labels"><span>18 years</span><span>60 years</span></div>
         </div>
         <div className="muse-control-block">
           <div className="muse-control-title"><label>Gender presentation</label><span className="muse-muted">Optional</span></div>
           <div className="muse-choice-grid three">
-            {(["auto", "female", "male"] as Gender[]).map((g) => <button type="button" key={g} className={`muse-choice ${gender === g ? "is-selected" : ""}`} onClick={() => setGender(g)} aria-pressed={gender === g}><span className="muse-choice-check">{gender === g ? <Check size={13}/> : null}</span><span><strong>{g === "auto" ? "Auto detect" : g === "female" ? "Female" : "Male"}</strong><small>{g === "auto" ? "Use the reference" : ` ${g} presentation`}</small></span></button>)}
+            {(["auto", "female", "male"] as Gender[]).map((g) => <button type="button" key={g} className={`muse-choice ${gender === g ? "is-selected" : ""}`} disabled={!!generatedImageUrl || savingMuse || !!savedMuse} onClick={() => setGender(g)} aria-pressed={gender === g}><span className="muse-choice-check">{gender === g ? <Check size={13}/> : null}</span><span><strong>{g === "auto" ? "Auto detect" : g === "female" ? "Female" : "Male"}</strong><small>{g === "auto" ? "Use the reference" : ` ${g} presentation`}</small></span></button>)}
           </div>
         </div>
         <div className="muse-candidate-summary"><span className="muse-candidate-icon"><Sparkles size={18}/></span><div><strong>8 distinctive Muse candidates</strong><p>One high-resolution collage · 4 columns × 2 rows</p></div><span className="muse-fixed-count">8</span></div>
