@@ -6,6 +6,8 @@ import { API_BASE } from "../../config/api";
 import FeatureLockedModal from "../../components/FeatureLockedModal";
 import StatusModal from "../../components/StatusModal";
 import { UploadCloud } from "lucide-react";
+import AvatarPickerDrawer from "../create-v2/AvatarPickerDrawer";
+import { useAvatarStore } from "../../store/avatarStore";
 import {
   GARMENTS,
   ETHNIC_SET_SUBTYPES,
@@ -42,6 +44,10 @@ const getMuseGender = (museId: string): "female" | "male" | null => {
 
 export default function CreateAIHero() {
   const navigate = useNavigate();
+  const selectedAvatar = useAvatarStore((state) => state.selectedAvatar);
+  const setAvatarCategory = useAvatarStore((state) => state.setCategory);
+  const clearSelectedAvatar = useAvatarStore((state) => state.clearSelectedAvatar);
+  const [isAvatarPickerOpen, setIsAvatarPickerOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(
     window.innerWidth < 980
   );
@@ -363,11 +369,11 @@ categoryKey:
 selectedSubType,
 
 avatarGender:
-selectedCategory,
+selectedAvatar?.gender || selectedCategory,
 
 avatarFaceImageUrl:
 
-MUSE_REGISTRY[
+selectedAvatar?.modelImage || MUSE_REGISTRY[
 selectedMuse
 ].processingImageUrl,
 
@@ -379,7 +385,7 @@ avatarBackImageUrl:
 backImageUrl
 ?
 
-MUSE_REGISTRY[
+selectedAvatar?.backModelImage || MUSE_REGISTRY[
 selectedMuse
 ].processingBackImageUrl
 
@@ -536,7 +542,7 @@ const generate360Reel = async () => {
 };
 
   const canGenerate =
-!!selectedMuse &&
+!!(selectedAvatar || selectedMuse) &&
 !!selectedCategory &&
 !!selectedSubType &&
 !!selectedPill &&
@@ -921,57 +927,35 @@ style={{
             >
 
               <select
-                value={
-                  selectedCategory
-                }
-
+                value={selectedCategory}
                 onChange={(e) => {
-
-                  const value =
-                    e.target
-                      .value as GarmentCategory;
-
-                  setSelectedCategory(
-                    value
-                  );
-
-                  setSelectedSubType(
-                    ""
-                  );
-
-                  setSelectedPill(
-                    ""
-                  );
-
+                  const value = e.target.value as GarmentCategory;
+                  clearSelectedAvatar();
+                  setSelectedCategory(value);
+                  setSelectedSubType("");
+                  setSelectedPill("");
                 }}
-
                 style={{
                   height: 46,
                   borderRadius: 12,
-                  background:
-                    "#111",
-
-                  color:
-                    "white"
+                  background: "#111",
+                  color: "white",
+                  width: "100%",
+                  padding: "0 10px",
+                  cursor: "pointer",
                 }}
               >
-
-                <option value="">
-                  Select Gender
-                </option>
-
+                <option value="">Select Gender</option>
                 {Object.keys(GARMENTS).map((category) => (
-  <option
-    key={category}
-    value={category}
-    disabled={category === "Kids"}
-  >
-    {category}
-  </option>
-))}
-
+                  <option
+                    key={category}
+                    value={category}
+                    disabled={category === "Kids"}
+                  >
+                    {category}
+                  </option>
+                ))}
               </select>
-
 
               <select
   value={selectedSubType}
@@ -1546,6 +1530,7 @@ transform:"scale(1.02)"
 >
   <button
     type="button"
+    onClick={() => clearSelectedAvatar()}
     style={{
       padding: "8px 18px",
       borderRadius: 999,
@@ -1563,15 +1548,19 @@ transform:"scale(1.02)"
 
   <button
     type="button"
-    onClick={() =>
-  setStatusModal({
-    open: true,
-    type: "info",
-    title: "Coming Soon",
-    description:
-  "Coming Soon!\n\nUpload a passport-style photo and MagicReel will create your personal AI Avatar.\n\nUse it instantly across Hero Images, Lookbooks and AI Fashion Reels."
-  })
-}
+    onClick={() => {
+      if (!selectedCategory) {
+        setStatusModal({
+          open: true,
+          type: "warning",
+          title: "Select Gender First",
+          description: "Please select Men or Women before choosing a personal Avatar.",
+        });
+        return;
+      }
+      setAvatarCategory(selectedCategory === "Women" ? "female" : "male");
+      setIsAvatarPickerOpen(true);
+    }}
     style={{
       padding: "8px 18px",
       borderRadius: 999,
@@ -1587,6 +1576,45 @@ transform:"scale(1.02)"
     Upload
   </button>
 </div>
+
+            {selectedAvatar && (
+              <div style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                padding: 10,
+                marginBottom: 12,
+                borderRadius: 14,
+                border: "1px solid rgba(168,85,247,.65)",
+                background: "rgba(168,85,247,.10)",
+              }}>
+                <img
+                  src={selectedAvatar.previewImage}
+                  alt="Selected personal Avatar"
+                  style={{ width: 48, height: 64, objectFit: "cover", borderRadius: 8 }}
+                />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700 }}>Personal Avatar selected</div>
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.6)" }}>
+                    {selectedAvatar.id.replace(/_/g, " ")}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsAvatarPickerOpen(true)}
+                  style={{
+                    border: "1px solid rgba(255,255,255,.18)",
+                    borderRadius: 999,
+                    padding: "7px 12px",
+                    color: "#fff",
+                    background: "rgba(255,255,255,.06)",
+                    cursor: "pointer",
+                  }}
+                >
+                  Change
+                </button>
+              </div>
+            )}
 
             <div
               style={{
@@ -2108,6 +2136,10 @@ Download Back Hero
   }
 />
 
+  <AvatarPickerDrawer
+    open={isAvatarPickerOpen}
+    onClose={() => setIsAvatarPickerOpen(false)}
+  />
 </div>
 
 );
