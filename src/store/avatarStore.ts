@@ -26,6 +26,7 @@ interface AvatarState {
 
   setCategory: (category: AvatarCategory) => void;
   selectAvatar: (a: Avatar) => void;
+  clearSelectedAvatar: () => void;
   getAvatars: () => Avatar[];
 }
 
@@ -159,6 +160,11 @@ export const useAvatarStore = create<AvatarState>((set, get) => ({
   selectAvatar: (avatar) =>
     set({
       selectedAvatar: avatar,
+    }),
+
+  clearSelectedAvatar: () =>
+    set({
+      selectedAvatar: undefined,
     }),
 
   getAvatars: () => {
