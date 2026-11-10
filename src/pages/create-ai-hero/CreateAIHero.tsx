@@ -397,7 +397,7 @@ categoryKey:
 selectedSubType,
 
 avatarGender:
-selectedAvatar?.gender || selectedMuseData?.gender || getMuseGender(selectedMuse) || selectedCategory,
+selectedAvatar?.gender || (selectedMuseData?.gender && selectedMuseData.gender !== "auto" ? selectedMuseData.gender : getMuseGender(selectedMuse) || selectedCategory),
 
 avatarFaceImageUrl:
 
@@ -1653,6 +1653,7 @@ transform:"scale(1.02)"
 
 <div
 key={muse.id}
+title={muse.name || muse.id}
 
 onClick={() => {
   clearSelectedAvatar();
@@ -1707,7 +1708,7 @@ transition:"all .25s ease"
 >
 <img
 src={muse.placeholderImageUrl}
-alt={muse.id}
+alt={muse.name || muse.id}
 
 style={{
 width:"100%",
