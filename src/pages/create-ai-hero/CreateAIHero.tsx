@@ -397,7 +397,7 @@ categoryKey:
 selectedSubType,
 
 avatarGender:
-selectedAvatar?.gender || selectedCategory,
+selectedAvatar?.gender || selectedMuseData?.gender || getMuseGender(selectedMuse) || selectedCategory,
 
 avatarFaceImageUrl:
 
@@ -1654,11 +1654,10 @@ transform:"scale(1.02)"
 <div
 key={muse.id}
 
-onClick={()=>
-setSelectedMuse(
-muse.id
-)
-}
+onClick={() => {
+  clearSelectedAvatar();
+  setSelectedMuse(muse.id);
+}}
 
 onMouseEnter={()=>
 setHoveredMuse(
