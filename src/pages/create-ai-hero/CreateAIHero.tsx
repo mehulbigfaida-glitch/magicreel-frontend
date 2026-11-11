@@ -6,6 +6,8 @@ import { API_BASE } from "../../config/api";
 import FeatureLockedModal from "../../components/FeatureLockedModal";
 import StatusModal from "../../components/StatusModal";
 import { UploadCloud } from "lucide-react";
+import AvatarPickerDrawer from "../create-v2/AvatarPickerDrawer";
+import { useAvatarStore } from "../../store/avatarStore";
 import {
   GARMENTS,
   ETHNIC_SET_SUBTYPES,
@@ -28,20 +30,23 @@ MUSE_REGISTRY
 }
 from "../create-ai/museRegistry";
 
-const getMuseGender = (museId: string): "female" | "male" | null => {
-  if (museId.startsWith("FS") || museId.startsWith("FP")) {
-    return "female";
-  }
+type SelectableMuse = (typeof MUSE_REGISTRY)[string] & {
+  gender?: "female" | "male" | "auto";
+  name?: string;
+};
 
-  if (museId.startsWith("MS") || museId.startsWith("MP")) {
-    return "male";
-  }
-
+const getMuseGender = (museId: string, gender?: string): "female" | "male" | null => {
+  if (gender === "female" || gender === "male") return gender;
+  if (museId.startsWith("FS") || museId.startsWith("FP")) return "female";
+  if (museId.startsWith("MS") || museId.startsWith("MP")) return "male";
   return null;
 };
 
 export default function CreateAIHero() {
   const navigate = useNavigate();
+  const selectedAvatar = useAvatarStore((state) => state.selectedAvatar);
+  const clearSelectedAvatar = useAvatarStore((state) => state.clearSelectedAvatar);
+  const [isAvatarPickerOpen, setIsAvatarPickerOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(
     window.innerWidth < 980
   );
@@ -54,6 +59,7 @@ export default function CreateAIHero() {
 
   const [selectedPill, setSelectedPill] =
     useState("");
+
   const [bodyType, setBodyType] =
     useState<"Slim" | "Athletic" | "Curvy" | "Plus Size">("Athletic");
 
@@ -88,17 +94,47 @@ hoveredMuse,
 setHoveredMuse
 ]=useState("");
 
-const visibleMuses = Object.values(MUSE_REGISTRY).filter((muse) => {
-  if (selectedCategory === "Women") {
-    return getMuseGender(muse.id) === "female";
-  }
+const [privateMuses, setPrivateMuses] = useState<SelectableMuse[]>([]);
+const [activeMuseTab, setActiveMuseTab] = useState<"mine" | "explore">("mine");
 
-  if (selectedCategory === "Men") {
-    return getMuseGender(muse.id) === "male";
-  }
+useEffect(() => {
+  const loadPrivateMuses = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setPrivateMuses([]);
+      return;
+    }
+    try {
+      const apiBase = API_BASE.endsWith("/") ? API_BASE.slice(0, -1) : API_BASE;
+      const response = await fetch(`${apiBase}/api/muse/my-muses`, {
+        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include"
+      });
+      if (!response.ok) return;
+      const result = await response.json();
+      const saved = Array.isArray(result?.data?.muses) ? result.data.muses : [];
+      setPrivateMuses(saved.filter((muse: any) =>
+        muse?.id && muse?.placeholderImageUrl && muse?.processingImageUrl && muse?.processingBackImageUrl
+      ));
+    } catch (error) {
+      console.error("Could not load private Muses:", error);
+    }
+  };
+  void loadPrivateMuses();
+}, []);
 
+const filterMusesByGender = (muses: SelectableMuse[]) => muses.filter((muse) => {
+  const gender = getMuseGender(muse.id, muse.gender);
+  if (selectedCategory === "Women") return gender === "female" || gender === null;
+  if (selectedCategory === "Men") return gender === "male" || gender === null;
   return true;
 });
+const myMuses = filterMusesByGender(privateMuses);
+const exploreMuses = filterMusesByGender(Object.values(MUSE_REGISTRY));
+const visibleMuses = activeMuseTab === "mine" ? myMuses : exploreMuses;
+const allMuses: SelectableMuse[] = [...Object.values(MUSE_REGISTRY), ...privateMuses];
+const selectedMuseData = allMuses.find((muse) => muse.id === selectedMuse);
+const hoveredMuseData = allMuses.find((muse) => muse.id === hoveredMuse);
 
 useEffect(() => {
   if (!selectedCategory || visibleMuses.length === 0) {
@@ -363,13 +399,11 @@ categoryKey:
 selectedSubType,
 
 avatarGender:
-selectedCategory,
+selectedAvatar?.gender || (selectedMuseData?.gender && selectedMuseData.gender !== "auto" ? selectedMuseData.gender : getMuseGender(selectedMuse) || selectedCategory),
 
 avatarFaceImageUrl:
 
-MUSE_REGISTRY[
-selectedMuse
-].processingImageUrl,
+selectedAvatar?.modelImage || selectedMuseData?.processingImageUrl,
 
 garmentFrontImageUrl:
 productImageUrl,
@@ -379,9 +413,7 @@ avatarBackImageUrl:
 backImageUrl
 ?
 
-MUSE_REGISTRY[
-selectedMuse
-].processingBackImageUrl
+selectedAvatar?.backModelImage || selectedMuseData?.processingBackImageUrl
 
 :undefined,
 
@@ -536,7 +568,7 @@ const generate360Reel = async () => {
 };
 
   const canGenerate =
-!!selectedMuse &&
+!!(selectedAvatar || selectedMuse) &&
 !!selectedCategory &&
 !!selectedSubType &&
 !!selectedPill &&
@@ -921,57 +953,35 @@ style={{
             >
 
               <select
-                value={
-                  selectedCategory
-                }
-
+                value={selectedCategory}
                 onChange={(e) => {
-
-                  const value =
-                    e.target
-                      .value as GarmentCategory;
-
-                  setSelectedCategory(
-                    value
-                  );
-
-                  setSelectedSubType(
-                    ""
-                  );
-
-                  setSelectedPill(
-                    ""
-                  );
-
+                  const value = e.target.value as GarmentCategory;
+                  clearSelectedAvatar();
+                  setSelectedCategory(value);
+                  setSelectedSubType("");
+                  setSelectedPill("");
                 }}
-
                 style={{
                   height: 46,
                   borderRadius: 12,
-                  background:
-                    "#111",
-
-                  color:
-                    "white"
+                  background: "#111",
+                  color: "white",
+                  width: "100%",
+                  padding: "0 10px",
+                  cursor: "pointer",
                 }}
               >
-
-                <option value="">
-                  Select Gender
-                </option>
-
+                <option value="">Select Gender</option>
                 {Object.keys(GARMENTS).map((category) => (
-  <option
-    key={category}
-    value={category}
-    disabled={category === "Kids"}
-  >
-    {category}
-  </option>
-))}
-
+                  <option
+                    key={category}
+                    value={category}
+                    disabled={category === "Kids"}
+                  >
+                    {category}
+                  </option>
+                ))}
               </select>
-
 
               <select
   value={selectedSubType}
@@ -1513,9 +1523,7 @@ pointerEvents:"none"
 
 <img
 src={
-MUSE_REGISTRY[
-hoveredMuse
-]?.placeholderImageUrl
+hoveredMuseData?.placeholderImageUrl
 }
 
 style={{
@@ -1546,11 +1554,12 @@ transform:"scale(1.02)"
 >
   <button
     type="button"
+    onClick={() => { setActiveMuseTab("mine"); clearSelectedAvatar(); }}
     style={{
       padding: "8px 18px",
       borderRadius: 999,
-      border: "none",
-      background: "#a855f7",
+      border: activeMuseTab === "mine" ? "1px solid #a855f7" : "1px solid rgba(255,255,255,.12)",
+      background: activeMuseTab === "mine" ? "#a855f7" : "rgba(255,255,255,.05)",
       color: "#fff",
       fontWeight: 600,
       fontSize: 14,
@@ -1558,20 +1567,29 @@ transform:"scale(1.02)"
       transition: "all .2s ease"
     }}
   >
-    Explore
+    My Muses
   </button>
 
   <button
     type="button"
-    onClick={() =>
-  setStatusModal({
-    open: true,
-    type: "info",
-    title: "Coming Soon",
-    description:
-  "Coming Soon!\n\nUpload a passport-style photo and MagicReel will create your personal AI Avatar.\n\nUse it instantly across Hero Images, Lookbooks and AI Fashion Reels."
-  })
-}
+    onClick={() => { setActiveMuseTab("explore"); clearSelectedAvatar(); }}
+    style={{
+      padding: "8px 18px",
+      borderRadius: 999,
+      border: activeMuseTab === "explore" ? "1px solid #a855f7" : "1px solid rgba(255,255,255,.12)",
+      background: activeMuseTab === "explore" ? "rgba(168,85,247,.22)" : "rgba(255,255,255,.05)",
+      color: "#fff",
+      fontWeight: 600,
+      fontSize: 14,
+      cursor: "pointer",
+      transition: "all .2s ease"
+    }}
+  >
+    Explore Muses
+  </button>
+  <button
+    type="button"
+    onClick={() => navigate("/create-muse/face")}
     style={{
       padding: "8px 18px",
       borderRadius: 999,
@@ -1584,33 +1602,67 @@ transform:"scale(1.02)"
       transition: "all .2s ease"
     }}
   >
-    Upload
+    Make My Muse
   </button>
 </div>
 
-            <div
-              style={{
-                display:"grid",
+            {selectedAvatar && (
+              <div style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                padding: 10,
+                marginBottom: 12,
+                borderRadius: 14,
+                border: "1px solid rgba(168,85,247,.65)",
+                background: "rgba(168,85,247,.10)",
+              }}>
+                <img
+                  src={selectedAvatar.previewImage}
+                  alt="Selected personal Avatar"
+                  style={{ width: 48, height: 64, objectFit: "cover", borderRadius: 8 }}
+                />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700 }}>Personal Avatar selected</div>
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.6)" }}>
+                    {selectedAvatar.id.replace(/_/g, " ")}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsAvatarPickerOpen(true)}
+                  style={{
+                    border: "1px solid rgba(255,255,255,.18)",
+                    borderRadius: 999,
+                    padding: "7px 12px",
+                    color: "#fff",
+                    background: "rgba(255,255,255,.06)",
+                    cursor: "pointer",
+                  }}
+                >
+                  Change
+                </button>
+              </div>
+            )}
 
-                gridTemplateColumns:
-                  isMobile
-                  ? "repeat(3,1fr)"
-                  : "repeat(5,1fr)",
-
-                gap:12
-              }}
-            >
-
+            {activeMuseTab === "mine" && myMuses.length === 0 ? (
+              <div style={{ padding: "24px 16px", borderRadius: 16, border: "1px dashed rgba(168,85,247,.45)", background: "rgba(168,85,247,.06)", textAlign: "center", color: "rgba(255,255,255,.72)", display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+                <div style={{ fontWeight: 700, color: "#fff" }}>Your private Muses will appear here</div>
+                <div style={{ fontSize: 12 }}>Create a Muse to build your own reusable fashion model collection.</div>
+                <button type="button" onClick={() => navigate("/create-muse/face")} style={{ padding: "9px 18px", borderRadius: 999, border: "1px solid #a855f7", background: "#a855f7", color: "#fff", fontWeight: 700, cursor: "pointer" }}>Make My Muse</button>
+              </div>
+            ) : (
+            <div style={{ display:"grid", gridTemplateColumns: isMobile ? "repeat(3,1fr)" : "repeat(5,1fr)", gap:12 }}>
               {visibleMuses.map((muse) => (
 
 <div
 key={muse.id}
+title={muse.name || muse.id}
 
-onClick={()=>
-setSelectedMuse(
-muse.id
-)
-}
+onClick={() => {
+  clearSelectedAvatar();
+  setSelectedMuse(muse.id);
+}}
 
 onMouseEnter={()=>
 setHoveredMuse(
@@ -1660,7 +1712,7 @@ transition:"all .25s ease"
 >
 <img
 src={muse.placeholderImageUrl}
-alt={muse.id}
+alt={muse.name || muse.id}
 
 style={{
 width:"100%",
@@ -1697,8 +1749,8 @@ display:"block"
 </div>
 
 ))}
-
             </div>
+            )}
 
           </div>
 
@@ -2108,6 +2160,10 @@ Download Back Hero
   }
 />
 
+  <AvatarPickerDrawer
+    open={isAvatarPickerOpen}
+    onClose={() => setIsAvatarPickerOpen(false)}
+  />
 </div>
 
 );
