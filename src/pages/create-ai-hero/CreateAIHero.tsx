@@ -1449,6 +1449,8 @@ style={{
 
     minHeight:500,
 
+    position:"relative",
+
     opacity:
       productImageUrl ? 1 : 0.45,
 
@@ -1493,17 +1495,16 @@ Muse
 style={{
 position:"absolute",
 
-top:45,
+top:105,
 left:"50%",
 
 transform:
 "translateX(-50%)",
 
 width:240,
+height:300,
 
-aspectRatio:"4/5",
-
-borderRadius:24,
+borderRadius:20,
 
 overflow:"hidden",
 
@@ -1530,13 +1531,13 @@ style={{
 width:"100%",
 height:"100%",
 
-objectFit:"none",
+objectFit:"contain",
 
-objectPosition:"center top",
+objectPosition:"center",
 
-display:"block",
+background:"#111",
 
-transform:"scale(1.02)"
+display:"block"
 }}
 />
 
