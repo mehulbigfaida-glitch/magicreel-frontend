@@ -45,7 +45,6 @@ const getMuseGender = (museId: string, gender?: string): "female" | "male" | nul
 export default function CreateAIHero() {
   const navigate = useNavigate();
   const selectedAvatar = useAvatarStore((state) => state.selectedAvatar);
-  const setAvatarCategory = useAvatarStore((state) => state.setCategory);
   const clearSelectedAvatar = useAvatarStore((state) => state.clearSelectedAvatar);
   const [isAvatarPickerOpen, setIsAvatarPickerOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(
