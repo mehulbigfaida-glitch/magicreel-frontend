@@ -1585,19 +1585,7 @@ transform:"scale(1.02)"
   </button>
   <button
     type="button"
-    onClick={() => {
-      if (!selectedCategory) {
-        setStatusModal({
-          open: true,
-          type: "warning",
-          title: "Select Gender First",
-          description: "Please select Men or Women before choosing a personal Avatar.",
-        });
-        return;
-      }
-      setAvatarCategory(selectedCategory === "Women" ? "female" : "male");
-      setIsAvatarPickerOpen(true);
-    }}
+    onClick={() => navigate("/create-muse/face")}
     style={{
       padding: "8px 18px",
       borderRadius: 999,
@@ -1610,7 +1598,7 @@ transform:"scale(1.02)"
       transition: "all .2s ease"
     }}
   >
-    Upload
+    Make My Muse
   </button>
 </div>
 
@@ -1657,14 +1645,7 @@ transform:"scale(1.02)"
               <div style={{ padding: "24px 16px", borderRadius: 16, border: "1px dashed rgba(168,85,247,.45)", background: "rgba(168,85,247,.06)", textAlign: "center", color: "rgba(255,255,255,.72)", display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
                 <div style={{ fontWeight: 700, color: "#fff" }}>Your private Muses will appear here</div>
                 <div style={{ fontSize: 12 }}>Create a Muse to build your own reusable fashion model collection.</div>
-                <button type="button" onClick={() => {
-                  if (!selectedCategory) {
-                    setStatusModal({ open: true, type: "warning", title: "Select Gender First", description: "Please select Men or Women before creating a personal Muse." });
-                    return;
-                  }
-                  setAvatarCategory(selectedCategory === "Women" ? "female" : "male");
-                  setIsAvatarPickerOpen(true);
-                }} style={{ padding: "9px 18px", borderRadius: 999, border: "1px solid #a855f7", background: "#a855f7", color: "#fff", fontWeight: 700, cursor: "pointer" }}>+ Create My Muse</button>
+                <button type="button" onClick={() => navigate("/create-muse/face")} style={{ padding: "9px 18px", borderRadius: 999, border: "1px solid #a855f7", background: "#a855f7", color: "#fff", fontWeight: 700, cursor: "pointer" }}>Make My Muse</button>
               </div>
             ) : (
             <div style={{ display:"grid", gridTemplateColumns: isMobile ? "repeat(3,1fr)" : "repeat(5,1fr)", gap:12 }}>
