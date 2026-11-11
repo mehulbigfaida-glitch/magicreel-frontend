@@ -123,7 +123,7 @@ export default function MuseFaceGenerationPage() {
       }));
       sessionStorage.removeItem("magicreel.selectedMuseCandidate");
       setSelectedCandidateNumber(null);
-      setNotice("Your eight Muse faces have been generated and separated into individual candidates. Select your preferred Muse.");
+      setNotice("Your Muse candidates are ready. 5 credits have been used. Select your preferred identity.");
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Something went wrong. Please try again.");
     } finally {
