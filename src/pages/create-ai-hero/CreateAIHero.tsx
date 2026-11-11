@@ -93,6 +93,7 @@ setHoveredMuse
 ]=useState("");
 
 const [privateMuses, setPrivateMuses] = useState<SelectableMuse[]>([]);
+const [activeMuseTab, setActiveMuseTab] = useState<"mine" | "explore">("mine");
 
 useEffect(() => {
   const loadPrivateMuses = async () => {
@@ -120,17 +121,16 @@ useEffect(() => {
   void loadPrivateMuses();
 }, []);
 
-const allMuses: SelectableMuse[] = [
-  ...Object.values(MUSE_REGISTRY),
-  ...privateMuses
-];
-
-const visibleMuses = allMuses.filter((muse) => {
+const filterMusesByGender = (muses: SelectableMuse[]) => muses.filter((muse) => {
   const gender = getMuseGender(muse.id, muse.gender);
   if (selectedCategory === "Women") return gender === "female" || gender === null;
   if (selectedCategory === "Men") return gender === "male" || gender === null;
   return true;
 });
+const myMuses = filterMusesByGender(privateMuses);
+const exploreMuses = filterMusesByGender(Object.values(MUSE_REGISTRY));
+const visibleMuses = activeMuseTab === "mine" ? myMuses : exploreMuses;
+const allMuses: SelectableMuse[] = [...Object.values(MUSE_REGISTRY), ...privateMuses];
 const selectedMuseData = allMuses.find((muse) => muse.id === selectedMuse);
 const hoveredMuseData = allMuses.find((muse) => muse.id === hoveredMuse);
 
@@ -1550,12 +1550,12 @@ transform:"scale(1.02)"
 >
   <button
     type="button"
-    onClick={() => clearSelectedAvatar()}
+    onClick={() => { setActiveMuseTab("mine"); clearSelectedAvatar(); }}
     style={{
       padding: "8px 18px",
       borderRadius: 999,
-      border: "none",
-      background: "#a855f7",
+      border: activeMuseTab === "mine" ? "1px solid #a855f7" : "1px solid rgba(255,255,255,.12)",
+      background: activeMuseTab === "mine" ? "#a855f7" : "rgba(255,255,255,.05)",
       color: "#fff",
       fontWeight: 600,
       fontSize: 14,
@@ -1563,9 +1563,26 @@ transform:"scale(1.02)"
       transition: "all .2s ease"
     }}
   >
-    Explore
+    My Muses
   </button>
 
+  <button
+    type="button"
+    onClick={() => { setActiveMuseTab("explore"); clearSelectedAvatar(); }}
+    style={{
+      padding: "8px 18px",
+      borderRadius: 999,
+      border: activeMuseTab === "explore" ? "1px solid #a855f7" : "1px solid rgba(255,255,255,.12)",
+      background: activeMuseTab === "explore" ? "rgba(168,85,247,.22)" : "rgba(255,255,255,.05)",
+      color: "#fff",
+      fontWeight: 600,
+      fontSize: 14,
+      cursor: "pointer",
+      transition: "all .2s ease"
+    }}
+  >
+    Explore Muses
+  </button>
   <button
     type="button"
     onClick={() => {
@@ -1636,19 +1653,21 @@ transform:"scale(1.02)"
               </div>
             )}
 
-            <div
-              style={{
-                display:"grid",
-
-                gridTemplateColumns:
-                  isMobile
-                  ? "repeat(3,1fr)"
-                  : "repeat(5,1fr)",
-
-                gap:12
-              }}
-            >
-
+            {activeMuseTab === "mine" && myMuses.length === 0 ? (
+              <div style={{ padding: "24px 16px", borderRadius: 16, border: "1px dashed rgba(168,85,247,.45)", background: "rgba(168,85,247,.06)", textAlign: "center", color: "rgba(255,255,255,.72)", display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+                <div style={{ fontWeight: 700, color: "#fff" }}>Your private Muses will appear here</div>
+                <div style={{ fontSize: 12 }}>Create a Muse to build your own reusable fashion model collection.</div>
+                <button type="button" onClick={() => {
+                  if (!selectedCategory) {
+                    setStatusModal({ open: true, type: "warning", title: "Select Gender First", description: "Please select Men or Women before creating a personal Muse." });
+                    return;
+                  }
+                  setAvatarCategory(selectedCategory === "Women" ? "female" : "male");
+                  setIsAvatarPickerOpen(true);
+                }} style={{ padding: "9px 18px", borderRadius: 999, border: "1px solid #a855f7", background: "#a855f7", color: "#fff", fontWeight: 700, cursor: "pointer" }}>+ Create My Muse</button>
+              </div>
+            ) : (
+            <div style={{ display:"grid", gridTemplateColumns: isMobile ? "repeat(3,1fr)" : "repeat(5,1fr)", gap:12 }}>
               {visibleMuses.map((muse) => (
 
 <div
@@ -1745,8 +1764,8 @@ display:"block"
 </div>
 
 ))}
-
             </div>
+            )}
 
           </div>
 
