@@ -45,3 +45,8 @@
 .muse-saved-assets-grid figcaption{padding-top:6px;color:#d4e7d9;font-size:10px;line-height:1.35}
 .muse-saved-assets>.muse-generate-button{width:100%;justify-content:center}
 @media(max-width:600px){.muse-saved-assets-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Customer-facing Muse completion summary: source, chosen identity and finished model. */
+.muse-saved-summary-grid{grid-template-columns:repeat(3,minmax(0,1fr));max-width:760px;margin:0 auto}
+.muse-saved-summary-grid figure{min-width:0}
+@media(max-width:600px){.muse-saved-summary-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.muse-saved-summary-grid figcaption{font-size:9px}}
