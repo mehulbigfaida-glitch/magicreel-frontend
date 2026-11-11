@@ -49,7 +49,7 @@ export default function MuseFaceGenerationPage() {
       if (!token) throw new Error("Your session has expired. Please sign in again.");
       const form = new FormData();
       form.append("image", next);
-      const response = await fetch(`${API_BASE.replace(/\\/$/, "")}/api/muse/upload-reference`, {
+      const response = await fetch(`${API_BASE.endsWith("/") ? API_BASE.slice(0, -1) : API_BASE}/api/muse/upload-reference`, {
         method: "POST",
         body: form,
         credentials: "include",
