@@ -101,7 +101,7 @@ export default function MuseFaceGenerationPage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ referencePublicId, age, gender, consent: true }),
+        body: JSON.stringify({ referencePublicId, age, gender, consent: true, consentVersion: "muse-consent-v1" }),
       });
       const generated = await generationResponse.json().catch(() => ({}));
       if (!generationResponse.ok) {
@@ -145,7 +145,7 @@ export default function MuseFaceGenerationPage() {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ candidatePublicId: selectedCandidate.publicId, candidateNumber: selectedCandidate.candidateNumber, age, gender, consent: true, name: museName.trim() || `My Muse ${selectedCandidate.candidateNumber}` }),
+        body: JSON.stringify({ candidatePublicId: selectedCandidate.publicId, candidateNumber: selectedCandidate.candidateNumber, age, gender, consent: true, consentVersion: "muse-consent-v1", name: museName.trim() || `My Muse ${selectedCandidate.candidateNumber}` }),
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result?.message || "Could not create your Muse. Please try again.");
@@ -200,7 +200,7 @@ export default function MuseFaceGenerationPage() {
           </div>
         </div>
         <div className="muse-candidate-summary"><span className="muse-candidate-icon"><Sparkles size={18}/></span><div><strong>8 distinctive Muse candidates</strong><p>One high-resolution collage · 4 columns × 2 rows</p></div><span className="muse-fixed-count">8</span></div>
-        <label className="muse-consent"><input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)}/><span>I confirm that I have the right and necessary consent to use this photograph and the depicted adult person's likeness for AI-generated commercial fashion content.</span></label>
+        <label className="muse-consent"><input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)}/><span>I confirm that I own this photograph or have permission to use it, and that the adult person shown has given permission for it to be used to create an AI-generated fashion identity and related commercial fashion content. I understand that the generated identity may resemble other people or independently generated images.</span></label>
         <button className="muse-generate-button" disabled={!file || !referencePublicId || !consent || busy} onClick={requestGeneration}><Sparkles size={17}/>{busy ? "Preparing…" : "Generate My Muses"}</button>
         {notice && <div className="muse-status-note" role="status">{notice}</div>}
         {generatedImageUrl && <div className="muse-generated-result">
