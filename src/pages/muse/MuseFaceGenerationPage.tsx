@@ -27,7 +27,7 @@ export default function MuseFaceGenerationPage() {
   const [savingMuse, setSavingMuse] = useState(false);
   const [savedMuse, setSavedMuse] = useState<SavedMuse | null>(null);
 
-  const onFile = (next?: File) => {
+  const onFile = async (next?: File) => {
     setNotice("");
     setReferencePublicId("");
     setGeneratedImageUrl("");
@@ -43,6 +43,29 @@ export default function MuseFaceGenerationPage() {
     const url = URL.createObjectURL(next);
     setPreview((old) => { if (old) URL.revokeObjectURL(old); return url; });
     setFile(next);
+    setBusy(true);
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Your session has expired. Please sign in again.");
+      const form = new FormData();
+      form.append("image", next);
+      const response = await fetch(`${API_BASE.replace(/\\/$/, "")}/api/muse/upload-reference`, {
+        method: "POST",
+        body: form,
+        credentials: "include",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const uploaded = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(uploaded?.message || "Reference photo upload failed. Please try again.");
+      const publicId = uploaded?.data?.publicId;
+      if (!publicId) throw new Error("The upload response did not include a reference ID.");
+      setReferencePublicId(publicId);
+      setNotice("Your photo is uploaded securely. Choose your preferences and generate your Muse candidates.");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Reference photo upload failed.");
+    } finally {
+      setBusy(false);
+    }
   };
 
   const reset = () => {
@@ -69,26 +92,7 @@ export default function MuseFaceGenerationPage() {
       if (!token) throw new Error("Your session has expired. Please sign in again.");
       const apiBase = API_BASE.replace(/\/$/, "");
 
-      // First action uploads the reference only. Generation requires a second, explicit click.
-      if (!referencePublicId) {
-        const form = new FormData();
-        form.append("image", file);
-        const uploadResponse = await fetch(`${apiBase}/api/muse/upload-reference`, {
-          method: "POST",
-          body: form,
-          credentials: "include",
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const uploaded = await uploadResponse.json().catch(() => ({}));
-        if (!uploadResponse.ok) {
-          throw new Error(uploaded?.message || "Reference photo upload failed. Please try again.");
-        }
-        const publicId = uploaded?.data?.publicId;
-        if (!publicId) throw new Error("The upload response did not include a reference ID.");
-        setReferencePublicId(publicId);
-        setNotice("Reference photo uploaded successfully. Click Generate My Muses again when you are ready to create the eight faces.");
-        return;
-      }
+      if (!referencePublicId) throw new Error("Please wait for your photo to finish uploading.");
 
       const generationResponse = await fetch(`${apiBase}/api/muse/generate-faces`, {
         method: "POST",
@@ -149,7 +153,7 @@ export default function MuseFaceGenerationPage() {
         throw new Error("Muse generation completed without all four required assets. Please contact support before retrying.");
       }
       setSavedMuse(result.data as SavedMuse);
-      setNotice("Your four Muse assets have been generated and saved to your private account.");
+      setNotice("Your Muse is ready and saved to your private account.");
       sessionStorage.removeItem("magicreel.selectedMuseCandidate");
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Muse asset generation failed. Please try again.");
@@ -197,7 +201,7 @@ export default function MuseFaceGenerationPage() {
         </div>
         <div className="muse-candidate-summary"><span className="muse-candidate-icon"><Sparkles size={18}/></span><div><strong>8 distinctive Muse candidates</strong><p>One high-resolution collage · 4 columns × 2 rows</p></div><span className="muse-fixed-count">8</span></div>
         <label className="muse-consent"><input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)}/><span>I confirm that I have the right and necessary consent to use this photograph and the depicted adult person's likeness for AI-generated commercial fashion content.</span></label>
-        <button className="muse-generate-button" disabled={!file || !consent || busy} onClick={requestGeneration}><Sparkles size={17}/>{busy ? "Preparing…" : referencePublicId ? "Generate My Muses" : "Upload Reference Photo"}</button>
+        <button className="muse-generate-button" disabled={!file || !referencePublicId || !consent || busy} onClick={requestGeneration}><Sparkles size={17}/>{busy ? "Preparing…" : "Generate My Muses"}</button>
         {notice && <div className="muse-status-note" role="status">{notice}</div>}
         {generatedImageUrl && <div className="muse-generated-result">
           <div className="muse-result-heading"><strong>Choose your Muse</strong><span>8 individual candidates</span></div>
@@ -237,17 +241,16 @@ export default function MuseFaceGenerationPage() {
             <input value={museName} maxLength={48} onChange={(event) => setMuseName(event.target.value)} placeholder="e.g. Anaya" />
           </label>
           <button className="muse-generate-button" disabled={savingMuse} onClick={createSelectedMuse}>
-            <Sparkles size={17}/>{savingMuse ? "Creating four Muse assets…" : "Create My Muse"}
+            <Sparkles size={17}/>{savingMuse ? "Creating your Muse…" : "Create My Muse"}
           </button>
-          <p className="muse-helper">This creates the master portrait, customer-facing placeholder, front Hero and back Hero using the selected face.</p>
+          <p className="muse-helper">Create your reusable virtual fashion model.</p>
         </div>}
         {savedMuse && <section className="muse-saved-assets" aria-live="polite">
-          <div className="muse-result-heading"><strong>{savedMuse.name} is ready</strong><span>4 assets saved</span></div>
-          <div className="muse-saved-assets-grid">
-            <figure><img src={savedMuse.masterPortraitUrl} alt="Master Muse portrait"/><figcaption>Master Muse Portrait</figcaption></figure>
-            <figure><img src={savedMuse.placeholderImageUrl} alt="Muse placeholder in blue T-shirt"/><figcaption>Customer Placeholder</figcaption></figure>
-            <figure><img src={savedMuse.processingImageUrl} alt="Front Hero reference"/><figcaption>Front Hero</figcaption></figure>
-            <figure><img src={savedMuse.processingBackImageUrl} alt="Back Hero reference"/><figcaption>Back Hero</figcaption></figure>
+          <div className="muse-result-heading"><strong>{savedMuse.name} is ready</strong><span>Your Muse is saved</span></div>
+          <div className="muse-saved-assets-grid muse-saved-summary-grid">
+            <figure><img src={preview} alt="Your uploaded reference photo"/><figcaption>Your photo</figcaption></figure>
+            <figure><img src={candidates.find((candidate) => candidate.candidateNumber === selectedCandidateNumber)?.imageUrl || savedMuse.masterPortraitUrl} alt="Your selected Muse identity"/><figcaption>Selected identity</figcaption></figure>
+            <figure><img src={savedMuse.placeholderImageUrl} alt="Your finished virtual fashion model"/><figcaption>Your Muse</figcaption></figure>
           </div>
           <button className="muse-generate-button" onClick={() => navigate("/create-ai-hero")}>Use My Muse in MagicReel</button>
         </section>}
