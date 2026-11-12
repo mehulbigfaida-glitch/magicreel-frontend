@@ -252,7 +252,7 @@ export default function MuseFaceGenerationPage() {
             <figure><img src={candidates.find((candidate) => candidate.candidateNumber === selectedCandidateNumber)?.imageUrl || savedMuse.masterPortraitUrl} alt="Your selected Muse identity"/><figcaption>Selected identity</figcaption></figure>
             <figure><img src={savedMuse.placeholderImageUrl} alt="Your finished virtual fashion model"/><figcaption>Your Muse</figcaption></figure>
           </div>
-          <button className="muse-generate-button" onClick={() => navigate("/create-ai-hero")}>Use My Muse in MagicReel</button>
+          <button className="muse-generate-button" onClick={() => navigate("/create-ai-hero")}>Create Hero Now</button>
         </section>}
         <p className="muse-privacy-note">Your source photo is used as a visual reference for this generation. It is not a public profile image.</p>
       </section>
