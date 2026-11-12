@@ -50,3 +50,21 @@
 .muse-saved-summary-grid{grid-template-columns:repeat(3,minmax(0,1fr));max-width:760px;margin:0 auto}
 .muse-saved-summary-grid figure{min-width:0}
 @media(max-width:600px){.muse-saved-summary-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.muse-saved-summary-grid figcaption{font-size:9px}}
+
+/* Honest elapsed-time feedback for the two Muse generation stages. */
+.muse-generation-progress{position:relative;display:grid;grid-template-columns:46px minmax(0,1fr);column-gap:13px;align-items:center;margin-top:13px;padding:15px;border:1px solid #514477;border-radius:12px;background:linear-gradient(125deg,#211c35,#171621 70%);overflow:hidden}
+.muse-generation-progress-assets{margin:12px 0 4px;border-color:#66518f;background:linear-gradient(125deg,#251d3c,#171621 70%)}
+.muse-progress-orbit{position:relative;width:42px;height:42px;border:1px solid #6553a1;border-radius:50%;animation:muse-orbit-spin 5s linear infinite}
+.muse-progress-orbit:before,.muse-progress-orbit:after{content:"";position:absolute;border:1px solid #7967ba;border-radius:50%;inset:6px}
+.muse-progress-orbit:after{inset:13px;background:#a993ff;box-shadow:0 0 16px #9b83ff}
+.muse-progress-orbit span{position:absolute;width:5px;height:5px;border-radius:50%;background:#d3c7ff;top:2px;left:18px;box-shadow:0 0 8px #c1adff}
+.muse-progress-orbit span:nth-child(2){top:28px;left:2px;background:#8fe0d0}
+.muse-progress-orbit span:nth-child(3){top:28px;left:32px;background:#f0b7df}
+.muse-progress-copy strong{display:block;color:#f3efff;font-size:12px}
+.muse-progress-copy p{margin:4px 0 5px;color:#aaa3bd;font-size:10px;line-height:1.5}
+.muse-progress-elapsed{color:#c4b4ff;font-size:10px;font-variant-numeric:tabular-nums}
+.muse-progress-track{grid-column:1/-1;height:4px;margin-top:13px;overflow:hidden;border-radius:99px;background:#353044}
+.muse-progress-track span{display:block;width:38%;height:100%;border-radius:99px;background:linear-gradient(90deg,#8267f6,#c3a5ff,#8fe0d0);animation:muse-progress-sweep 2.1s ease-in-out infinite}
+@keyframes muse-orbit-spin{to{transform:rotate(360deg)}}
+@keyframes muse-progress-sweep{0%{transform:translateX(-110%)}100%{transform:translateX(280%)}}
+@media(prefers-reduced-motion:reduce){.muse-progress-orbit,.muse-progress-track span{animation:none}}
