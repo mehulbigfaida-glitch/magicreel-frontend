@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Check, ImagePlus, Info, Sparkles, X } from "lucide-react";
 import "./MuseFaceGenerationPage.css";
@@ -26,6 +26,17 @@ export default function MuseFaceGenerationPage() {
   const [museName, setMuseName] = useState("My Muse");
   const [savingMuse, setSavingMuse] = useState(false);
   const [savedMuse, setSavedMuse] = useState<SavedMuse | null>(null);
+  const [generationStage, setGenerationStage] = useState<"collage" | "assets" | null>(null);
+  const [generationStartedAt, setGenerationStartedAt] = useState<number | null>(null);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+
+  useEffect(() => {
+    if (!generationStage || generationStartedAt === null) return;
+    const updateElapsed = () => setElapsedSeconds(Math.max(0, Math.floor((Date.now() - generationStartedAt) / 1000)));
+    updateElapsed();
+    const interval = window.setInterval(updateElapsed, 1000);
+    return () => window.clearInterval(interval);
+  }, [generationStage, generationStartedAt]);
 
   const onFile = async (next?: File) => {
     setNotice("");
@@ -86,6 +97,9 @@ export default function MuseFaceGenerationPage() {
   const requestGeneration = async () => {
     if (!file || !consent || busy) return;
     setBusy(true);
+    setGenerationStage("collage");
+    setGenerationStartedAt(Date.now());
+    setElapsedSeconds(0);
     setNotice("");
     try {
       const token = localStorage.getItem("token");
@@ -128,6 +142,8 @@ export default function MuseFaceGenerationPage() {
       setNotice(error instanceof Error ? error.message : "Something went wrong. Please try again.");
     } finally {
       setBusy(false);
+      setGenerationStage(null);
+      setGenerationStartedAt(null);
     }
   };
 
@@ -136,6 +152,9 @@ export default function MuseFaceGenerationPage() {
     const selectedCandidate = candidates.find((candidate) => candidate.candidateNumber === selectedCandidateNumber);
     if (!selectedCandidate) { setNotice("Please select one of the eight Muse faces first."); return; }
     setSavingMuse(true);
+    setGenerationStage("assets");
+    setGenerationStartedAt(Date.now());
+    setElapsedSeconds(0);
     setNotice("");
     try {
       const token = localStorage.getItem("token");
@@ -157,7 +176,11 @@ export default function MuseFaceGenerationPage() {
       sessionStorage.removeItem("magicreel.selectedMuseCandidate");
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Muse asset generation failed. Please try again.");
-    } finally { setSavingMuse(false); }
+    } finally {
+      setSavingMuse(false);
+      setGenerationStage(null);
+      setGenerationStartedAt(null);
+    }
   };
   return <main className="muse-face-page">
     <header className="muse-face-topbar">
@@ -201,7 +224,16 @@ export default function MuseFaceGenerationPage() {
         </div>
         <div className="muse-candidate-summary"><span className="muse-candidate-icon"><Sparkles size={18}/></span><div><strong>8 distinctive Muse candidates</strong><p>One high-resolution collage · 4 columns × 2 rows</p></div><span className="muse-fixed-count">8</span></div>
         <label className="muse-consent"><input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)}/><span>I confirm that I own this photograph or have permission to use it, and that the adult person shown has given permission for it to be used to create an AI-generated fashion identity and related commercial fashion content. I understand that the generated identity may resemble other people or independently generated images.</span></label>
-        <button className="muse-generate-button" disabled={!file || !referencePublicId || !consent || busy} onClick={requestGeneration}><Sparkles size={17}/>{busy ? "Preparing…" : "Generate My Muses"}</button>
+        <button className="muse-generate-button" disabled={!file || !referencePublicId || !consent || busy} onClick={requestGeneration}><Sparkles size={17}/>{busy ? "Generating Muse Collage…" : "Generate My Muses · 5 Credits"}</button>
+        {generationStage === "collage" && <div className="muse-generation-progress" role="status" aria-live="polite">
+          <div className="muse-progress-orbit" aria-hidden="true"><span/><span/><span/></div>
+          <div className="muse-progress-copy">
+            <strong>Creating your 8 Muse candidates</strong>
+            <p>Usually under 1 minute. We are shaping your candidate portraits now.</p>
+            <span className="muse-progress-elapsed">Elapsed {Math.floor(elapsedSeconds / 60)}:{String(elapsedSeconds % 60).padStart(2, "0")}</span>
+          </div>
+          <div className="muse-progress-track"><span/></div>
+        </div>}
         {notice && <div className="muse-status-note" role="status">{notice}</div>}
         {generatedImageUrl && <div className="muse-generated-result">
           <div className="muse-result-heading"><strong>Choose your Muse</strong><span>8 individual candidates</span></div>
@@ -243,6 +275,15 @@ export default function MuseFaceGenerationPage() {
           <button className="muse-generate-button" disabled={savingMuse} onClick={createSelectedMuse}>
             <Sparkles size={17}/>{savingMuse ? "Creating your Muse…" : "Create My Muse"}
           </button>
+          {generationStage === "assets" && <div className="muse-generation-progress muse-generation-progress-assets" role="status" aria-live="polite">
+            <div className="muse-progress-orbit" aria-hidden="true"><span/><span/><span/></div>
+            <div className="muse-progress-copy">
+              <strong>Bringing your Muse to life</strong>
+              <p>Generating your Front, Back and reusable Muse images. This usually takes around 2–3 minutes.</p>
+              <span className="muse-progress-elapsed">Elapsed {Math.floor(elapsedSeconds / 60)}:{String(elapsedSeconds % 60).padStart(2, "0")}</span>
+            </div>
+            <div className="muse-progress-track"><span/></div>
+          </div>}
           <p className="muse-helper">Create your reusable virtual fashion model.</p>
         </div>}
         {savedMuse && <section className="muse-saved-assets" aria-live="polite">
