@@ -20,6 +20,12 @@ export const CREATIVE_STUDIO_ITEMS: NavigationItem[] = [
     featured: true,
   },
   {
+    title: "Make My Muse",
+    description: "Create your reusable AI fashion model",
+    icon: Sparkles,
+    to: "/create-muse/face",
+  },
+  {
     title: "E-COM Lookbook",
     description: "E-commerce Image Packs",
     icon: ShoppingBag,
