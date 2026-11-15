@@ -298,7 +298,7 @@ export default function MuseFaceGenerationPage() {
             <div className="muse-certificate-detail"><span>Certificate ID</span><strong>{savedMuse.certificate.certificateId}</strong></div>
             <div className="muse-certificate-detail"><span>Issued</span><strong>{new Date(savedMuse.certificate.issuedAt).toLocaleString()}</strong></div>
             <div className="muse-certificate-hash"><span>Provenance manifest SHA-256</span><code>{savedMuse.certificate.manifestHash}</code></div>
-            <a className="muse-certificate-verify" href={`${API_BASE.replace(/\\/$/, "")}${savedMuse.certificate.verificationPath}`} target="_blank" rel="noreferrer">Open public verification record ↗</a>
+            <a className="muse-certificate-verify" href={`${API_BASE.replace(/\/$/, "")}${savedMuse.certificate.verificationPath}`} target="_blank" rel="noreferrer">Open public verification record ↗</a>
             <p>This record documents the Muse creation history and asset lineage. It is not government-issued IPR registration or a guarantee of exclusive rights in a facial identity.</p>
           </div>}
           <button className="muse-generate-button" onClick={() => navigate("/create-ai-hero")}>Create Hero Now</button>
