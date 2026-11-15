@@ -7,7 +7,7 @@ import { API_BASE } from "../../config/api";
 type Gender = "auto" | "female" | "male";
 
 type MuseCandidate = { candidateNumber: number; imageUrl: string; publicId: string; width?: number; height?: number };
-type SavedMuse = { id: string; name: string; masterPortraitUrl: string; placeholderImageUrl: string; processingImageUrl: string; processingBackImageUrl: string; status: string; certificate?: { certificateId: string; manifestHash: string; issuedAt: string; verificationPath: string; status: string; signatureStatus?: string; signingKeyId?: string | null; notice: string } };
+type SavedMuse = { id: string; name: string; age?: number; gender?: string; candidateNumber?: number; masterPortraitUrl: string; placeholderImageUrl: string; processingImageUrl: string; processingBackImageUrl: string; status: string; createdAt?: string; certificate?: { certificateId: string; manifestHash: string; issuedAt: string; verificationPath: string; status: string; signatureStatus?: string; signingKeyId?: string | null; notice: string } };
 
 export default function MuseFaceGenerationPage() {
   const navigate = useNavigate();
@@ -26,9 +26,29 @@ export default function MuseFaceGenerationPage() {
   const [museName, setMuseName] = useState("My Muse");
   const [savingMuse, setSavingMuse] = useState(false);
   const [savedMuse, setSavedMuse] = useState<SavedMuse | null>(null);
+  const [savedMuses, setSavedMuses] = useState<SavedMuse[]>([]);
+  const [savedMusesLoading, setSavedMusesLoading] = useState(true);
   const [generationStage, setGenerationStage] = useState<"collage" | "assets" | null>(null);
   const [generationStartedAt, setGenerationStartedAt] = useState<number | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+    const loadSavedMuses = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) { if (active) setSavedMusesLoading(false); return; }
+      try {
+        const response = await fetch(`${API_BASE.replace(/\/$/, "")}/api/muse/my-muses`, { credentials: "include", headers: { Authorization: `Bearer ${token}` } });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result?.message || "Could not load saved Muses.");
+        if (active) setSavedMuses(Array.isArray(result?.data?.muses) ? result.data.muses : []);
+      } catch (error) {
+        if (active) setNotice(error instanceof Error ? error.message : "Could not load saved Muses.");
+      } finally { if (active) setSavedMusesLoading(false); }
+    };
+    loadSavedMuses();
+    return () => { active = false; };
+  }, []);
 
   useEffect(() => {
     if (!generationStage || generationStartedAt === null) return;
@@ -195,6 +215,16 @@ export default function MuseFaceGenerationPage() {
       </div>
       <div className="muse-stepper"><span className="active">1 <small>Face</small></span><i/><span>2 <small>Muse assets</small></span><i/><span>3 <small>Save Muse</small></span></div>
     </div>
+    <section className="muse-saved-library" aria-label="Your saved Muses">
+      <div className="muse-result-heading"><strong>Your saved Muses</strong><span>{savedMuses.length} saved</span></div>
+      {savedMusesLoading ? <p>Loading your private Muses…</p> : savedMuses.length === 0 ? <p>Your saved Muses will appear here.</p> : <div className="muse-candidate-grid">
+        {savedMuses.map((muse) => <article className="muse-candidate-card" key={muse.id}>
+          <img src={muse.placeholderImageUrl || muse.masterPortraitUrl} alt={`${muse.name} virtual fashion model`}/>
+          <span className="muse-candidate-card-footer"><strong>{muse.name}</strong><span>{muse.status}</span></span>
+          <button type="button" className="muse-generate-button" onClick={() => navigate(`/muse/certificate/${muse.id}`)}>View Identity Certificate</button>
+        </article>)}
+      </div>}
+    </section>
     <div className="muse-face-workspace">
       <section className="muse-upload-card">
         <div className="muse-section-heading"><div><span className="muse-eyebrow">01 · SOURCE IMAGE</span><h2>Upload a portrait</h2><p>A clear adult head-and-shoulders photo works best.</p></div></div>
