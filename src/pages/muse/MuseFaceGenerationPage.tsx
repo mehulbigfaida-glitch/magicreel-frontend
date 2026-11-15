@@ -302,7 +302,7 @@ export default function MuseFaceGenerationPage() {
             <a className="muse-certificate-verify" href={`${API_BASE.replace(/\/$/, "")}${savedMuse.certificate.verificationPath}`} target="_blank" rel="noreferrer">Open public verification record ↗</a>
             <p>This record documents the Muse creation history and asset lineage. It is not government-issued IPR registration or a guarantee of exclusive rights in a facial identity.</p>
           </div>}
-          <button className="muse-generate-button" onClick={() => navigate("/create-ai-hero")}>Create Hero Now</button>
+          <button className="muse-generate-button" onClick={() => navigate(`/muse/certificate/${savedMuse.id}`)}>View AI Model Identity Certificate</button><button className="muse-generate-button" onClick={() => navigate("/create-ai-hero")}>Create Hero Now</button>
         </section>}
         <p className="muse-privacy-note">Your source photo is used as a visual reference for this generation. It is not a public profile image.</p>
       </section>
