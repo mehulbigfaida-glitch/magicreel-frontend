@@ -7,7 +7,7 @@ import { API_BASE } from "../../config/api";
 type Gender = "auto" | "female" | "male";
 
 type MuseCandidate = { candidateNumber: number; imageUrl: string; publicId: string; width?: number; height?: number };
-type SavedMuse = { id: string; name: string; masterPortraitUrl: string; placeholderImageUrl: string; processingImageUrl: string; processingBackImageUrl: string; status: string; certificate?: { certificateId: string; manifestHash: string; issuedAt: string; verificationPath: string; status: string; notice: string } };
+type SavedMuse = { id: string; name: string; masterPortraitUrl: string; placeholderImageUrl: string; processingImageUrl: string; processingBackImageUrl: string; status: string; certificate?: { certificateId: string; manifestHash: string; issuedAt: string; verificationPath: string; status: string; signatureStatus?: string; signingKeyId?: string | null; notice: string } };
 
 export default function MuseFaceGenerationPage() {
   const navigate = useNavigate();
@@ -294,7 +294,8 @@ export default function MuseFaceGenerationPage() {
             <figure><img src={savedMuse.placeholderImageUrl} alt="Your finished virtual fashion model"/><figcaption>Your Muse</figcaption></figure>
           </div>
           {savedMuse.certificate && <div className="muse-certificate-panel">
-            <div className="muse-certificate-heading"><span className="muse-certificate-seal"><Check size={16}/></span><div><strong>Muse Identity Certificate</strong><small>Creation provenance record</small></div></div>
+            <div className="muse-certificate-heading"><span className={`muse-certificate-seal ${savedMuse.certificate.signatureStatus === "SIGNED" ? "is-signed" : "is-unsigned"}`}>{savedMuse.certificate.signatureStatus === "SIGNED" ? <Check size={16}/> : <Info size={16}/>}</span><div><strong>Muse Creation Provenance Record</strong><small>{savedMuse.certificate.signatureStatus === "SIGNED" ? "Cryptographically signed · provisional" : "Unsigned provisional record · signature unavailable"}</small></div></div>
+            <div className="muse-certificate-detail"><span>Evidence status</span><strong>{savedMuse.certificate.signatureStatus === "SIGNED" ? "SIGNED · PROVISIONAL" : "UNSIGNED · PROVISIONAL"}</strong></div>
             <div className="muse-certificate-detail"><span>Certificate ID</span><strong>{savedMuse.certificate.certificateId}</strong></div>
             <div className="muse-certificate-detail"><span>Issued</span><strong>{new Date(savedMuse.certificate.issuedAt).toLocaleString()}</strong></div>
             <div className="muse-certificate-hash"><span>Provenance manifest SHA-256</span><code>{savedMuse.certificate.manifestHash}</code></div>
