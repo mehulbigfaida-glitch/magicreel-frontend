@@ -85,3 +85,43 @@
 
 .muse-certificate-seal.is-signed{background:#273c32;color:#a7e5bd}
 .muse-certificate-seal.is-unsigned{background:#49371f;color:#ffd18a}
+
+
+/* Saved Muse library follows the creation workspace and stays visually secondary. */
+.muse-saved-library-compact{
+  max-width:1440px;
+  margin:28px auto 0;
+  padding:18px;
+  border:1px solid #2a2935;
+  border-radius:16px;
+  background:#15151e;
+}
+.muse-saved-library-compact>.muse-result-heading{padding:0 0 14px}
+.muse-saved-library-compact>.muse-candidate-grid{
+  grid-template-columns:repeat(auto-fill,minmax(165px,210px));
+  justify-content:start;
+  gap:12px;
+  padding:0;
+}
+.muse-saved-library-compact .muse-candidate-card img{
+  aspect-ratio:4/5;
+  max-height:210px;
+  object-fit:cover;
+}
+.muse-saved-library-compact .muse-candidate-card-footer{padding:8px 9px}
+.muse-saved-library-compact .muse-generate-button{
+  padding:9px 8px;
+  border-radius:0 0 8px 8px;
+  font-size:10px;
+}
+.muse-saved-library-compact>p{
+  margin:0;
+  color:#9996a6;
+  font-size:12px;
+}
+@media(max-width:600px){
+  .muse-saved-library-compact{padding:13px;margin-top:20px}
+  .muse-saved-library-compact>.muse-candidate-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
