@@ -125,8 +125,8 @@ useEffect(() => {
 
 const filterMusesByGender = (muses: SelectableMuse[]) => muses.filter((muse) => {
   const gender = getMuseGender(muse.id, muse.gender);
-  if (selectedCategory === "Women") return gender === "female" || gender === "androgynous" || gender === null;
-  if (selectedCategory === "Men") return gender === "male" || gender === "androgynous" || gender === null;
+  if (selectedCategory === "Women") return gender === "female" || gender === "androgynous";
+  if (selectedCategory === "Men") return gender === "male" || gender === "androgynous";
   return true;
 });
 const myMuses = filterMusesByGender(privateMuses);
