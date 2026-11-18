@@ -4,7 +4,7 @@ import { ArrowLeft, Check, ImagePlus, Info, Sparkles, X } from "lucide-react";
 import "./MuseFaceGenerationPage.css";
 import { API_BASE } from "../../config/api";
 
-type Gender = "auto" | "female" | "male";
+type Gender = "female" | "male" | "androgynous";
 
 type MuseCandidate = { candidateNumber: number; imageUrl: string; publicId: string; width?: number; height?: number };
 type SavedMuse = { id: string; name: string; age?: number; gender?: string; candidateNumber?: number; masterPortraitUrl: string; placeholderImageUrl: string; processingImageUrl: string; processingBackImageUrl: string; status: string; createdAt?: string; certificate?: { certificateId: string; manifestHash: string; issuedAt: string; verificationPath: string; status: string; signatureStatus?: string; signingKeyId?: string | null; notice: string } };
@@ -15,7 +15,7 @@ export default function MuseFaceGenerationPage() {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState("");
   const [age, setAge] = useState(25);
-  const [gender, setGender] = useState<Gender>("auto");
+  const [gender, setGender] = useState<Gender | null>(null);
   const [consent, setConsent] = useState(false);
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
@@ -115,7 +115,7 @@ export default function MuseFaceGenerationPage() {
   };
 
   const requestGeneration = async () => {
-    if (!file || !consent || busy) return;
+    if (!file || !consent || !gender || busy) return;
     setBusy(true);
     setGenerationStage("collage");
     setGenerationStartedAt(Date.now());
@@ -168,7 +168,7 @@ export default function MuseFaceGenerationPage() {
   };
 
   const createSelectedMuse = async () => {
-    if (savingMuse || selectedCandidateNumber === null) return;
+    if (savingMuse || selectedCandidateNumber === null || !gender) return;
     const selectedCandidate = candidates.find((candidate) => candidate.candidateNumber === selectedCandidateNumber);
     if (!selectedCandidate) { setNotice("Please select one of the eight Muse faces first."); return; }
     setSavingMuse(true);
@@ -211,7 +211,7 @@ export default function MuseFaceGenerationPage() {
     <div className="muse-face-heading">
       <div><span className="muse-eyebrow"><Sparkles size={14}/> CREATE YOUR VIRTUAL MODEL</span>
         <h1>Create your model's face</h1>
-        <p>Upload one portrait, choose an age and explore eight distinctive fictional fashion-model identities.</p>
+        <p>Upload one portrait, choose an age and presentation, and explore eight distinctive fictional fashion-model identities.</p>
       </div>
       <div className="muse-stepper"><span className="active">1 <small>Face</small></span><i/><span>2 <small>Muse assets</small></span><i/><span>3 <small>Save Muse</small></span></div>
     </div>
@@ -237,14 +237,14 @@ export default function MuseFaceGenerationPage() {
           <div className="muse-range-labels"><span>18 years</span><span>60 years</span></div>
         </div>
         <div className="muse-control-block">
-          <div className="muse-control-title"><label>Gender presentation</label><span className="muse-muted">Optional</span></div>
+          <div className="muse-control-title"><label>Gender presentation</label><span className="muse-muted">Choose one</span></div>
           <div className="muse-choice-grid three">
-            {(["auto", "female", "male"] as Gender[]).map((g) => <button type="button" key={g} className={`muse-choice ${gender === g ? "is-selected" : ""}`} disabled={!!generatedImageUrl || savingMuse || !!savedMuse} onClick={() => setGender(g)} aria-pressed={gender === g}><span className="muse-choice-check">{gender === g ? <Check size={13}/> : null}</span><span><strong>{g === "auto" ? "Auto detect" : g === "female" ? "Female" : "Male"}</strong><small>{g === "auto" ? "Use the reference" : ` ${g} presentation`}</small></span></button>)}
+            {(["female", "male", "androgynous"] as Gender[]).map((g) => <button type="button" key={g} className={`muse-choice ${gender === g ? "is-selected" : ""}`} disabled={!!generatedImageUrl || savingMuse || !!savedMuse} onClick={() => setGender(g)} aria-pressed={gender === g}><span className="muse-choice-check">{gender === g ? <Check size={13}/> : null}</span><span><strong>{g === "female" ? "Female" : g === "male" ? "Male" : "Androgynous"}</strong><small>{g === "female" ? "Feminine presentation" : g === "male" ? "Masculine presentation" : "Gender-neutral appearance"}</small></span></button>)}
           </div>
         </div>
         <div className="muse-candidate-summary"><span className="muse-candidate-icon"><Sparkles size={18}/></span><div><strong>8 distinctive Muse candidates</strong><p>One high-resolution collage · 4 columns × 2 rows</p></div><span className="muse-fixed-count">8</span></div>
         <label className="muse-consent"><input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)}/><span>I confirm that I own this photograph or have permission to use it, and that the adult person shown has given permission for it to be used to create an AI-generated fashion identity and related commercial fashion content. I understand that the generated identity may resemble other people or independently generated images.</span></label>
-        <button className="muse-generate-button" disabled={!file || !referencePublicId || !consent || busy} onClick={requestGeneration}><Sparkles size={17}/>{busy ? "Generating Muse Collage…" : "Generate My Muses · 5 Credits"}</button>
+        <button className="muse-generate-button" disabled={!file || !referencePublicId || !consent || !gender || busy} onClick={requestGeneration}><Sparkles size={17}/>{busy ? "Generating Muse Collage…" : "Generate My Muses · 5 Credits"}</button>
         {generationStage === "collage" && <div className="muse-generation-progress" role="status" aria-live="polite">
           <div className="muse-progress-orbit" aria-hidden="true"><span/><span/><span/></div>
           <div className="muse-progress-copy">
