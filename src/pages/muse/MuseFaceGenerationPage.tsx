@@ -109,7 +109,7 @@ export default function MuseFaceGenerationPage() {
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Your session has expired. Please sign in again.");
-      const response = await fetch(`${API_BASE.replace(/\\/$/, "")}/api/muse/my-muses/${encodeURIComponent(muse.id)}`, {
+      const response = await fetch(`${API_BASE.replace(/\/$/, "")}/api/muse/my-muses/${encodeURIComponent(muse.id)}`, {
         method: "DELETE",
         credentials: "include",
         headers: { Authorization: `Bearer ${token}` }
