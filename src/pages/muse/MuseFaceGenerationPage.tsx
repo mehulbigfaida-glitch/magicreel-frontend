@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Check, ImagePlus, Info, Sparkles, X } from "lucide-react";
+import { ArrowLeft, Check, ImagePlus, Info, Sparkles, Trash2, X } from "lucide-react";
 import "./MuseFaceGenerationPage.css";
 import { API_BASE } from "../../config/api";
 
@@ -28,6 +28,7 @@ export default function MuseFaceGenerationPage() {
   const [savedMuse, setSavedMuse] = useState<SavedMuse | null>(null);
   const [savedMuses, setSavedMuses] = useState<SavedMuse[]>([]);
   const [savedMusesLoading, setSavedMusesLoading] = useState(true);
+  const [deletingMuseId, setDeletingMuseId] = useState<string | null>(null);
   const [generationStage, setGenerationStage] = useState<"collage" | "assets" | null>(null);
   const [generationStartedAt, setGenerationStartedAt] = useState<number | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -96,6 +97,31 @@ export default function MuseFaceGenerationPage() {
       setNotice(error instanceof Error ? error.message : "Reference photo upload failed.");
     } finally {
       setBusy(false);
+    }
+  };
+
+  const deleteMuse = async (muse: SavedMuse) => {
+    if (deletingMuseId) return;
+    const confirmed = window.confirm(`Delete "${muse.name}" from your active Muses? Its identity certificate will be revoked and retained as an audit record. This Muse will no longer be available for Hero generation.`);
+    if (!confirmed) return;
+    setDeletingMuseId(muse.id);
+    setNotice("");
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Your session has expired. Please sign in again.");
+      const response = await fetch(`${API_BASE.replace(/\\/$/, "")}/api/muse/my-muses/${encodeURIComponent(muse.id)}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result?.message || "Could not delete this Muse.");
+      setSavedMuses((current) => current.filter((item) => item.id !== muse.id));
+      setNotice(result?.message || "Muse deleted from active use.");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Could not delete this Muse.");
+    } finally {
+      setDeletingMuseId(null);
     }
   };
 
@@ -333,7 +359,12 @@ export default function MuseFaceGenerationPage() {
         {savedMuses.map((muse) => <article className="muse-candidate-card" key={muse.id}>
           <img src={muse.placeholderImageUrl || muse.masterPortraitUrl} alt={`${muse.name} virtual fashion model`}/>
           <span className="muse-candidate-card-footer"><strong>{muse.name}</strong><span>{muse.status}</span></span>
-          <button type="button" className="muse-generate-button" onClick={() => navigate(`/muse/certificate/${muse.id}`)}>View Identity Certificate</button>
+          <div className="muse-saved-card-actions">
+            <button type="button" className="muse-generate-button" onClick={() => navigate(`/muse/certificate/${muse.id}`)}>View Identity Certificate</button>
+            <button type="button" className="muse-delete-button" disabled={deletingMuseId !== null} onClick={() => deleteMuse(muse)} aria-label={`Delete ${muse.name}`} title="Delete Muse">
+              <Trash2 size={15}/>{deletingMuseId === muse.id ? "Deleting…" : "Delete"}
+            </button>
+          </div>
         </article>)}
       </div>}
     </section>
