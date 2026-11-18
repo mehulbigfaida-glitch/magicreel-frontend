@@ -31,12 +31,12 @@ MUSE_REGISTRY
 from "../create-ai/museRegistry";
 
 type SelectableMuse = (typeof MUSE_REGISTRY)[string] & {
-  gender?: "female" | "male" | "auto";
+  gender?: "female" | "male" | "androgynous" | "auto";
   name?: string;
 };
 
-const getMuseGender = (museId: string, gender?: string): "female" | "male" | null => {
-  if (gender === "female" || gender === "male") return gender;
+const getMuseGender = (museId: string, gender?: string): "female" | "male" | "androgynous" | null => {
+  if (gender === "female" || gender === "male" || gender === "androgynous") return gender;
   if (museId.startsWith("FS") || museId.startsWith("FP")) return "female";
   if (museId.startsWith("MS") || museId.startsWith("MP")) return "male";
   return null;
@@ -125,8 +125,8 @@ useEffect(() => {
 
 const filterMusesByGender = (muses: SelectableMuse[]) => muses.filter((muse) => {
   const gender = getMuseGender(muse.id, muse.gender);
-  if (selectedCategory === "Women") return gender === "female" || gender === null;
-  if (selectedCategory === "Men") return gender === "male" || gender === null;
+  if (selectedCategory === "Women") return gender === "female" || gender === "androgynous" || gender === null;
+  if (selectedCategory === "Men") return gender === "male" || gender === "androgynous" || gender === null;
   return true;
 });
 const myMuses = filterMusesByGender(privateMuses);
