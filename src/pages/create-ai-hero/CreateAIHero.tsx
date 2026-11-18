@@ -399,7 +399,7 @@ categoryKey:
 selectedSubType,
 
 avatarGender:
-selectedAvatar?.gender || (selectedMuseData?.gender && selectedMuseData.gender !== "auto" ? selectedMuseData.gender : getMuseGender(selectedMuse) || selectedCategory),
+selectedAvatar?.gender || (selectedMuseData?.gender === "androgynous" ? (selectedCategory === "Women" ? "female" : "male") : selectedMuseData?.gender && selectedMuseData.gender !== "auto" ? selectedMuseData.gender : getMuseGender(selectedMuse) || selectedCategory),
 
 avatarFaceImageUrl:
 
