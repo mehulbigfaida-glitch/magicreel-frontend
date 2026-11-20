@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import StatusModal from "../../components/StatusModal";
+import "./Reels360OutputPage.css";
 
 const API_BASE =
   import.meta.env.VITE_API_BASE_URL ||
@@ -186,100 +187,28 @@ const [statusModal, setStatusModal] =
   }
 
   if (loading) {
-
   return (
-
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#000",
-        color: "#fff",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "40px"
-      }}
-    >
-
-      <div
-        style={{
-          maxWidth: "700px",
-          textAlign: "center"
-        }}
-      >
-
-        <div
-          className="hero-loading-spinner"
-          style={{
-            margin: "0 auto 32px"
-          }}
-        />
-
-        <h1
-  style={{
-    fontSize: "34px",
-    marginBottom: "18px",
-    fontWeight: 700
-  }}
->
-  ✨ Creating your 360° Reel
-</h1>
-
-<p
-  style={{
-    fontSize: "18px",
-    color: "#bdbdbd",
-    lineHeight: 1.8
-  }}
->
-  High-quality AI video generation can take several minutes.
-
-  <br />
-  <br />
-
-  Please keep this page open.
-
-  <br />
-
-  Your reel will appear automatically when it's ready.
-</p>
-
-<div
-  style={{
-    marginTop: "40px"
-  }}
->
-  <div
-    style={{
-      color: "#888",
-      fontSize: "15px",
-      letterSpacing: "1px",
-      textTransform: "uppercase"
-    }}
-  >
-    Elapsed Time
-  </div>
-
-  <div
-    style={{
-      marginTop: "12px",
-      fontSize: "42px",
-      fontWeight: 700
-    }}
-  >
-    {String(Math.floor(elapsedTime / 60)).padStart(2, "0")}:
-    {String(elapsedTime % 60).padStart(2, "0")}
-  </div>
-</div>
-
+    <div className="reels360-loading-screen">
+      <div className="reels360-loading-card">
+        <div className="reels360-loading-eyebrow">MAGICREEL AI STUDIO</div>
+        <h1>Creating Your 360° Reel</h1>
+        <p className="reels360-loading-message">
+          Your fashion reel is being carefully generated. Complex generations may take longer than usual.
+          Please keep this page open while we finish creating your Reel.
+        </p>
+        <div className="reels360-generation-progress" role="status" aria-live="polite">
+          <div className="reels360-spinner" aria-hidden="true"><span/><span/><span/></div>
+          <div className="reels360-progress-copy">
+            <strong>Usually takes 3–4 minutes</strong>
+            <p>This generation uses 4 credits.</p>
+            <span className="reels360-elapsed">Elapsed {String(Math.floor(elapsedTime/60)).padStart(2,"0")}:{String(elapsedTime%60).padStart(2,"0")}</span>
+          </div>
+        </div>
+        <div className="reels360-poll-note">Your Reel will appear automatically when it’s ready.</div>
       </div>
-
     </div>
-
   );
-
 }
-
 if (failed) {
 
   return (
