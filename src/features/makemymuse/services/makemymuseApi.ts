@@ -3,7 +3,8 @@ const museEnv = import.meta.env as ImportMetaEnv & { VITE_MAKEMYMUSE_API_BASE?: 
 const MAKEMYMUSE_API_BASE = museEnv.VITE_MAKEMYMUSE_API_BASE || API_BASE;
 
 export type MuseGender = "female" | "male" | "androgynous";
-export type MuseCandidate = { candidateNumber:number; publicId:string; imageUrl:string; width:number; height:number; sha256:string };
+export type MuseCandidate = { candidateNumber:number; publicId:string; imageUrl:string; width:number; height:number; sha256:string; perceptualHash?:string };
+export type CandidateScreening = { method:string; thresholdHammingDistance:number; withinBatchNearDuplicates:Array<{candidateNumbers:number[];distance:number}>; catalogNearDuplicateFlags:Array<{candidateNumber:number;similarPriorAssets:Array<{priorSessionId:string;distance:number}>}>; interpretation:string };
 export type SavedMuse = { id:string; name:string; image:string; body:string; created:string; updatedAt:string };
 export type MuseRefinement = { eyes?:string; faceShape?:string; hair?:string; lips?:string };
 
@@ -38,7 +39,7 @@ export const makemymuseApi = {
     return request<{promptVersion:string;prompt:string;manifest:Record<string,unknown>}>("/sessions/"+encodeURIComponent(sessionId)+"/prompt-preview",{method:"POST",body:JSON.stringify(brief)});
   },
   generateCandidates(sessionId:string,brief:{genderPresentation:MuseGender;apparentAge:number;skinDirection:string;transformationDirection?:string}) {
-    return request<{batchId:string;candidateCount:number;layout:string;collage:{publicId:string;imageUrl:string;width:number;height:number};candidates:MuseCandidate[];promptVersion:string;promptHash:string}>("/sessions/"+encodeURIComponent(sessionId)+"/generate-candidates",{method:"POST",body:JSON.stringify(brief)});
+    return request<{batchId:string;candidateCount:number;layout:string;collage:{publicId:string;imageUrl:string;width:number;height:number};candidates:MuseCandidate[];candidateScreening:CandidateScreening;promptVersion:string;promptHash:string}>("/sessions/"+encodeURIComponent(sessionId)+"/generate-candidates",{method:"POST",body:JSON.stringify(brief)});
   },
   refinePreview(sessionId:string,candidatePublicId:string,refinement:MuseRefinement) {
     return request<{refinementId:string;previewPublicId:string;previewImageUrl:string;sha256:string}>("/sessions/"+encodeURIComponent(sessionId)+"/refine-preview",{method:"POST",body:JSON.stringify({candidatePublicId,refinement})});
