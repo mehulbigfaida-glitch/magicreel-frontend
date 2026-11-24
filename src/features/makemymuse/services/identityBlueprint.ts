@@ -22,7 +22,7 @@ async function getLandmarker() {
       let vision;
       try {
         vision = await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.22/wasm"
+          "/mediapipe/wasm"
         );
       } catch (err) {
         landmarkerPromise = null;
