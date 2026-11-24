@@ -23,8 +23,8 @@ export const makemymuseApi = {
     const form=new FormData();form.append("reference",file);
     return request<{publicId:string;imageUrl:string;sourceHash:string}>("/reference",{method:"POST",body:form});
   },
-  createSession(referencePublicId:string,consent:boolean) {
-    return request<{sessionId:string}>("/sessions",{method:"POST",body:JSON.stringify({referencePublicId,consent})});
+  createSession(referencePublicId:string,consent:boolean,sourceHash:string) {
+    return request<{sessionId:string}>("/sessions",{method:"POST",body:JSON.stringify({referencePublicId,consent,sourceHash})});
   },
   promptPreview(sessionId:string,brief:{genderPresentation:MuseGender;apparentAge:number;skinDirection:string;transformationDirection?:string}) {
     return request<{promptVersion:string;prompt:string;manifest:Record<string,unknown>}>("/sessions/"+encodeURIComponent(sessionId)+"/prompt-preview",{method:"POST",body:JSON.stringify(brief)});
