@@ -19,20 +19,27 @@ let landmarkerPromise: Promise<FaceLandmarker> | null = null;
 async function getLandmarker() {
   if (!landmarkerPromise) {
     landmarkerPromise = (async () => {
-      const vision = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.22/wasm"
-      );
-      return FaceLandmarker.createFromOptions(vision, {
-        baseOptions: {
-          modelAssetPath:
-            "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
-          delegate: "CPU",
-        },
-        runningMode: "IMAGE",
-        numFaces: 2,
-        outputFaceBlendshapes: false,
-        outputFacialTransformationMatrices: false,
-      });
+      try {
+        const vision = await FilesetResolver.forVisionTasks(
+          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.22/wasm"
+        );
+        return await FaceLandmarker.createFromOptions(vision, {
+          baseOptions: {
+            modelAssetPath:
+              "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+            delegate: "CPU",
+          },
+          runningMode: "IMAGE",
+          numFaces: 2,
+          outputFaceBlendshapes: false,
+          outputFacialTransformationMatrices: false,
+        });
+      } catch (err) {
+        // Reset initialization so a subsequent user retry can recover from transient CDN/model failures.
+        landmarkerPromise = null;
+        const detail = err instanceof Error ? err.message : String(err);
+        throw new Error("Face-mapping engine could not initialize (MediaPipe WASM/model load). Check network access to jsDelivr and Google Storage, then retry. Details: " + detail);
+      }
     })();
   }
   return landmarkerPromise;
