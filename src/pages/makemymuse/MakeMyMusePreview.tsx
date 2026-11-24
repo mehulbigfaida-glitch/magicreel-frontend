@@ -6,9 +6,9 @@ import {
 } from "lucide-react";
 import "./MakeMyMuse.css";
 import { makemymuseApi } from "../../features/makemymuse/services/makemymuseApi";
-import type { MuseGender, MuseRefinement } from "../../features/makemymuse/services/makemymuseApi";
+import type { MuseGender, MuseRefinement, SavedMuse } from "../../features/makemymuse/services/makemymuseApi";
 
-type Muse = { id: number; name: string; image: string; created: string; body: string };
+type Muse = { id: string; name: string; image: string; created: string; body: string };
 const sampleFemale = [
   "https://images.unsplash.com/photo-1534523231584-76b3b6e1b7c8?auto=format&fit=crop&w=900&q=88",
   "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=88",
@@ -131,12 +131,27 @@ export default function MakeMyMusePreview() {
     setLoading(true);setError("");
     try{
       const data=await makemymuseApi.save(sessionId,name.trim()||"My Muse");
-      const item:Muse={id:Date.now(),name:data.name,image:data.imageUrl,created:new Date().toLocaleDateString(),body:body||"Slim"};
+      const item:Muse={id:data.sessionId,name:data.name,image:data.imageUrl,created:new Date().toLocaleDateString(),body:body||"Slim"};
       setSaved((prev)=>[item,...prev]);setDashboard(false);setStage(8);
     }catch(e:any){setError(e.message||"Save failed.");}
     finally{setLoading(false);}
   };
 
+  const loadMuses=async()=>{
+    setLoading(true);setError("");
+    try{
+      const data=await makemymuseApi.listMuses();
+      setSaved(data.muses.map((m:SavedMuse)=>({id:m.id,name:m.name,image:m.image,body:m.body,created:new Date(m.created).toLocaleDateString()})));
+      setDashboard(true);setStage(8);
+    }catch(e:any){setError(e.message||"Could not load My Muses.");}
+    finally{setLoading(false);}
+  };
+  const deleteSavedMuse=async(id:string)=>{
+    setLoading(true);setError("");
+    try{await makemymuseApi.deleteMuse(id);setSaved(prev=>prev.filter(m=>m.id!==id));}
+    catch(e:any){setError(e.message||"Muse deletion failed.");}
+    finally{setLoading(false);}
+  };
   const downloadCertificate=async()=>{
     setLoading(true);setError("");
     try{
@@ -154,14 +169,14 @@ export default function MakeMyMusePreview() {
       <button className="mmm-brand" onClick={()=>{setDashboard(true);setStage(8)}} aria-label="MakeMyMuse home">
         <span className="mmm-brand-mark"><Sparkles size={17}/></span><span>MakeMy<span className="mmm-brand-accent">Muse</span></span>
       </button>
-      <nav className="mmm-nav"><button className={dashboard?"active":""} onClick={()=>{setDashboard(true);setStage(8)}}>My Muses</button><button onClick={()=>go(-1)}>Create</button></nav>
+      <nav className="mmm-nav"><button className={dashboard?"active":""} onClick={loadMuses}>My Muses</button><button onClick={()=>go(-1)}>Create</button></nav>
       <div className="mmm-top-right"><span className="mmm-pill"><Sparkles size={13}/> Creative Studio</span><button className="mmm-avatar">MG</button></div>
     </header>
 
     {dashboard ? <main className="mmm-dashboard">
       <div className="mmm-dash-head"><div><div className="mmm-eyebrow">YOUR CREATIVE COLLECTION</div><h1>Meet your <em>Muses.</em></h1><p>Distinctive characters, created by you. Ready to be brought to life.</p></div><button className="mmm-button mmm-button-dark" onClick={()=>go(0)}><Sparkles size={16}/> Create a new Muse</button></div>
       <div className="mmm-dash-grid">
-        {saved.map(m=><article className="mmm-muse-card" key={m.id}><img src={m.image}/><div className="mmm-muse-info"><div><h3>{m.name}</h3><p>Created {m.created} · {m.body}</p></div><button className="mmm-icon-button" title="Delete" onClick={()=>setSaved(s=>s.filter(x=>x.id!==m.id))}><Trash2 size={16}/></button></div></article>)}
+        {saved.map(m=><article className="mmm-muse-card" key={m.id}><img src={m.image}/><div className="mmm-muse-info"><div><h3>{m.name}</h3><p>Created {m.created} · {m.body}</p></div><button className="mmm-icon-button" title="Delete Muse and private assets" disabled={loading} onClick={()=>deleteSavedMuse(m.id)}><Trash2 size={16}/></button></div></article>)}
         {!saved.length&&<div className="mmm-empty"><div className="mmm-empty-icon"><Sparkles/></div><h2>Your collection begins here.</h2><p>Create a character you love—and make it yours.</p><button className="mmm-button mmm-button-dark" onClick={()=>go(0)}>Create my first Muse <ArrowRight size={16}/></button></div>}
       </div>
     </main> : stage===-1 ? <main className="mmm-welcome">
