@@ -83,7 +83,7 @@ export default function MakeMyMusePreview() {
     try{
       const uploaded=await makemymuseApi.uploadReference(file);
       setReferencePublicId(uploaded.publicId);
-      const session=await makemymuseApi.createSession(uploaded.publicId);
+      const session=await makemymuseApi.createSession(uploaded.publicId,consent);
       setSessionId(session.sessionId);
       go(1);
     }catch(e:any){setError(e.message||"Reference upload failed.");}
