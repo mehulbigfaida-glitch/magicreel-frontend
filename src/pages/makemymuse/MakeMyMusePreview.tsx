@@ -5,7 +5,8 @@ import {
   CheckCircle2, UserRound, Camera, Trash2, FileText, Loader2
 } from "lucide-react";
 import "./MakeMyMuse.css";
-import { makemymuseApi, MuseCandidate, MuseGender, MuseRefinement } from "../../features/makemymuse/services/makemymuseApi";
+import { makemymuseApi } from "../../features/makemymuse/services/makemymuseApi";
+import type { MuseGender, MuseRefinement } from "../../features/makemymuse/services/makemymuseApi";
 
 type Muse = { id: number; name: string; image: string; created: string; body: string };
 const sampleFemale = [
@@ -44,7 +45,6 @@ export default function MakeMyMusePreview() {
   const [file,setFile] = useState<File|null>(null);
   const [fileName,setFileName] = useState("");
   const [consent,setConsent] = useState(false);
-  const [referencePublicId,setReferencePublicId] = useState("");
   const [sessionId,setSessionId] = useState("");
   const [gender,setGender] = useState<MuseGender>("female");
   const [age,setAge] = useState(25);
@@ -82,7 +82,6 @@ export default function MakeMyMusePreview() {
     setLoading(true);setError("");
     try{
       const uploaded=await makemymuseApi.uploadReference(file);
-      setReferencePublicId(uploaded.publicId);
       const session=await makemymuseApi.createSession(uploaded.publicId,consent,uploaded.sourceHash);
       setSessionId(session.sessionId);
       go(1);
