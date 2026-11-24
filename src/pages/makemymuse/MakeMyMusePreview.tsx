@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from "react";
 import {
-  ArrowLeft, ArrowRight, Check, ChevronDown, CircleHelp, Crown, ImagePlus,
-  Sparkles, Upload, WandSparkles, X, Heart, SlidersHorizontal, RotateCcw,
-  CheckCircle2, UserRound, Camera, Trash2, Download
+  ArrowLeft, ArrowRight, Check, CircleHelp, Crown, ImagePlus,
+  Sparkles, WandSparkles, X, Heart, SlidersHorizontal,
+  CheckCircle2, UserRound, Camera, Trash2
 } from "lucide-react";
 import "./MakeMyMuse.css";
 
@@ -42,7 +42,6 @@ export default function MakeMyMusePreview() {
   const [refined,setRefined] = useState(false);
   const [generating,setGenerating] = useState(false);
   const finalImage = selected===null ? portraitUrls[0] : portraitUrls[selected];
-  const activeImage = stage===1 && reference ? reference : stage>=3 && selected!==null ? finalImage : reference || portraitUrls[0];
 
   const onUpload=(file?:File)=>{
     if(!file) return;
