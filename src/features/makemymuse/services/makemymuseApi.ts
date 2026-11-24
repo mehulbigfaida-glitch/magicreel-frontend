@@ -2,6 +2,7 @@ import { API_BASE } from "../../../config/api";
 
 export type MuseGender = "female" | "male" | "androgynous";
 export type MuseCandidate = { candidateNumber:number; publicId:string; imageUrl:string; width:number; height:number; sha256:string };
+export type SavedMuse = { id:string; name:string; image:string; body:string; created:string; updatedAt:string };
 export type MuseRefinement = { eyes?:string; faceShape?:string; hair?:string; lips?:string };
 type ApiResponse<T> = { success:boolean; data:T; message?:string };
 
@@ -19,6 +20,9 @@ async function request<T>(path:string, init:RequestInit={}):Promise<T> {
   return payload.data as T;
 }
 export const makemymuseApi = {
+  listMuses() {
+    return request<{muses:SavedMuse[]}>("/muses");
+  },
   uploadReference(file:File) {
     const form=new FormData();form.append("reference",file);
     return request<{publicId:string;imageUrl:string;sourceHash:string}>("/reference",{method:"POST",body:form});
