@@ -43,3 +43,12 @@
 .mmm-insight-status{grid-column:2;color:#a08a68;font-size:7px;letter-spacing:.13em;margin-top:2px}
 @media(max-width:900px){.mmm-blueprint-layout{grid-template-columns:1fr}.mmm-blueprint-reference{min-height:300px;max-height:420px}.mmm-blueprint-main{grid-template-columns:1fr minmax(180px,.55fr)}.mmm-blueprint-portrait{min-height:420px}}
 @media(max-width:600px){.mmm-blueprint-main{grid-template-columns:1fr}.mmm-blueprint-portrait{min-height:430px}.mmm-blueprint-insights{padding:10px 16px}.mmm-blueprint-insight{padding:12px 0}.mmm-blueprint-reference{min-height:280px}}
+
+/* MakeMyMuse prototype corrections — identity reference, age slider, batch note */
+.mmm-age-control{display:flex;align-items:center;gap:18px;width:100%}
+.mmm-age-control input[type=range]{flex:1;accent-color:#a88c68;min-width:120px}
+.mmm-age-control strong{font-size:13px;min-width:70px;text-align:right;color:#6f6558}
+.mmm-batch-note{display:inline-flex;align-items:center;gap:8px;margin:-14px 0 24px;padding:10px 13px;border:1px solid rgba(168,140,104,.45);background:#eee9e0;color:#8a7659;font-size:9px;letter-spacing:.12em}
+.mmm-batch-note span{color:#b8a184}
+.mmm-blueprint-portrait>img{object-position:center 28%;filter:saturate(.72)}
+.mmm-blueprint-viz{mix-blend-mode:screen}
