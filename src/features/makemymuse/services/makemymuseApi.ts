@@ -23,6 +23,9 @@ export const makemymuseApi = {
   listMuses() {
     return request<{muses:SavedMuse[]}>("/muses");
   },
+  deleteMuse(sessionId:string) {
+    return request<{deleted:boolean;assetCount:number}>("/sessions/"+encodeURIComponent(sessionId),{method:"DELETE"});
+  },
   uploadReference(file:File) {
     const form=new FormData();form.append("reference",file);
     return request<{publicId:string;imageUrl:string;sourceHash:string}>("/reference",{method:"POST",body:form});
