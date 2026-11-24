@@ -10,7 +10,7 @@ import type { CandidateScreening, MuseCandidate, MuseGender, MuseRefinement, Sav
 
 type Muse = { id: string; name: string; image: string; created: string; body: string };
 const sampleFemale = [
-  "https://images.unsplash.com/photo-1534523231584-76b3b6e1b7c8?auto=format&fit=crop&w=900&q=88",
+  "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=88",
   "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=88",
   "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=900&q=88",
   "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=900&q=88",
