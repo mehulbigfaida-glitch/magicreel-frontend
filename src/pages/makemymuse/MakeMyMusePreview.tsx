@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 import "./MakeMyMuse.css";
 import { makemymuseApi } from "../../features/makemymuse/services/makemymuseApi";
-import type { MuseGender, MuseRefinement, SavedMuse } from "../../features/makemymuse/services/makemymuseApi";
+import type { MuseCandidate, MuseGender, MuseRefinement, SavedMuse } from "../../features/makemymuse/services/makemymuseApi";
 
 type Muse = { id: string; name: string; image: string; created: string; body: string };
 const sampleFemale = [
