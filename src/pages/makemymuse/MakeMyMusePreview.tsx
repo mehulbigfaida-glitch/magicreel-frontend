@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ArrowLeft, ArrowRight, Check, CircleHelp, Crown, ImagePlus,
   Sparkles, WandSparkles, X, Heart, SlidersHorizontal,
