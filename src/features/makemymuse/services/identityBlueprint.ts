@@ -19,10 +19,17 @@ let landmarkerPromise: Promise<FaceLandmarker> | null = null;
 async function getLandmarker() {
   if (!landmarkerPromise) {
     landmarkerPromise = (async () => {
+      let vision;
       try {
-        const vision = await FilesetResolver.forVisionTasks(
+        vision = await FilesetResolver.forVisionTasks(
           "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.22/wasm"
         );
+      } catch (err) {
+        landmarkerPromise = null;
+        throw new Error("MediaPipe WASM files failed to load from jsDelivr. This may be blocked by browser/network policy. Diagnostic: " + describeError(err));
+      }
+
+      try {
         return await FaceLandmarker.createFromOptions(vision, {
           baseOptions: {
             modelAssetPath:
@@ -35,14 +42,30 @@ async function getLandmarker() {
           outputFacialTransformationMatrices: false,
         });
       } catch (err) {
-        // Reset initialization so a subsequent user retry can recover from transient CDN/model failures.
         landmarkerPromise = null;
-        const detail = err instanceof Error ? err.message : String(err);
-        throw new Error("Face-mapping engine could not initialize (MediaPipe WASM/model load). Check network access to jsDelivr and Google Storage, then retry. Details: " + detail);
+        throw new Error("MediaPipe face model failed to load from Google Storage or initialize. Diagnostic: " + describeError(err));
       }
     })();
   }
   return landmarkerPromise;
+}
+
+function describeError(err: unknown): string {
+  if (err instanceof Error) return err.name + ": " + err.message;
+  if (err && typeof err === "object") {
+    const event = err as Record<string, unknown>;
+    const fields = ["type", "target", "currentTarget", "message", "status", "statusText"];
+    return fields.map((key) => {
+      const value = event[key];
+      if (value === undefined || value === null) return "";
+      if (key === "target" || key === "currentTarget") {
+        const target = value as Record<string, unknown>;
+        return key + "=" + JSON.stringify({ tagName: target.tagName, src: target.src, href: target.href });
+      }
+      return key + "=" + String(value);
+    }).filter(Boolean).join("; ") || Object.prototype.toString.call(err);
+  }
+  return String(err);
 }
 
 function average(points: BlueprintPoint[]) {
