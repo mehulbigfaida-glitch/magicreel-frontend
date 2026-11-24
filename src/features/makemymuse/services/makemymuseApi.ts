@@ -4,7 +4,6 @@ export type MuseGender = "female" | "male" | "androgynous";
 export type MuseCandidate = { candidateNumber:number; publicId:string; imageUrl:string; width:number; height:number; sha256:string };
 export type SavedMuse = { id:string; name:string; image:string; body:string; created:string; updatedAt:string };
 export type MuseRefinement = { eyes?:string; faceShape?:string; hair?:string; lips?:string };
-type ApiResponse<T> = { success:boolean; data:T; message?:string };
 
 function token() {
   return localStorage.getItem("token") || "";
