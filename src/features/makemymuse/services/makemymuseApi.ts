@@ -1,4 +1,5 @@
 import { API_BASE } from "../../../config/api";
+const MAKEMYMUSE_API_BASE = import.meta.env.VITE_MAKEMYMUSE_API_BASE || API_BASE;
 
 export type MuseGender = "female" | "male" | "androgynous";
 export type MuseCandidate = { candidateNumber:number; publicId:string; imageUrl:string; width:number; height:number; sha256:string };
@@ -13,7 +14,7 @@ async function request<T>(path:string, init:RequestInit={}):Promise<T> {
   const auth = token();
   if (auth) headers.set("Authorization","Bearer "+auth);
   if (init.body && !(init.body instanceof FormData)) headers.set("Content-Type","application/json");
-  const response = await fetch(API_BASE+"/api/makemymuse"+path,{...init,headers});
+  const response = await fetch(MAKEMYMUSE_API_BASE+"/api/makemymuse"+path,{...init,headers});
   const payload = await response.json().catch(()=>({message:"Unexpected server response"}));
   if(!response.ok || payload.success===false) throw new Error(payload.message || "MakeMyMuse request failed ("+response.status+")");
   return payload.data as T;
