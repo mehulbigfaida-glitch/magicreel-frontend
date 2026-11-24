@@ -1,5 +1,6 @@
 import { API_BASE } from "../../../config/api";
-const MAKEMYMUSE_API_BASE = import.meta.env.VITE_MAKEMYMUSE_API_BASE || API_BASE;
+const museEnv = import.meta.env as ImportMetaEnv & { VITE_MAKEMYMUSE_API_BASE?: string };
+const MAKEMYMUSE_API_BASE = museEnv.VITE_MAKEMYMUSE_API_BASE || API_BASE;
 
 export type MuseGender = "female" | "male" | "androgynous";
 export type MuseCandidate = { candidateNumber:number; publicId:string; imageUrl:string; width:number; height:number; sha256:string };
