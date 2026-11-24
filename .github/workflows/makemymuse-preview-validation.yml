@@ -1,0 +1,30 @@
+name: MakeMyMuse preview build validation
+
+on:
+  push:
+    branches: [experiment/makemymuse-immersive-ui]
+    paths:
+      - "src/pages/makemymuse/**"
+      - "src/features/makemymuse/**"
+      - ".github/workflows/makemymuse-preview-validation.yml"
+      - "package.json"
+      - "package-lock.json"
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/pages/makemymuse/**"
+      - "src/features/makemymuse/**"
+      - "package.json"
+      - "package-lock.json"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build
