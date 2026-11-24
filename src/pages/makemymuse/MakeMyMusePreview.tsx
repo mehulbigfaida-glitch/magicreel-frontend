@@ -31,7 +31,7 @@ export default function MakeMyMusePreview() {
   const [reference,setReference] = useState<string|null>(null);
   const [fileName,setFileName] = useState("");
   const [gender,setGender] = useState("Female");
-  const [age,setAge] = useState("25–30");
+  const [age,setAge] = useState("25");
   const [skin,setSkin] = useState("Keep inspired by reference");
   const [selected,setSelected] = useState<number|null>(null);
   const [body,setBody] = useState("");
