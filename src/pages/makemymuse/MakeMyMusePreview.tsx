@@ -137,7 +137,19 @@ export default function MakeMyMusePreview() {
     finally{setLoading(false);}
   };
 
-  const downloadCertificate=async()=>{\n    setLoading(true);setError("");\n    try{\n      const cert=await makemymuseApi.certificate(sessionId);\n      const file=new Blob([JSON.stringify(cert,null,2)],{type:"application/json"});\n      const url=URL.createObjectURL(file);\n      const a=document.createElement("a");a.href=url;a.download="MakeMyMuse-Creation-Certificate-"+sessionId+".json";a.click();\n      URL.revokeObjectURL(url);\n    }catch(e:any){setError(e.message||"Certificate download failed.");}\n    finally{setLoading(false);}\n  };\n\n  return <div className="mmm">
+  const downloadCertificate=async()=>{
+    setLoading(true);setError("");
+    try{
+      const cert=await makemymuseApi.certificate(sessionId);
+      const file=new Blob([JSON.stringify(cert,null,2)],{type:"application/json"});
+      const url=URL.createObjectURL(file);
+      const a=document.createElement("a");a.href=url;a.download="MakeMyMuse-Creation-Certificate-"+sessionId+".json";a.click();
+      URL.revokeObjectURL(url);
+    }catch(e:any){setError(e.message||"Certificate download failed.");}
+    finally{setLoading(false);}
+  };
+
+  return <div className="mmm">
     <header className="mmm-topbar">
       <button className="mmm-brand" onClick={()=>{setDashboard(true);setStage(8)}} aria-label="MakeMyMuse home">
         <span className="mmm-brand-mark"><Sparkles size={17}/></span><span>MakeMy<span className="mmm-brand-accent">Muse</span></span>
