@@ -46,5 +46,8 @@ export const makemymuseApi = {
   },
   history(sessionId:string) {
     return request<{sessionId:string;events:Array<{event_type:string;event_data:any;created_at:string}>}>("/sessions/"+encodeURIComponent(sessionId)+"/history");
+  },
+  certificate(sessionId:string) {
+    return request<{manifest:Record<string,unknown>;manifestHash:string;signature:string|null;publicKeyPem:string|null;keyId:string|null;signatureStatus:string}>("/sessions/"+encodeURIComponent(sessionId)+"/certificate");
   }
 };
