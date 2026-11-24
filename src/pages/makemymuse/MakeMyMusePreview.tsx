@@ -166,7 +166,7 @@ export default function MakeMyMusePreview() {
 
   return <div className="mmm">
     <header className="mmm-topbar">
-      <button className="mmm-brand" onClick={()=>{setDashboard(true);setStage(8)}} aria-label="MakeMyMuse home">
+      <button className="mmm-brand" onClick={loadMuses} aria-label="MakeMyMuse home">
         <span className="mmm-brand-mark"><Sparkles size={17}/></span><span>MakeMy<span className="mmm-brand-accent">Muse</span></span>
       </button>
       <nav className="mmm-nav"><button className={dashboard?"active":""} onClick={loadMuses}>My Muses</button><button onClick={()=>go(-1)}>Create</button></nav>
@@ -178,7 +178,7 @@ export default function MakeMyMusePreview() {
       <div className="mmm-dash-grid">
         {saved.map(m=><article className="mmm-muse-card" key={m.id}><img src={m.image}/><div className="mmm-muse-info"><div><h3>{m.name}</h3><p>Created {m.created} · {m.body}</p></div><button className="mmm-icon-button" title="Delete Muse and private assets" disabled={loading} onClick={()=>deleteSavedMuse(m.id)}><Trash2 size={16}/></button></div></article>)}
         {!saved.length&&<div className="mmm-empty"><div className="mmm-empty-icon"><Sparkles/></div><h2>Your collection begins here.</h2><p>Create a character you love—and make it yours.</p><button className="mmm-button mmm-button-dark" onClick={()=>go(0)}>Create my first Muse <ArrowRight size={16}/></button></div>}
-      </div>
+      </div>{error&&<div className="mmm-error">{error}</div>}
     </main> : stage===-1 ? <main className="mmm-welcome">
       <div className="mmm-welcome-copy"><div className="mmm-eyebrow"><span className="mmm-dot"/> A NEW KIND OF CREATIVE IDENTITY</div><h1>Your brand<br/>deserves its<br/><em>own face.</em></h1><p>Turn a photograph into a distinctive digital Muse. Inspired by you. Transformed by us. Uniquely yours.</p><button className="mmm-button mmm-button-dark mmm-button-xl" onClick={()=>go(0)}>Create your Muse <ArrowRight size={18}/></button><div className="mmm-welcome-meta"><span><Sparkles size={14}/> Personalised character creation</span><span>01 / 08</span></div></div><div className="mmm-welcome-art"><div className="mmm-art-orbit mmm-orbit-1"/><div className="mmm-art-orbit mmm-orbit-2"/><div className="mmm-art-image"><img src={sampleFemale[0]} alt="Fashion editorial portrait"/></div><div className="mmm-floating-note mmm-note-top"><span className="mmm-note-icon"><Sparkles size={15}/></span><div><strong>Designed to be yours</strong><small>A character. Your creative identity.</small></div></div><div className="mmm-floating-note mmm-note-bottom"><div className="mmm-note-avatars">{sampleFemale.slice(0,3).map((u,i)=><img key={i} src={u}/>)}</div><div><strong>8 distinct faces</strong><small>Find the one that feels right</small></div></div><div className="mmm-art-caption">THE ART OF BECOMING</div></div>
     </main> : stage===8 ? <main className="mmm-done">
