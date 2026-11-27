@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowLeft, ArrowRight, Check, CircleHelp, Crown, ImagePlus,
   Sparkles, WandSparkles, X, Heart, SlidersHorizontal,
@@ -40,6 +40,42 @@ const bodies = [
   {name:"Curvy",note:"A fuller, naturally proportioned silhouette",image:"https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=600&q=80"}
 ];
 
+
+const cinematicScenes = Array.from({ length: 8 }, (_, i) => `/makemymuse/cinematic/Home_scene${i + 1}.mp4`);
+function CinematicHeroBackground() {
+  const [clipIndex, setClipIndex] = useState(() => Math.floor(Math.random() * cinematicScenes.length));
+  const [fade, setFade] = useState(false);
+  const [videoUnavailable, setVideoUnavailable] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const timerRef = useRef<number | null>(null);
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReducedMotion(media.matches);
+    const onChange = (event: MediaQueryListEvent) => setReducedMotion(event.matches);
+    media.addEventListener("change", onChange);
+    return () => { media.removeEventListener("change", onChange); if (timerRef.current) window.clearTimeout(timerRef.current); };
+  }, []);
+  const nextScene = () => {
+    const next = Math.floor(Math.random() * (cinematicScenes.length - 1));
+    return next >= clipIndex ? next + 1 : next;
+  };
+  const handleEnded = () => {
+    setFade(true);
+    const next = nextScene();
+    timerRef.current = window.setTimeout(() => { setClipIndex(next); setFade(false); }, 320);
+  };
+  useEffect(() => {
+    if (!videoRef.current || reducedMotion || videoUnavailable) return;
+    const video = videoRef.current;
+    video.play().catch(() => setVideoUnavailable(true));
+  }, [clipIndex, reducedMotion, videoUnavailable]);
+  return <div className="mmm-cinematic-video" aria-hidden="true">
+    <img className="mmm-cinematic-fallback" src={sampleFemale[0]} alt="" />
+    {!reducedMotion && !videoUnavailable && <video ref={videoRef} key={clipIndex} className={"mmm-cinematic-video-element" + (fade ? " is-fading" : "")} src={cinematicScenes[clipIndex]} muted playsInline autoPlay preload="metadata" onEnded={handleEnded} onError={() => setVideoUnavailable(true)} />}
+    <div className="mmm-cinematic-overlay" />
+  </div>;
+}
 export default function MakeMyMusePreview() {
   const [stage,setStage] = useState(-1);
   const [reference,setReference] = useState<string|null>(null);
@@ -194,8 +230,9 @@ export default function MakeMyMusePreview() {
         {saved.map(m=><article className="mmm-muse-card" key={m.id}><img src={m.image}/><div className="mmm-muse-info"><div><h3>{m.name}</h3><p>Created {m.created} · {m.body}</p></div><button className="mmm-icon-button" title="Delete Muse and private assets" disabled={loading} onClick={()=>deleteSavedMuse(m.id)}><Trash2 size={16}/></button></div></article>)}
         {!saved.length&&<div className="mmm-empty"><div className="mmm-empty-icon"><Sparkles/></div><h2>Your collection begins here.</h2><p>Create a character you love—and make it yours.</p><button className="mmm-button mmm-button-dark" onClick={()=>go(0)}>Create my first Muse <ArrowRight size={16}/></button></div>}
       </div>{error&&<div className="mmm-error">{error}</div>}
-    </main> : stage===-1 ? <main className="mmm-welcome">
-      <div className="mmm-welcome-copy"><div className="mmm-eyebrow"><span className="mmm-dot"/> A NEW KIND OF CREATIVE IDENTITY</div><h1>Your brand<br/>deserves its<br/><em>own face.</em></h1><p>Turn a photograph into a distinctive digital Muse. Inspired by you. Transformed by us. Uniquely yours.</p><button className="mmm-button mmm-button-dark mmm-button-xl" onClick={()=>go(0)}>Create your Muse <ArrowRight size={18}/></button><div className="mmm-welcome-meta"><span><Sparkles size={14}/> Personalised character creation</span><span>01 / 08</span></div></div><div className="mmm-welcome-art"><div className="mmm-art-orbit mmm-orbit-1"/><div className="mmm-art-orbit mmm-orbit-2"/><div className="mmm-art-image"><img src={sampleFemale[0]} alt="Fashion editorial portrait"/></div><div className="mmm-floating-note mmm-note-top"><span className="mmm-note-icon"><Sparkles size={15}/></span><div><strong>Designed to be yours</strong><small>A character. Your creative identity.</small></div></div><div className="mmm-floating-note mmm-note-bottom"><div className="mmm-note-avatars">{sampleFemale.slice(0,3).map((u,i)=><img key={i} src={u}/>)}</div><div><strong>8 distinct faces</strong><small>Find the one that feels right</small></div></div><div className="mmm-art-caption">THE ART OF BECOMING</div></div>
+    </main> : stage===-1 ? <main className="mmm-welcome mmm-welcome-cinematic">
+      <CinematicHeroBackground />
+      <div className="mmm-welcome-copy mmm-cinematic-copy"><div className="mmm-eyebrow mmm-cinematic-eyebrow"><span className="mmm-dot"/> A NEW KIND OF CREATIVE IDENTITY</div><h1>Your brand<br/>deserves its<br/><em>own face.</em></h1><p>Turn a photograph into a distinctive digital Muse. Inspired by you. Transformed by us. Uniquely yours.</p><div className="mmm-cinematic-actions"><button className="mmm-button mmm-button-dark mmm-button-xl mmm-cinematic-cta" onClick={()=>go(0)}>Create your Muse <ArrowRight size={18}/></button><button className="mmm-cinematic-secondary" onClick={()=>go(0)}>Begin your story <span>↗</span></button></div><div className="mmm-welcome-meta mmm-cinematic-meta"><span><Sparkles size={14}/> Personalised character creation</span><span>01 / 08</span></div></div><div className="mmm-cinematic-caption"><span className="mmm-caption-line"/> <span>THE ART OF BECOMING</span></div>
     </main> : stage===8 ? <main className="mmm-done">
       <div className="mmm-done-image"><img src={finalImage||approvedImage} alt="Your completed Muse"/><div className="mmm-image-label"><CheckCircle2 size={15}/> IDENTITY CREATED</div></div><div className="mmm-done-copy"><div className="mmm-eyebrow">YOUR CREATION, COMPLETE</div><h1>Meet <em>{name||"your Muse"}.</em></h1><p>A distinctive digital character, created through your choices. Your Muse is ready for its next chapter.</p><div className="mmm-done-actions"><button className="mmm-button mmm-button-dark mmm-button-xl" disabled={loading} onClick={downloadCertificate}>{loading?<Loader2 size={16} className="mmm-spin"/>:"Download Creation Record"} <FileText size={18}/></button><button className="mmm-button mmm-button-outline" onClick={()=>{setDashboard(true)}}>View My Muses</button><button className="mmm-button mmm-button-outline" onClick={()=>go(0)}>Create another</button></div><div className="mmm-done-foot"><span><Check size={15}/> Face approved</span><span><Check size={15}/> Body selected</span><span><Check size={15}/> Identity saved</span></div></div>
     </main> : <main className="mmm-flow">
