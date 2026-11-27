@@ -52,12 +52,19 @@ const cinematicScenes = [
   "https://res.cloudinary.com/duaqfspwa/video/upload/v1795781660/Home_scene8_odjaxs.mp4"
 ];
 function CinematicHeroBackground() {
-  const [clips, setClips] = useState<[number, number]>(() => {
-    const first = Math.floor(Math.random() * cinematicScenes.length);
-    let second = Math.floor(Math.random() * (cinematicScenes.length - 1));
-    if (second >= first) second++;
-    return [first, second];
-  });
+  const shuffleDeck = (avoidFirst?: number) => {
+    const deck = cinematicScenes.map((_, i) => i);
+    for (let i = deck.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [deck[i], deck[j]] = [deck[j], deck[i]];
+    }
+    if (avoidFirst !== undefined && deck[0] === avoidFirst && deck.length > 1) {
+      [deck[0], deck[1]] = [deck[1], deck[0]];
+    }
+    return deck;
+  };
+  const initialDeck = useRef(shuffleDeck()).current;
+  const [clips, setClips] = useState<[number, number]>([initialDeck[0], initialDeck[1]]);
   const [activeSlot, setActiveSlot] = useState<0 | 1>(0);
   const [crossfading, setCrossfading] = useState(false);
   const [videoUnavailable, setVideoUnavailable] = useState(false);
@@ -66,6 +73,8 @@ function CinematicHeroBackground() {
   const transitionTimer = useRef<number | null>(null);
   const transitioning = useRef(false);
   const activeSlotRef = useRef<0 | 1>(0);
+  const deckRef = useRef<number[]>(initialDeck);
+  const cursorRef = useRef(0);
   const clipsRef = useRef<[number, number]>(clips);
   clipsRef.current = clips;
   activeSlotRef.current = activeSlot;
@@ -81,14 +90,7 @@ function CinematicHeroBackground() {
     };
   }, []);
 
-  const chooseNext = (current: number) => {
-    let next = Math.floor(Math.random() * (cinematicScenes.length - 1));
-    if (next >= current) next++;
-    return next;
-  };
   const inactiveSlot = (activeSlot === 0 ? 1 : 0) as 0 | 1;
-
-  // Load the hidden video in advance; never reveal it until it has a decoded frame.
   useEffect(() => {
     const active = refs[activeSlot].current;
     const standby = refs[inactiveSlot].current;
@@ -128,6 +130,18 @@ function CinematicHeroBackground() {
     const next = refs[nextSlot].current;
     if (!current || !next) return;
     transitioning.current = true;
+
+    const nextCursor = cursorRef.current + 1;
+    if (nextCursor >= deckRef.current.length) {
+      deckRef.current = shuffleDeck(deckRef.current[cursorRef.current]);
+      cursorRef.current = 0;
+    }
+    const nextClip = deckRef.current[nextCursor >= deckRef.current.length ? 0 : nextCursor];
+    // Ensure the standby player is explicitly loaded with the next unique clip.
+    if (clipsRef.current[nextSlot] !== nextClip) {
+      setClips(prev => nextSlot === 0 ? [nextClip, prev[1]] : [prev[0], nextClip]);
+    }
+    await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
     const ready = await waitUntilReady(next);
     if (!ready) {
       transitioning.current = false;
@@ -141,24 +155,31 @@ function CinematicHeroBackground() {
       setVideoUnavailable(true);
       return;
     }
-    // Give the browser a short moment to present the incoming frame before revealing it.
     await new Promise<void>(resolve => window.setTimeout(resolve, 120));
     setCrossfading(true);
     transitionTimer.current = window.setTimeout(() => {
-      const newIndex = clipsRef.current[nextSlot];
+      cursorRef.current = nextCursor >= deckRef.current.length ? 0 : nextCursor;
       setActiveSlot(nextSlot);
       setCrossfading(false);
-      setClips(([a, b]) => {
-        const fresh = chooseNext(newIndex);
-        return nextSlot === 0 ? [fresh, b] : [a, fresh];
-      });
+      // The old player becomes standby and receives the next sequence item.
+      const followingCursor = cursorRef.current + 1;
+      let followingClip: number;
+      if (followingCursor >= deckRef.current.length) {
+        const freshDeck = shuffleDeck(deckRef.current[cursorRef.current]);
+        deckRef.current = freshDeck;
+        cursorRef.current = 0;
+        followingClip = freshDeck[1];
+      } else {
+        followingClip = deckRef.current[followingCursor];
+      }
+      setClips(prev => nextSlot === 0 ? [prev[0], followingClip] : [followingClip, prev[1]]);
       transitioning.current = false;
     }, 1550);
   };
 
   const onTimeUpdate = () => {
     const current = refs[activeSlotRef.current].current;
-    if (current && current.duration && current.currentTime >= current.duration - 1.65) void startCrossfade();
+    if (current && current.duration && current.currentTime >= current.duration - 1.7) void startCrossfade();
   };
   const onEnded = () => { if (!transitioning.current) void startCrossfade(); };
 
