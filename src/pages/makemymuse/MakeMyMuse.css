@@ -96,6 +96,7 @@
 .mmm-cinematic-fallback{filter:brightness(.62) saturate(.82);transform:scale(1.02)}
 .mmm-cinematic-video-element{opacity:0;transition:opacity 1.05s ease-in-out;filter:saturate(.84) contrast(1.02)}
 .mmm-cinematic-video-element.is-active{opacity:1}
+.mmm-cinematic-video-element.is-incoming{opacity:1}
 .mmm-cinematic-video-a,.mmm-cinematic-video-b{will-change:opacity}
 .mmm-cinematic-video-element.is-fading{opacity:0}
 .mmm-cinematic-overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(24,22,19,.76) 0%,rgba(24,22,19,.58) 31%,rgba(24,22,19,.22) 60%,rgba(24,22,19,.06) 100%),linear-gradient(0deg,rgba(24,22,19,.42) 0%,transparent 28%,transparent 76%,rgba(24,22,19,.16) 100%)}
