@@ -53,35 +53,32 @@ const cinematicScenes = [
 ];
 function CinematicHeroBackground() {
   const [clipIndex, setClipIndex] = useState(() => Math.floor(Math.random() * cinematicScenes.length));
-  const [fade, setFade] = useState(false);
   const [videoUnavailable, setVideoUnavailable] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const timerRef = useRef<number | null>(null);
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
     setReducedMotion(media.matches);
     const onChange = (event: MediaQueryListEvent) => setReducedMotion(event.matches);
     media.addEventListener("change", onChange);
-    return () => { media.removeEventListener("change", onChange); if (timerRef.current) window.clearTimeout(timerRef.current); };
+    return () => media.removeEventListener("change", onChange);
   }, []);
   const nextScene = () => {
     const next = Math.floor(Math.random() * (cinematicScenes.length - 1));
     return next >= clipIndex ? next + 1 : next;
   };
   const handleEnded = () => {
-    setFade(true);
-    const next = nextScene();
-    timerRef.current = window.setTimeout(() => { setClipIndex(next); setFade(false); }, 320);
+    // Switch immediately at the end of a clip. Do not fade to transparency:
+    // the old static portrait fallback caused a visible flash between videos.
+    setClipIndex(nextScene());
   };
   useEffect(() => {
     if (!videoRef.current || reducedMotion || videoUnavailable) return;
-    const video = videoRef.current;
-    video.play().catch(() => setVideoUnavailable(true));
+    videoRef.current.play().catch(() => setVideoUnavailable(true));
   }, [clipIndex, reducedMotion, videoUnavailable]);
   return <div className="mmm-cinematic-video" aria-hidden="true">
-    <img className="mmm-cinematic-fallback" src={sampleFemale[0]} alt="" />
-    {!reducedMotion && !videoUnavailable && <video ref={videoRef} key={clipIndex} className={"mmm-cinematic-video-element" + (fade ? " is-fading" : "")} src={cinematicScenes[clipIndex]} muted playsInline autoPlay preload="metadata" onEnded={handleEnded} onError={() => setVideoUnavailable(true)} />}
+    {videoUnavailable && <img className="mmm-cinematic-fallback" src={sampleFemale[0]} alt="" />}
+    {!reducedMotion && !videoUnavailable && <video ref={videoRef} key={clipIndex} className="mmm-cinematic-video-element" src={cinematicScenes[clipIndex]} muted playsInline autoPlay preload="metadata" onEnded={handleEnded} onError={() => setVideoUnavailable(true)} />}
     <div className="mmm-cinematic-overlay" />
   </div>;
 }
