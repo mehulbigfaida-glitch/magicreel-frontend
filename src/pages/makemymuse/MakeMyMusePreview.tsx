@@ -52,33 +52,64 @@ const cinematicScenes = [
   "https://res.cloudinary.com/duaqfspwa/video/upload/v1795781660/Home_scene8_odjaxs.mp4"
 ];
 function CinematicHeroBackground() {
-  const [clipIndex, setClipIndex] = useState(() => Math.floor(Math.random() * cinematicScenes.length));
+  const [clips, setClips] = useState<[number, number]>(() => {
+    const first = Math.floor(Math.random() * cinematicScenes.length);
+    let second = Math.floor(Math.random() * (cinematicScenes.length - 1));
+    if (second >= first) second++;
+    return [first, second];
+  });
+  const [activeSlot, setActiveSlot] = useState<0 | 1>(0);
+  const [crossfading, setCrossfading] = useState(false);
   const [videoUnavailable, setVideoUnavailable] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const refs = [useRef<HTMLVideoElement | null>(null), useRef<HTMLVideoElement | null>(null)] as const;
+  const transitionTimer = useRef<number | null>(null);
+  const didTransition = useRef(false);
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
     setReducedMotion(media.matches);
     const onChange = (event: MediaQueryListEvent) => setReducedMotion(event.matches);
     media.addEventListener("change", onChange);
-    return () => media.removeEventListener("change", onChange);
+    return () => { media.removeEventListener("change", onChange); if (transitionTimer.current) clearTimeout(transitionTimer.current); };
   }, []);
-  const nextScene = () => {
-    const next = Math.floor(Math.random() * (cinematicScenes.length - 1));
-    return next >= clipIndex ? next + 1 : next;
+  const chooseNext = (current: number) => {
+    let next = Math.floor(Math.random() * (cinematicScenes.length - 1));
+    if (next >= current) next++;
+    return next;
   };
-  const handleEnded = () => {
-    // Switch immediately at the end of a clip. Do not fade to transparency:
-    // the old static portrait fallback caused a visible flash between videos.
-    setClipIndex(nextScene());
+  const inactiveSlot = (activeSlot === 0 ? 1 : 0) as 0 | 1;
+  const activeVideo = refs[activeSlot].current;
+  const nextVideo = refs[inactiveSlot].current;
+  const startCrossfade = async () => {
+    if (didTransition.current || !nextVideo || nextVideo.readyState < 2) return;
+    didTransition.current = true;
+    try { await nextVideo.play(); } catch { setVideoUnavailable(true); return; }
+    setCrossfading(true);
+    transitionTimer.current = window.setTimeout(() => {
+      setActiveSlot(inactiveSlot);
+      setCrossfading(false);
+      didTransition.current = false;
+      const currentIndex = clips[inactiveSlot];
+      setClips(([a,b]) => {
+        const next = chooseNext(currentIndex);
+        return inactiveSlot === 0 ? [next,b] : [a,next];
+      });
+    }, 1100);
   };
+  const onTimeUpdate = () => {
+    const v = refs[activeSlot].current;
+    if (v && v.duration && v.currentTime >= v.duration - 1.15) startCrossfade();
+  };
+  const onEnded = () => { if (!didTransition.current) startCrossfade(); };
   useEffect(() => {
-    if (!videoRef.current || reducedMotion || videoUnavailable) return;
-    videoRef.current.play().catch(() => setVideoUnavailable(true));
-  }, [clipIndex, reducedMotion, videoUnavailable]);
+    refs[0].current?.play().catch(() => setVideoUnavailable(true));
+  }, []);
   return <div className="mmm-cinematic-video" aria-hidden="true">
     {videoUnavailable && <img className="mmm-cinematic-fallback" src={sampleFemale[0]} alt="" />}
-    {!reducedMotion && !videoUnavailable && <video ref={videoRef} key={clipIndex} className="mmm-cinematic-video-element" src={cinematicScenes[clipIndex]} muted playsInline autoPlay preload="metadata" onEnded={handleEnded} onError={() => setVideoUnavailable(true)} />}
+    {!reducedMotion && !videoUnavailable && <>
+      <video ref={refs[0]} className={"mmm-cinematic-video-element mmm-cinematic-video-a"+(activeSlot===0&&!crossfading?" is-active":"")+(activeSlot===1&&crossfading?" is-active":"")} src={cinematicScenes[clips[0]]} muted playsInline autoPlay preload="auto" onTimeUpdate={activeSlot===0?onTimeUpdate:undefined} onEnded={activeSlot===0?onEnded:undefined} onError={() => setVideoUnavailable(true)} />
+      <video ref={refs[1]} className={"mmm-cinematic-video-element mmm-cinematic-video-b"+(activeSlot===1&&!crossfading?" is-active":"")+(activeSlot===0&&crossfading?" is-active":"")} src={cinematicScenes[clips[1]]} muted playsInline preload="auto" onTimeUpdate={activeSlot===1?onTimeUpdate:undefined} onEnded={activeSlot===1?onEnded:undefined} onError={() => setVideoUnavailable(true)} />
+    </>}
     <div className="mmm-cinematic-overlay" />
   </div>;
 }
