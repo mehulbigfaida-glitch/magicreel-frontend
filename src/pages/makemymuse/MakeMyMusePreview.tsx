@@ -64,13 +64,13 @@ function CinematicHeroBackground() {
   const [reducedMotion, setReducedMotion] = useState(false);
   const refs = [useRef<HTMLVideoElement | null>(null), useRef<HTMLVideoElement | null>(null)] as const;
   const transitionTimer = useRef<number | null>(null);
-  const didTransition = useRef(false);
+  const transitioning = useRef(false);
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
     setReducedMotion(media.matches);
     const onChange = (event: MediaQueryListEvent) => setReducedMotion(event.matches);
     media.addEventListener("change", onChange);
-    return () => { media.removeEventListener("change", onChange); if (transitionTimer.current) clearTimeout(transitionTimer.current); };
+    return () => { media.removeEventListener("change", onChange); if (transitionTimer.current) window.clearTimeout(transitionTimer.current); };
   }, []);
   const chooseNext = (current: number) => {
     let next = Math.floor(Math.random() * (cinematicScenes.length - 1));
@@ -78,37 +78,43 @@ function CinematicHeroBackground() {
     return next;
   };
   const inactiveSlot = (activeSlot === 0 ? 1 : 0) as 0 | 1;
-  const activeVideo = refs[activeSlot].current;
-  const nextVideo = refs[inactiveSlot].current;
+  // Keep the active clip playing and make sure the standby clip is loaded.
+  useEffect(() => {
+    const active = refs[activeSlot].current;
+    const standby = refs[inactiveSlot].current;
+    if (active && !reducedMotion && !videoUnavailable) active.play().catch(() => setVideoUnavailable(true));
+    if (standby) { standby.pause(); standby.load(); }
+  }, [activeSlot, clips, reducedMotion, videoUnavailable]);
   const startCrossfade = async () => {
-    if (didTransition.current || !nextVideo || nextVideo.readyState < 2) return;
-    didTransition.current = true;
-    try { await nextVideo.play(); } catch { setVideoUnavailable(true); return; }
+    if (transitioning.current) return;
+    const current = refs[activeSlot].current;
+    const next = refs[inactiveSlot].current;
+    if (!current || !next || next.readyState < 2) return;
+    transitioning.current = true;
+    try { await next.play(); } catch { transitioning.current = false; setVideoUnavailable(true); return; }
     setCrossfading(true);
     transitionTimer.current = window.setTimeout(() => {
-      setActiveSlot(inactiveSlot);
+      const newSlot = inactiveSlot;
+      const currentIndex = clips[newSlot];
+      setActiveSlot(newSlot);
       setCrossfading(false);
-      didTransition.current = false;
-      const currentIndex = clips[inactiveSlot];
       setClips(([a,b]) => {
-        const next = chooseNext(currentIndex);
-        return inactiveSlot === 0 ? [next,b] : [a,next];
+        const fresh = chooseNext(currentIndex);
+        return newSlot === 0 ? [fresh,b] : [a,fresh];
       });
-    }, 1100);
+      transitioning.current = false;
+    }, 1050);
   };
   const onTimeUpdate = () => {
-    const v = refs[activeSlot].current;
-    if (v && v.duration && v.currentTime >= v.duration - 1.15) startCrossfade();
+    const current = refs[activeSlot].current;
+    if (current && current.duration && current.currentTime >= current.duration - 1.1) startCrossfade();
   };
-  const onEnded = () => { if (!didTransition.current) startCrossfade(); };
-  useEffect(() => {
-    refs[0].current?.play().catch(() => setVideoUnavailable(true));
-  }, []);
+  const onEnded = () => { if (!transitioning.current) startCrossfade(); };
   return <div className="mmm-cinematic-video" aria-hidden="true">
     {videoUnavailable && <img className="mmm-cinematic-fallback" src={sampleFemale[0]} alt="" />}
     {!reducedMotion && !videoUnavailable && <>
-      <video ref={refs[0]} className={"mmm-cinematic-video-element mmm-cinematic-video-a"+(activeSlot===0&&!crossfading?" is-active":"")+(activeSlot===1&&crossfading?" is-active":"")} src={cinematicScenes[clips[0]]} muted playsInline autoPlay preload="auto" onTimeUpdate={activeSlot===0?onTimeUpdate:undefined} onEnded={activeSlot===0?onEnded:undefined} onError={() => setVideoUnavailable(true)} />
-      <video ref={refs[1]} className={"mmm-cinematic-video-element mmm-cinematic-video-b"+(activeSlot===1&&!crossfading?" is-active":"")+(activeSlot===0&&crossfading?" is-active":"")} src={cinematicScenes[clips[1]]} muted playsInline preload="auto" onTimeUpdate={activeSlot===1?onTimeUpdate:undefined} onEnded={activeSlot===1?onEnded:undefined} onError={() => setVideoUnavailable(true)} />
+      <video ref={refs[0]} className={"mmm-cinematic-video-element mmm-cinematic-video-a"+(activeSlot===0?" is-active":"")+(activeSlot===1&&crossfading?" is-incoming":"")} src={cinematicScenes[clips[0]]} muted playsInline autoPlay preload="auto" onTimeUpdate={activeSlot===0?onTimeUpdate:undefined} onEnded={activeSlot===0?onEnded:undefined} onError={() => setVideoUnavailable(true)} />
+      <video ref={refs[1]} className={"mmm-cinematic-video-element mmm-cinematic-video-b"+(activeSlot===1?" is-active":"")+(activeSlot===0&&crossfading?" is-incoming":"")} src={cinematicScenes[clips[1]]} muted playsInline preload="auto" onTimeUpdate={activeSlot===1?onTimeUpdate:undefined} onEnded={activeSlot===1?onEnded:undefined} onError={() => setVideoUnavailable(true)} />
     </>}
     <div className="mmm-cinematic-overlay" />
   </div>;
