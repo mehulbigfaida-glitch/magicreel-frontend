@@ -41,7 +41,16 @@ const bodies = [
 ];
 
 
-const cinematicScenes = Array.from({ length: 8 }, (_, i) => `/makemymuse/cinematic/Home_scene${i + 1}.mp4`);
+const cinematicScenes = [
+  "https://res.cloudinary.com/duaqfspwa/video/upload/v1795781665/Home_scene1_e2aqcw.mp4",
+  "https://res.cloudinary.com/duaqfspwa/video/upload/v1795781656/Home_scene2_lhfzam.mp4",
+  "https://res.cloudinary.com/duaqfspwa/video/upload/v1795781660/Home_scene3_yqrrxu.mp4",
+  "https://res.cloudinary.com/duaqfspwa/video/upload/v1795781660/Home_scene4_u737dp.mp4",
+  "https://res.cloudinary.com/duaqfspwa/video/upload/v1795781655/Home_scene5_knot9s.mp4",
+  "https://res.cloudinary.com/duaqfspwa/video/upload/v1795781657/Home_scene6_ftopzl.mp4",
+  "https://res.cloudinary.com/duaqfspwa/video/upload/v1795781658/Home_scene7_dgfbey.mp4",
+  "https://res.cloudinary.com/duaqfspwa/video/upload/v1795781660/Home_scene8_odjaxs.mp4"
+];
 function CinematicHeroBackground() {
   const [clipIndex, setClipIndex] = useState(() => Math.floor(Math.random() * cinematicScenes.length));
   const [fade, setFade] = useState(false);
