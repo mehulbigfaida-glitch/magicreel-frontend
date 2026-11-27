@@ -65,56 +65,108 @@ function CinematicHeroBackground() {
   const refs = [useRef<HTMLVideoElement | null>(null), useRef<HTMLVideoElement | null>(null)] as const;
   const transitionTimer = useRef<number | null>(null);
   const transitioning = useRef(false);
+  const activeSlotRef = useRef<0 | 1>(0);
+  const clipsRef = useRef<[number, number]>(clips);
+  clipsRef.current = clips;
+  activeSlotRef.current = activeSlot;
+
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
     setReducedMotion(media.matches);
     const onChange = (event: MediaQueryListEvent) => setReducedMotion(event.matches);
     media.addEventListener("change", onChange);
-    return () => { media.removeEventListener("change", onChange); if (transitionTimer.current) window.clearTimeout(transitionTimer.current); };
+    return () => {
+      media.removeEventListener("change", onChange);
+      if (transitionTimer.current) window.clearTimeout(transitionTimer.current);
+    };
   }, []);
+
   const chooseNext = (current: number) => {
     let next = Math.floor(Math.random() * (cinematicScenes.length - 1));
     if (next >= current) next++;
     return next;
   };
   const inactiveSlot = (activeSlot === 0 ? 1 : 0) as 0 | 1;
-  // Keep the active clip playing and make sure the standby clip is loaded.
+
+  // Load the hidden video in advance; never reveal it until it has a decoded frame.
   useEffect(() => {
     const active = refs[activeSlot].current;
     const standby = refs[inactiveSlot].current;
     if (active && !reducedMotion && !videoUnavailable) active.play().catch(() => setVideoUnavailable(true));
-    if (standby) { standby.pause(); standby.load(); }
+    if (standby) {
+      standby.pause();
+      try { standby.currentTime = 0; } catch {}
+      standby.load();
+    }
   }, [activeSlot, clips, reducedMotion, videoUnavailable]);
+
+  const waitUntilReady = (video: HTMLVideoElement, timeoutMs = 4500) => new Promise<boolean>((resolve) => {
+    if (video.readyState >= 2) { resolve(true); return; }
+    let settled = false;
+    const finish = (ok: boolean) => {
+      if (settled) return;
+      settled = true;
+      window.clearTimeout(timer);
+      video.removeEventListener("loadeddata", onReady);
+      video.removeEventListener("canplay", onReady);
+      video.removeEventListener("error", onError);
+      resolve(ok);
+    };
+    const onReady = () => finish(video.readyState >= 2);
+    const onError = () => finish(false);
+    const timer = window.setTimeout(() => finish(video.readyState >= 2), timeoutMs);
+    video.addEventListener("loadeddata", onReady, { once: true });
+    video.addEventListener("canplay", onReady, { once: true });
+    video.addEventListener("error", onError, { once: true });
+  });
+
   const startCrossfade = async () => {
     if (transitioning.current) return;
-    const current = refs[activeSlot].current;
-    const next = refs[inactiveSlot].current;
-    if (!current || !next || next.readyState < 2) return;
+    const currentSlot = activeSlotRef.current;
+    const nextSlot = (currentSlot === 0 ? 1 : 0) as 0 | 1;
+    const current = refs[currentSlot].current;
+    const next = refs[nextSlot].current;
+    if (!current || !next) return;
     transitioning.current = true;
-    try { await next.play(); } catch { transitioning.current = false; setVideoUnavailable(true); return; }
+    const ready = await waitUntilReady(next);
+    if (!ready) {
+      transitioning.current = false;
+      return;
+    }
+    try {
+      next.currentTime = 0;
+      await next.play();
+    } catch {
+      transitioning.current = false;
+      setVideoUnavailable(true);
+      return;
+    }
+    // Give the browser a short moment to present the incoming frame before revealing it.
+    await new Promise<void>(resolve => window.setTimeout(resolve, 120));
     setCrossfading(true);
     transitionTimer.current = window.setTimeout(() => {
-      const newSlot = inactiveSlot;
-      const currentIndex = clips[newSlot];
-      setActiveSlot(newSlot);
+      const newIndex = clipsRef.current[nextSlot];
+      setActiveSlot(nextSlot);
       setCrossfading(false);
-      setClips(([a,b]) => {
-        const fresh = chooseNext(currentIndex);
-        return newSlot === 0 ? [fresh,b] : [a,fresh];
+      setClips(([a, b]) => {
+        const fresh = chooseNext(newIndex);
+        return nextSlot === 0 ? [fresh, b] : [a, fresh];
       });
       transitioning.current = false;
-    }, 1050);
+    }, 1550);
   };
+
   const onTimeUpdate = () => {
-    const current = refs[activeSlot].current;
-    if (current && current.duration && current.currentTime >= current.duration - 1.1) startCrossfade();
+    const current = refs[activeSlotRef.current].current;
+    if (current && current.duration && current.currentTime >= current.duration - 1.65) void startCrossfade();
   };
-  const onEnded = () => { if (!transitioning.current) startCrossfade(); };
+  const onEnded = () => { if (!transitioning.current) void startCrossfade(); };
+
   return <div className="mmm-cinematic-video" aria-hidden="true">
     {videoUnavailable && <img className="mmm-cinematic-fallback" src={sampleFemale[0]} alt="" />}
     {!reducedMotion && !videoUnavailable && <>
-      <video ref={refs[0]} className={"mmm-cinematic-video-element mmm-cinematic-video-a"+(activeSlot===0?" is-active":"")+(activeSlot===1&&crossfading?" is-incoming":"")} src={cinematicScenes[clips[0]]} muted playsInline autoPlay preload="auto" onTimeUpdate={activeSlot===0?onTimeUpdate:undefined} onEnded={activeSlot===0?onEnded:undefined} onError={() => setVideoUnavailable(true)} />
-      <video ref={refs[1]} className={"mmm-cinematic-video-element mmm-cinematic-video-b"+(activeSlot===1?" is-active":"")+(activeSlot===0&&crossfading?" is-incoming":"")} src={cinematicScenes[clips[1]]} muted playsInline preload="auto" onTimeUpdate={activeSlot===1?onTimeUpdate:undefined} onEnded={activeSlot===1?onEnded:undefined} onError={() => setVideoUnavailable(true)} />
+      <video ref={refs[0]} className={"mmm-cinematic-video-element mmm-cinematic-video-a" + (activeSlot===0?" is-active":"") + (activeSlot===0&&crossfading?" is-fading":"") + (activeSlot===1&&crossfading?" is-incoming":"")} src={cinematicScenes[clips[0]]} muted playsInline autoPlay preload="auto" onTimeUpdate={activeSlot===0?onTimeUpdate:undefined} onEnded={activeSlot===0?onEnded:undefined} onError={() => setVideoUnavailable(true)} />
+      <video ref={refs[1]} className={"mmm-cinematic-video-element mmm-cinematic-video-b" + (activeSlot===1?" is-active":"") + (activeSlot===1&&crossfading?" is-fading":"") + (activeSlot===0&&crossfading?" is-incoming":"")} src={cinematicScenes[clips[1]]} muted playsInline autoPlay preload="auto" onTimeUpdate={activeSlot===1?onTimeUpdate:undefined} onEnded={activeSlot===1?onEnded:undefined} onError={() => setVideoUnavailable(true)} />
     </>}
     <div className="mmm-cinematic-overlay" />
   </div>;
