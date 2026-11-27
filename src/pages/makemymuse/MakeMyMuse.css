@@ -94,7 +94,9 @@
 .mmm-cinematic-video{position:absolute;inset:0;z-index:-2;overflow:hidden;background:#29251f}
 .mmm-cinematic-fallback,.mmm-cinematic-video-element{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 48%}
 .mmm-cinematic-fallback{filter:brightness(.62) saturate(.82);transform:scale(1.02)}
-.mmm-cinematic-video-element{opacity:1;transition:opacity .42s ease;filter:saturate(.84) contrast(1.02)}
+.mmm-cinematic-video-element{opacity:0;transition:opacity 1.05s ease-in-out;filter:saturate(.84) contrast(1.02)}
+.mmm-cinematic-video-element.is-active{opacity:1}
+.mmm-cinematic-video-a,.mmm-cinematic-video-b{will-change:opacity}
 .mmm-cinematic-video-element.is-fading{opacity:0}
 .mmm-cinematic-overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(24,22,19,.76) 0%,rgba(24,22,19,.58) 31%,rgba(24,22,19,.22) 60%,rgba(24,22,19,.06) 100%),linear-gradient(0deg,rgba(24,22,19,.42) 0%,transparent 28%,transparent 76%,rgba(24,22,19,.16) 100%)}
 .mmm-cinematic-copy{position:relative;z-index:1;width:min(720px,58vw);max-width:none;padding:clamp(32px,6vw,90px) clamp(24px,7vw,100px);display:flex;flex-direction:column;justify-content:center;min-height:inherit}
